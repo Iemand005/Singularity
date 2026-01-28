@@ -26,6 +26,8 @@ if(MSVC)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDebug" CACHE STRING "" FORCE)
 endif()
 
+set(AIONE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/AIOne")
+
 get_filename_component(THIRD_PARTY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/AIOne/external" ABSOLUTE)
 set(LLAMA_CPP_DIR "${THIRD_PARTY_DIR}/llama.cpp")
 set(STABLE_DIFFUSION_CPP_DIR "${THIRD_PARTY_DIR}/stable-diffusion.cpp")
@@ -136,7 +138,6 @@ qt_add_qml_module(AIOne
         Main.qml
         SOURCES UIHandler.h UIHandler.cpp
         QML_FILES AIOButton.ui.qml
-        SOURCES ../src/LLModel.hpp ../src/LLModel2.hpp ../src/Model.hpp ../src/ModelFactory.hpp ../src/ModelOptions.hpp ../src/PreferredDevice.hpp ../src/SDModel.hpp ../src/TextContext.hpp ../src/TextContextOptions.hpp ../src/TextGenerationOptions.hpp
 )
 
 if(AIONE_VULKAN)
