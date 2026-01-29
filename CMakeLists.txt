@@ -37,6 +37,12 @@ unset(LLAMA_VULKAN CACHE)
 unset(GGML_VULKAN CACHE)
 
 if(AIONE_VULKAN)
+    set(shader_cache_dir "${CMAKE_BINARY_DIR}/llama.cpp_build/ggml/src/ggml-vulkan/shaders")
+    if(EXISTS "${shader_cache_dir}")
+        file(REMOVE_RECURSE "${shader_cache_dir}")
+        message(STATUS "Cleared Vulkan shader cache")
+    endif()
+
     set(VULKAN_SDK_PATH "C:/VulkanSDK/1.4.335.0")
     set(CMAKE_PREFIX_PATH "${VULKAN_SDK_PATH};${CMAKE_PREFIX_PATH}" )
     set(Vulkan_INCLUDE_DIR "${VULKAN_SDK_PATH}/Include" CACHE PATH "Vulkan include dir" FORCE)
@@ -47,6 +53,9 @@ if(AIONE_VULKAN)
     set(SD_VULKAN ON CACHE BOOL "Enable Vulkan for stable-diffusion.cpp" FORCE)
     # set(SD_VK_DEVICE ON CACHE BOOL "" FORCE)
     message(STATUS "Vulkan support: ENABLED")
+
+    # set(GGML_VULKAN_SHADER_SOURCE ON CACHE BOOL "Compile Vulkan shaders from source" FORCE)
+    # set(GGML_VULKAN_SHADER_BINARY OFF CACHE BOOL "Use precompiled shader binaries" FORCE)
 else()
     set(LLAMA_VULKAN OFF CACHE BOOL "" FORCE)
     set(GGML_VULKAN OFF CACHE BOOL "" FORCE)
@@ -162,3 +171,18 @@ set_target_properties(AIOne PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
     DEBUG_POSTFIX "d"
 )
+
+if(MSVC)
+    set_target_properties(llama PROPERTIES
+        COMPILE_PDB_NAME "llama"
+        COMPILE_PDB_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/pdb"
+    )
+
+    set_target_properties(stable-diffusion PROPERTIES
+        COMPILE_PDB_NAME "stable-diffusion"
+        COMPILE_PDB_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/pdb"
+    )
+
+    # Create PDB directory
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/pdb")
+endif()
