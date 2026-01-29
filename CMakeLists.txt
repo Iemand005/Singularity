@@ -138,6 +138,7 @@ qt_add_qml_module(AIOne
         Main.qml
         SOURCES UIHandler.h UIHandler.cpp
         QML_FILES AIOButton.ui.qml
+        SOURCES AIOne/src/ContextInvalidError.hpp AIOne/src/LLModel.hpp AIOne/src/Model.hpp AIOne/src/ModelFactory.hpp AIOne/src/PreferredDevice.hpp AIOne/src/SDModel.hpp AIOne/src/TextContext.hpp AIOne/src/TextContextOptions.hpp AIOne/src/TextGenerationOptions.hpp AIOne/src/TextModelOptions.hpp
 )
 
 if(AIONE_VULKAN)
