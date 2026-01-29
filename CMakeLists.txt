@@ -37,12 +37,6 @@ unset(LLAMA_VULKAN CACHE)
 unset(GGML_VULKAN CACHE)
 
 if(AIONE_VULKAN)
-    set(shader_cache_dir "${CMAKE_BINARY_DIR}/llama.cpp_build/ggml/src/ggml-vulkan/shaders")
-    if(EXISTS "${shader_cache_dir}")
-        file(REMOVE_RECURSE "${shader_cache_dir}")
-        message(STATUS "Cleared Vulkan shader cache")
-    endif()
-
     set(VULKAN_SDK_PATH "C:/VulkanSDK/1.4.335.0")
     set(CMAKE_PREFIX_PATH "${VULKAN_SDK_PATH};${CMAKE_PREFIX_PATH}" )
     set(Vulkan_INCLUDE_DIR "${VULKAN_SDK_PATH}/Include" CACHE PATH "Vulkan include dir" FORCE)
