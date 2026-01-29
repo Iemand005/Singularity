@@ -155,7 +155,7 @@ void UIHandler::prompt(const QString &message) {
             return;
         }
 
-        this->llm->prompt(message.toStdString(), [this](const std::string &token) {
+        this->llm->completeAny(message.toStdString(), [this](const std::string &token) {
             tokenReceived(QString(token.c_str()));
         });
 
