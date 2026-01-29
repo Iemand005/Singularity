@@ -82,26 +82,61 @@ void UIHandler::loadModel(const QString &path) {
 
     llmWorkerThread->setStackSize(256 * 1024 * 1024);
 
-    this->llm = modelFactory->loadLLM(pathStr);
+    // this->llm = modelFactory->loadLLM(pathStr);
 
-    // QObject::connect(llmWorkerThread, &QThread::started, [this, pathStr]() {
-    //     QMutexLocker locker(&llmMutex);
-    //     try {
-    //         this->llm = modelFactory->loadLLM(pathStr);
-    //         qDebug() << "LLM model loaded successfully";
-    //     } catch (const std::exception &e) {
-    //         qCritical() << "Failed to load LLM model:" << e.what();
-    //         this->llm = nullptr;
-    //     }
-    //     llmWorkerThread->quit();
-    // });
+    QObject::connect(llmWorkerThread, &QThread::started, [this, pathStr]() {
+        QMutexLocker locker(&llmMutex);
+        try {
+            this->llm = modelFactory->loadLLM(pathStr);
+            this->context = std::make_shared<TextContext>(this->llm->newContext());
+            this->llm->registerContext(context);
+
+            qDebug() << "LLM model loaded successfully";
+        } catch (const std::exception &e) {
+            qCritical() << "Failed to load LLM model:" << e.what();
+            this->llm = nullptr;
+        }
+        llmWorkerThread->quit();
+    });
     
-    // QObject::connect(llmWorkerThread, &QThread::finished, [this]() {
-    //     llmWorkerThread->deleteLater();
-    //     llmWorkerThread = nullptr;
-    // });
+    QObject::connect(llmWorkerThread, &QThread::finished, [this]() {
+        llmWorkerThread->deleteLater();
+        llmWorkerThread = nullptr;
+    });
 
-    // llmWorkerThread->start();
+    llmWorkerThread->start();
+}
+
+void UIHandler::prompt(const QString &message) {
+    qDebug() << "Generating response to:" << message;
+
+    if (workerThread && workerThread->isRunning()) {
+        qWarning() << "Already processing a prompt";
+        return;
+    }
+
+    workerThread = new QThread();
+
+    QObject::connect(workerThread, &QThread::started, [this, message]() {
+        QMutexLocker locker(&llmMutex);
+
+        if (!llm) {
+            qWarning() << "LLM model not loaded";
+            return;
+        }
+
+        this->llm->completeAny(message.toStdString(), [this](const std::string &token) {
+            tokenReceived(QString(token.c_str()));
+        });
+
+        workerThread->quit();
+    });
+    QObject::connect(workerThread, &QThread::finished, [this]() {
+        workerThread->deleteLater();
+        workerThread = nullptr;
+    });
+
+    workerThread->start();
 }
 
 void UIHandler::loadSDModel(const QString &path) {
@@ -137,37 +172,7 @@ void UIHandler::loadSDModel(const QString &path) {
     sdWorkerThread->start();
 }
 
-void UIHandler::prompt(const QString &message) {
-    qDebug() << "Generating response to:" << message;
 
-    if (workerThread && workerThread->isRunning()) {
-        qWarning() << "Already processing a prompt";
-        return;
-    }
-
-    workerThread = new QThread();
-
-    QObject::connect(workerThread, &QThread::started, [this, message]() {
-        QMutexLocker locker(&llmMutex);
-
-        if (!llm) {
-            qWarning() << "LLM model not loaded";
-            return;
-        }
-
-        this->llm->completeAny(message.toStdString(), [this](const std::string &token) {
-            tokenReceived(QString(token.c_str()));
-        });
-
-        workerThread->quit();
-    });
-    QObject::connect(workerThread, &QThread::finished, [this]() {
-        workerThread->deleteLater();
-        workerThread = nullptr;
-    });
-
-    workerThread->start();
-}
 
 void UIHandler::generateImage(const QString &prompt) {
     qDebug() << "Generating image for:" << prompt;

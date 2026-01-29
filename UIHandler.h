@@ -20,6 +20,8 @@ public:
     std::unique_ptr<LLModel> llm;
     std::unique_ptr<SDModel> sdm;
 
+    std::shared_ptr<TextContext> context;
+
 public slots:
     void handleButtonClick();
     void handleButtonClickWithParam(const QString &message);
