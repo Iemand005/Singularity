@@ -4,13 +4,36 @@
   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
-
+    // {
+    //   "name": "Debug CMake",
+    //   "type": "cppdbg",
+    //   "request": "launch",
+    //   "program": "${command:cmake.launchTargetPath}",
+    //   "args": [],
+    //   "stopAtEntry": false,
+    //   "cwd": "${workspaceFolder}",
+    //   "environment": [],
+    //   "externalConsole": false,
+    //   "MIMode": "gdb",
+    //   "setupCommands": [
+    //     {
+    //       "description": "Enable pretty-printing",
+    //       "text": "-enable-pretty-printing",
+    //       "ignoreFailures": true
+    //     }
+    //   ],
+    //   "preLaunchTask": "CMake: Build"
+    // }
     {
-      "name": "CMake: CMake Script",
-      "type": "cmake",
+      "name": "Debug CMake",
+      "type": "cppvsdbg",
       "request": "launch",
-      "cmakeDebugType": "script",
-      "scriptPath": "${workspaceFolder}/CMakeLists.txt"
+      "program": "${command:cmake.launchTargetPath}",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "console": "integratedTerminal"
     }
   ]
 }
