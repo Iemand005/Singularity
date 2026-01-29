@@ -154,6 +154,7 @@ target_link_libraries(AIOne
 
 target_include_directories(AIOne PRIVATE
     ${LLAMA_CPP_DIR}
+    ${LLAMA_CPP_DIR}/src
     ${STABLE_DIFFUSION_CPP_DIR}
 )
 
