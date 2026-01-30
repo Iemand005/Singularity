@@ -30,6 +30,10 @@ else()
     endif()
 endif()
 
+if(MSVC)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+endif()
+
 # if(MSVC)
 #     add_compile_options(/FS /bigobj /MP /W3 /wd4244 /wd4267)
 #     string(APPEND CMAKE_C_FLAGS " /FS")
