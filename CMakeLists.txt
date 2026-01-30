@@ -5,10 +5,6 @@ cmake_minimum_required(VERSION 3.16)
 project(AIOneQT VERSION 0.1 LANGUAGES CXX C)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Options
-option(AIONE_OPENCL "Enable OpenCL support via CLBlast" OFF)
-option(AIONE_VULKAN "Enable Vulkan support" OFF)
-
 # Better Qt detection - don't hardcode paths
 if(MSVC)
     set(Qt6_ROOT_DIR "/Qt/6.10.1/msvc2022_64")
