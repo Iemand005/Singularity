@@ -10,10 +10,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Options
 option(AIONE_OPENCL "Enable OpenCL support via CLBlast" OFF)
-option(AIONE_VULKAN "Enable Vulkan support" OFF) # Here's da vulkaannn
+option(AIONE_VULKAN "Enable Vulkan support" OFF)
 
-set(QT_VERSION, "6.10.1")
-
+# Better Qt detection - don't hardcode paths
 if(MSVC)
     set(Qt6_ROOT_DIR "/Qt/6.10.1/msvc2022_64")
 else()
@@ -21,7 +20,18 @@ else()
 endif()
 
 set(Qt6_DIR "${Qt6_ROOT_DIR}/lib/cmake/Qt6")
-set(CMAKE_PREFIX_PATH Qt6_ROOT_DIR ${CMAKE_PREFIX_PATH})
+
+# Add CMAKE_PREFIX_PATH for Qt (this is what find_package actually uses)
+if(MSVC)
+    if(EXISTS "C:/Qt/6.10.1/msvc2022_64/lib/cmake/Qt6")
+        list(APPEND CMAKE_PREFIX_PATH "C:/Qt/6.10.1/msvc2022_64")
+    endif()
+else()
+    # Mingw - MSYS2 paths
+    if(EXISTS "/Qt/6.10.2/mingw_64")
+        list(APPEND CMAKE_PREFIX_PATH "/Qt/6.10.2/mingw_64")
+    endif()
+endif()
 
 if(MSVC)
     add_compile_options(/FS /bigobj /MP /W3 /wd4244 /wd4267)
@@ -51,7 +61,6 @@ if(AIONE_VULKAN)
     set(LLAMA_VULKAN ON CACHE BOOL "Enable Vulkan for llama.cpp" FORCE)
     set(GGML_VULKAN ON CACHE BOOL "Enable Vulkan for ggml" FORCE)
     set(SD_VULKAN ON CACHE BOOL "Enable Vulkan for stable-diffusion.cpp" FORCE)
-    # set(SD_VK_DEVICE ON CACHE BOOL "" FORCE)
     message(STATUS "Vulkan support: ENABLED")
 
     set(GGML_VULKAN_VALIDATE OFF CACHE BOOL "" FORCE)
@@ -125,11 +134,9 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 
 add_subdirectory(${LLAMA_CPP_DIR} ${CMAKE_BINARY_DIR}/llama.cpp_build)
-
 add_subdirectory(${STABLE_DIFFUSION_CPP_DIR} ${CMAKE_BINARY_DIR}/stable-diffusion.cpp_build)
 
 if(AIONE_VULKAN)
-
     find_package(Vulkan REQUIRED)
     if(Vulkan_FOUND)
         message(STATUS "Vulkan library found: ${Vulkan_LIBRARY}")
@@ -138,8 +145,16 @@ if(AIONE_VULKAN)
     endif()
 endif()
 
-# Qt setup
-find_package(Qt6 REQUIRED COMPONENTS Quick)
+# Qt setup - Find ALL required Qt6 components
+find_package(Qt6 REQUIRED COMPONENTS 
+    Core
+    Quick
+    Qml
+    Gui
+    Widgets
+    Network
+)
+
 qt_standard_project_setup(REQUIRES 6.8)
 
 qt_add_executable(AIOne
@@ -148,12 +163,24 @@ qt_add_executable(AIOne
 
 qt_add_qml_module(AIOne
     URI AIOne
+    VERSION 1.0
     QML_FILES
         Main.qml
-        SOURCES UIHandler.h UIHandler.cpp
-        QML_FILES AIOButton.ui.qml
-        SOURCES AIOne/src/ContextInvalidError.hpp AIOne/src/LLModel.hpp AIOne/src/Model.hpp AIOne/src/ModelFactory.hpp AIOne/src/PreferredDevice.hpp AIOne/src/SDModel.hpp AIOne/src/TextContext.hpp AIOne/src/TextContextOptions.hpp AIOne/src/TextGenerationOptions.hpp AIOne/src/TextModelOptions.hpp
-        SOURCES AIOne/src/TextContext.cpp
+        AIOButton.ui.qml
+    SOURCES 
+        UIHandler.h 
+        UIHandler.cpp
+        AIOne/src/ContextInvalidError.hpp 
+        AIOne/src/LLModel.hpp 
+        AIOne/src/Model.hpp 
+        AIOne/src/ModelFactory.hpp 
+        AIOne/src/PreferredDevice.hpp 
+        AIOne/src/SDModel.hpp 
+        AIOne/src/TextContext.hpp 
+        AIOne/src/TextContextOptions.hpp 
+        AIOne/src/TextGenerationOptions.hpp 
+        AIOne/src/TextModelOptions.hpp
+        AIOne/src/TextContext.cpp
 )
 
 if(AIONE_VULKAN)
@@ -161,7 +188,13 @@ if(AIONE_VULKAN)
 endif()
 
 target_link_libraries(AIOne
-    PRIVATE Qt6::Quick
+    PRIVATE 
+        Qt6::Core
+        Qt6::Quick
+        Qt6::Qml
+        Qt6::Gui
+        Qt6::Widgets
+        Qt6::Network
     PRIVATE llama
     PRIVATE stable-diffusion
 )
