@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 
 
-project(AIOne VERSION 0.1 LANGUAGES CXX C)
+project(AIOneQT VERSION 0.1 LANGUAGES CXX C)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Options
@@ -54,6 +54,7 @@ endif()
 
 
 
+
 # Qt setup - Find ALL required Qt6 components
 find_package(Qt6 REQUIRED COMPONENTS 
     Core
@@ -66,11 +67,13 @@ find_package(Qt6 REQUIRED COMPONENTS
 
 qt_standard_project_setup(REQUIRES 6.8)
 
-qt_add_executable(AIOne
+qt_add_executable(AIOneQT 
     main.cpp
 )
 
-qt_add_qml_module(AIOne
+
+
+qt_add_qml_module(AIOneQT 
     URI AIOne
     VERSION 1.0
     QML_FILES
@@ -82,20 +85,22 @@ qt_add_qml_module(AIOne
 )
 
 # if(AIONE_VULKAN)
-#     target_link_libraries(AIOne PRIVATE Vulkan::Vulkan)
+#     target_link_libraries(AIOneQT PRIVATE Vulkan::Vulkan)
 # endif()
 set(AIONE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/AIOne")
 
 add_subdirectory("${AIONE_DIR}" ${CMAKE_BINARY_DIR}/AIOneCore_build)
 
-target_include_directories(AIOne PRIVATE
+target_include_directories(AIOneQT PRIVATE
+    ${AIONE_DIR}/src
+    ${AIONE_DIR}/external/llama.cpp/src
     ${AIONE_DIR}/external/llama.cpp/include
     ${AIONE_DIR}/external/llama.cpp/ggml/include
     ${AIONE_DIR}/external/stable-diffusion.cpp
     ${AIONE_DIR}/external/stable-diffusion.cpp/thirdparty
 )
 
-target_link_libraries(AIOne
+target_link_libraries(AIOneQT 
     PRIVATE 
         Qt6::Core
         Qt6::Quick
@@ -106,13 +111,13 @@ target_link_libraries(AIOne
     PRIVATE AIOne::Core
 )
 
-# target_include_directories(AIOne PRIVATE
+# target_include_directories(AIOneQT PRIVATE
 #     ${LLAMA_CPP_DIR}
 #     ${LLAMA_CPP_DIR}/src
 #     ${STABLE_DIFFUSION_CPP_DIR}
 # )
 
-set_target_properties(AIOne PROPERTIES
+set_target_properties(AIOneQT PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
     DEBUG_POSTFIX "d"
 )

@@ -26,6 +26,10 @@ MainWindow::MainWindow(QWidget *parent)
             tr("GGUF files (*.gguf);")
             );
         qDebug() << "and this is the file" << fileName;
+
+        std::string path = fileName.toStdString();
+        this->llm = factory->loadLLM(path);
+        this->messages = llm->createContext();
     });
 }
 

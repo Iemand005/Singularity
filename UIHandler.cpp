@@ -80,8 +80,6 @@ void UIHandler::loadModel(const QString &path) {
     std::string pathStr = path.toStdString();
     llmWorkerThread = new QThread();
 
-    llmWorkerThread->setStackSize(256 * 1024 * 1024);
-
     // this->llm = modelFactory->loadLLM(pathStr);
 
     QObject::connect(llmWorkerThread, &QThread::started, [this, pathStr]() {

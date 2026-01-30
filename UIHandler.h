@@ -6,7 +6,7 @@
 #include <QThread>
 #include <QMutex>
 
-#include "AIOne/src/ModelFactory.hpp"
+#include <ModelFactory.hpp>
 
 class UIHandler : public QObject
 {
