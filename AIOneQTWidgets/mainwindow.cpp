@@ -18,8 +18,8 @@ MainWindow::MainWindow(QWidget *parent)
 
         llm->completeAny(message.toStdString(), [this](std::string token) {
             QString response(token.c_str());
-            qDebug() << token;
-            ui->listWidget->addItem(token.c_str());
+            qDebug() << response;
+            ui->listWidget->addItem(response);
         });
     });
 
