@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QObject>
+#include <QImage>
 #include <SDModel.hpp>
 
 
@@ -36,7 +37,7 @@ public:
     QSDModel(QString &path) : SDModel(path.toStdString()) {}
 
     QImage generateImage(QString &prompt) {
-        const sd_image_t image = super()->generateImage(prompt->toStdString());
+        const sd_image_t image = super()->generateImage(prompt.toStdString());
         return convertToQImage(image);
     }
 };

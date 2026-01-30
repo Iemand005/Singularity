@@ -22,7 +22,7 @@ public:
         return std::make_unique<QLLModel>(path);
     }
 
-    QSDModelPtr loadSD(QString &path) {
+    QSDModelPtr loadSDM(QString &path) {
         return std::make_unique<QSDModel>(path);
     }
 

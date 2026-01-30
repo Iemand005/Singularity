@@ -85,7 +85,7 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <widget class="QPushButton" name="LoadSDButton">
+         <widget class="QPushButton" name="loadSDButton">
           <property name="text">
            <string>Load Model</string>
           </property>
