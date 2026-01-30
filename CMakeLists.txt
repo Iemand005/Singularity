@@ -40,7 +40,7 @@ if(MSVC)
     set(CMAKE_JOB_POOLS compile=1 link=1)
     add_definitions(-DNOMINMAX -D_CRT_SECURE_NO_WARNINGS)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDebug" CACHE STRING "" FORCE)
-    
+
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /FS" CACHE STRING "" FORCE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /FS" CACHE STRING "" FORCE)
     set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /FS" CACHE STRING "" FORCE)
@@ -86,6 +86,13 @@ qt_add_qml_module(AIOne
 if(AIONE_VULKAN)
     target_link_libraries(AIOne PRIVATE Vulkan::Vulkan)
 endif()
+
+target_include_directories(AIOne PRIVATE
+    ${AIONE_DIR}/external/llama.cpp/include
+    ${AIONE_DIR}/external/llama.cpp/ggml/include
+    ${AIONE_DIR}/external/stable-diffusion.cpp
+    ${AIONE_DIR}/external/stable-diffusion.cpp/thirdparty
+)
 
 target_link_libraries(AIOne
     PRIVATE 
