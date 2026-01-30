@@ -45,6 +45,24 @@ MainWindow::MainWindow(QWidget *parent)
         this->messages = llm->createContext();
         qDebug() << "Loaded da modeellaaa";
     });
+
+
+    connect(ui->loadLLMButton, &QPushButton::clicked, [this]() {
+        qDebug() << "I need that!";
+
+        QString fileName = QFileDialog::getOpenFileName(
+            this,                    // Parent widget
+            tr("Open GGUF file"),         // Dialog title
+            QDir::homePath(),        // Starting directory
+            tr("GGUF files (*.gguf);")
+            );
+        qDebug() << "and this is the file" << fileName;
+
+        std::string path = fileName.toStdString();
+        this->llm = factory->loadLLM(path);
+        this->messages = llm->createContext();
+        qDebug() << "Loaded da modeellaaa";
+    });
 }
 
 MainWindow::~MainWindow()

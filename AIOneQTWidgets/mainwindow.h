@@ -4,6 +4,7 @@
 #include <QMainWindow>
 
 #include <ModelFactory.hpp>
+#include "AIOneQTCore/QLLModel.hpp"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -20,9 +21,7 @@ public:
     ~MainWindow();
 
     std::unique_ptr<ModelFactory> factory = std::make_unique<ModelFactory>();
-    std::unique_ptr<LLModel> llm = nullptr;
-    std::shared_ptr<MessageContext> messages = nullptr;
-
+    std::unique_ptr<QLLModel> llm = nullptr;
 
 private:
     Ui::MainWindow *ui;
