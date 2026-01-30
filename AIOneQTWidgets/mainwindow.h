@@ -22,7 +22,8 @@ public:
     ~MainWindow();
 
     std::unique_ptr<QModelFactory> factory = std::make_unique<QModelFactory>();
-    std::unique_ptr<QLLModel> llm = nullptr;
+    QLLModelPtr llm = nullptr;
+    QSDModelPtr sdm = nullptr;
 
 private:
     Ui::MainWindow *ui;

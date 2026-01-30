@@ -7,8 +7,10 @@
 #include "QSDModel.hpp"
 
 using QLLModelPtr = std::unique_ptr<QLLModel>;
+using QSDModelPtr = std::unique_ptr<QSDModel>;
 
-class QModelFactory : public ModelFactory, public QObject {
+class QModelFactory : public QObject, public ModelFactory {
+    Q_OBJECT
 
     ModelFactory *super() {
         return this;
@@ -17,11 +19,13 @@ class QModelFactory : public ModelFactory, public QObject {
 public:
     QLLModelPtr loadLLM(QString &path) {
         initLlama();
-        return path.toStdString();
+        return std::make_unique<QLLModel>(path);
     }
 
-    QLLModelPtr loadSD(QString &path) {
-        return path.toStdString();
+    QSDModelPtr loadSD(QString &path) {
+        return std::make_unique<QSDModel>(path);
     }
 
 };
+
+using QModelFactoryPtr = std::unique_ptr<QModelFactory>;

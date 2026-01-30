@@ -3,8 +3,8 @@
 #include <LLModel.hpp>
 #include <QObject>
 
-class QLLModel : public LLModel, public QObject {
-
+class QLLModel : public QObject, public LLModel {
+    Q_OBJECT
     std::shared_ptr<MessageContext> messageContext = nullptr;
 
 public:

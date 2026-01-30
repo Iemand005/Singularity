@@ -45,21 +45,28 @@ MainWindow::MainWindow(QWidget *parent)
     });
 
 
-    connect(ui->loadLLMButton, &QPushButton::clicked, [this]() {
-        qDebug() << "I need that!";
+    connect(ui->loadSDButton, &QPushButton::clicked, [this]() {
+        qDebug() << "I need that als too!";
 
         QString fileName = QFileDialog::getOpenFileName(
             this,                    // Parent widget
-            tr("Open GGUF file"),         // Dialog title
+            tr("Open SafeTensors file"),         // Dialog title
             QDir::homePath(),        // Starting directory
-            tr("GGUF files (*.gguf);")
+            tr("SafeTensors files (*.safetensors);")
             );
         qDebug() << "and this is the file" << fileName;
 
-        std::string path = fileName.toStdString();
-        this->llm = factory->loadLLM(path);
-        this->messages = llm->createContext();
-        qDebug() << "Loaded da modeellaaa";
+        this->sdm = factory->loadSDM(fileName);
+        qDebug() << "Loaded da SD modelk";
+    });
+
+    connect(ui->generateButton, &QPushButton::clicked, [this]() {
+        qDebug() << "I need to generat ya image!";
+
+        QString keywords = ui->imageKeywordsInput->toPlainText();
+
+        sdm->generateImage(keywords);
+        qDebug() << "Loaded da SD modelk";
     });
 }
 
