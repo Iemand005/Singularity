@@ -44,76 +44,6 @@ endif()
 
 set(AIONE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/AIOne")
 
-get_filename_component(THIRD_PARTY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/AIOne/external" ABSOLUTE)
-set(LLAMA_CPP_DIR "${THIRD_PARTY_DIR}/llama.cpp")
-set(STABLE_DIFFUSION_CPP_DIR "${THIRD_PARTY_DIR}/stable-diffusion.cpp")
-
-unset(SD_VULKAN CACHE)
-unset(LLAMA_VULKAN CACHE)
-unset(GGML_VULKAN CACHE)
-
-if(AIONE_VULKAN)
-    set(VULKAN_SDK_PATH "C:/VulkanSDK/1.4.335.0")
-    set(CMAKE_PREFIX_PATH "${VULKAN_SDK_PATH};${CMAKE_PREFIX_PATH}" )
-    set(Vulkan_INCLUDE_DIR "${VULKAN_SDK_PATH}/Include" CACHE PATH "Vulkan include dir" FORCE)
-    set(Vulkan_LIBRARY "${VULKAN_SDK_PATH}/Lib/vulkan-1.lib" CACHE FILEPATH "Vulkan library" FORCE)
-
-    set(LLAMA_VULKAN ON CACHE BOOL "Enable Vulkan for llama.cpp" FORCE)
-    set(GGML_VULKAN ON CACHE BOOL "Enable Vulkan for ggml" FORCE)
-    set(SD_VULKAN ON CACHE BOOL "Enable Vulkan for stable-diffusion.cpp" FORCE)
-    message(STATUS "Vulkan support: ENABLED")
-
-    set(GGML_VULKAN_VALIDATE OFF CACHE BOOL "" FORCE)
-    set(GGML_VULKAN_CHECK_RESULTS OFF CACHE BOOL "" FORCE)
-
-    set(GGML_VULKAN_SHADER_SOURCE ON CACHE BOOL "Compile Vulkan shaders from source" FORCE)
-    set(GGML_VULKAN_SHADER_BINARY OFF CACHE BOOL "Use precompiled shader binaries" FORCE)
-
-    add_definitions(-DGGML_USE_VULKAN -DSD_USE_VULKAN)
-else()
-    set(LLAMA_VULKAN OFF CACHE BOOL "" FORCE)
-    set(GGML_VULKAN OFF CACHE BOOL "" FORCE)
-    set(SD_VULKAN OFF CACHE BOOL "" FORCE)
-    message(STATUS "Vulkan support: DISABLED")
-endif()
-
-if(AIONE_OPENCL)
-    set(LLAMA_CLBLAST ON CACHE BOOL "Enable CLBlast for OpenCL" FORCE)
-    set(SD_OPENCL ON CACHE BOOL "Enable Stable Diffusion OpenCL" FORCE)
-    set(GGML_OPENCL ON CACHE BOOL "Enable GGML OpenCL backend" FORCE)
-    message(STATUS "OpenCL support: ENABLED")
-endif()
-
-if(AIONE_VULKAN AND WIN32)
-    # Try multiple possible Vulkan SDK locations
-    if(DEFINED ENV{VULKAN_SDK})
-        set(VULKAN_SDK_PATH "$ENV{VULKAN_SDK}")
-        message(STATUS "Found Vulkan SDK from environment: ${VULKAN_SDK_PATH}")
-    else()
-        if(EXISTS "C:/VulkanSDK/1.4.335.0")
-            set(VULKAN_SDK_PATH "C:/VulkanSDK/1.4.335.0")
-        elseif(EXISTS "C:/VulkanSDK/1.4.250.1")
-            set(VULKAN_SDK_PATH "C:/VulkanSDK/1.4.250.1")
-        elseif(EXISTS "C:/VulkanSDK")
-            set(VULKAN_SDK_PATH "C:/VulkanSDK")
-        else()
-            message(WARNING "Vulkan SDK not found. Please install it or set VULKAN_SDK environment variable")
-        endif()
-    endif()
-
-    if(VULKAN_SDK_PATH AND EXISTS "${VULKAN_SDK_PATH}")
-        message(STATUS "Using Vulkan SDK at: ${VULKAN_SDK_PATH}")
-        set(CMAKE_PREFIX_PATH "${VULKAN_SDK_PATH};${CMAKE_PREFIX_PATH}")
-        set(Vulkan_DIR "${VULKAN_SDK_PATH}/cmake")
-    endif()
-endif()
-
-set(LLAMA_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(LLAMA_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
-set(LLAMA_METAL OFF CACHE BOOL "" FORCE)
-set(LLAMA_CUDA OFF CACHE BOOL "" FORCE)
-
 if(AIONE_VULKAN)
     set(GGML_VULKAN_VALIDATE OFF CACHE BOOL "" FORCE)
     set(GGML_VULKAN_CHECK_RESULTS OFF CACHE BOOL "" FORCE)
@@ -133,19 +63,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_definitions(QT_DECLARATIVE_DEBUG)
 endif()
 
-# add_subdirectory(${LLAMA_CPP_DIR} ${CMAKE_BINARY_DIR}/llama.cpp_build)
-# add_subdirectory(${STABLE_DIFFUSION_CPP_DIR} ${CMAKE_BINARY_DIR}/stable-diffusion.cpp_build)
-
 add_subdirectory("AIOne" ${CMAKE_BINARY_DIR}/AIOneCore_build)
-
-if(AIONE_VULKAN)
-    find_package(Vulkan REQUIRED)
-    if(Vulkan_FOUND)
-        message(STATUS "Vulkan library found: ${Vulkan_LIBRARY}")
-    else()
-        message(FATAL_ERROR "Vulkan not found! Install Vulkan SDK")
-    endif()
-endif()
 
 # Qt setup - Find ALL required Qt6 components
 find_package(Qt6 REQUIRED COMPONENTS 
@@ -172,17 +90,6 @@ qt_add_qml_module(AIOne
     SOURCES 
         UIHandler.h 
         UIHandler.cpp
-        AIOne/src/ContextInvalidError.hpp 
-        AIOne/src/LLModel.hpp 
-        AIOne/src/Model.hpp 
-        AIOne/src/ModelFactory.hpp 
-        AIOne/src/PreferredDevice.hpp 
-        AIOne/src/SDModel.hpp 
-        AIOne/src/MessageContext.hpp 
-        AIOne/src/MessageContextOptions.hpp 
-        AIOne/src/TextGenerationOptions.hpp 
-        AIOne/src/TextModelOptions.hpp
-        AIOne/src/MessageContext.cpp
 )
 
 if(AIONE_VULKAN)
@@ -197,8 +104,7 @@ target_link_libraries(AIOne
         Qt6::Gui
         Qt6::Widgets
         Qt6::Network
-    PRIVATE llama
-    PRIVATE stable-diffusion
+    PRIVATE AIOne::Core
 )
 
 target_include_directories(AIOne PRIVATE
