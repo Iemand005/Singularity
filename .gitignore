@@ -3,3 +3,5 @@ build
 build*/
 .autosave
 .cache
+*.log
+*.vs

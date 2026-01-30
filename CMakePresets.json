@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 5,
   "configurePresets": [
     {
       "name": "default",
@@ -13,6 +13,9 @@
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_C_COMPILER": "cl",
         "CMAKE_CXX_COMPILER": "cl"
+      },
+      "environment": {
+        "PATH": "C:/Qt/6.10.1/msvc2022_64/bin;$penv{PATH}"
       }
     },
     {
