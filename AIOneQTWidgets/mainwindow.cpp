@@ -65,7 +65,7 @@ MainWindow::MainWindow(QWidget *parent)
 
         QString keywords = ui->imageKeywordsInput->toPlainText();
 
-        sdm->generateImage(keywords);
+        QImage image = sdm->generateImage(keywords);
         qDebug() << "Loaded da SD modelk";
     });
 }

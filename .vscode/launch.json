@@ -20,7 +20,6 @@
       ],
       "console": "integratedTerminal",
       "symbolSearchPath": "${workspaceFolder}/build/default/bin",
-      "preLaunchTask": "Qt: Acquire Port"
     },
     {
       "name": "Qt: QML: Launch",

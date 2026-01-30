@@ -19,9 +19,8 @@ class QSDModel : public QObject, public SDModel {
                 QRgb* scanline = (QRgb*)image.scanLine(y);
                 const uint8_t* src = sd_img.data + (y * sd_img.width * 3);
 
-                for (int x = 0; x < sd_img.width; x++) {
+                for (int x = 0; x < sd_img.width; x++)
                     scanline[x] = qRgb(src[x * 3], src[x * 3 + 1], src[x * 3 + 2]);
-                }
             }
             return image;
         } else if (sd_img.channel == 4) {
