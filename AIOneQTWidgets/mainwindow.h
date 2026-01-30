@@ -5,7 +5,7 @@
 
 #include <ModelFactory.hpp>
 
-#include "AIOneQTCore/QModelFactory.hpp"
+#include "../AIOneQTCore/QModelFactory.hpp"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
