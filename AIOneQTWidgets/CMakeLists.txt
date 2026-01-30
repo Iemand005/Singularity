@@ -19,6 +19,17 @@ qt_add_translations(
     TS_FILES AIOneQTWidgets_en_US.ts
 )
 
+set(AIONE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../AIOne")
+
+add_subdirectory("${AIONE_DIR}" ${CMAKE_BINARY_DIR}/AIOneCore_build)
+
+target_include_directories(AIOneQTWidgets PRIVATE
+    ${AIONE_DIR}/external/llama.cpp/include
+    ${AIONE_DIR}/external/llama.cpp/ggml/include
+    ${AIONE_DIR}/external/stable-diffusion.cpp
+    ${AIONE_DIR}/external/stable-diffusion.cpp/thirdparty
+)
+
 target_link_libraries(AIOneQTWidgets
     PRIVATE
         Qt::Core

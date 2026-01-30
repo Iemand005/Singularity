@@ -6,7 +6,6 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    this->setWindowTitle("AIOne");
     ui->listWidget->addItem("hey");
     ui->listWidget->addItem("hey");
 }

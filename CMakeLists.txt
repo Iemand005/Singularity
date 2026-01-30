@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-if(MSVC)
-    set(CMAKE_C_FLAGS_INIT "/FS")
-    set(CMAKE_CXX_FLAGS_INIT "/FS")
-endif()
+
 
 project(AIOne VERSION 0.1 LANGUAGES CXX C)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -33,28 +30,29 @@ else()
     endif()
 endif()
 
-if(MSVC)
-    add_compile_options(/FS /bigobj /MP /W3 /wd4244 /wd4267)
-    string(APPEND CMAKE_C_FLAGS " /FS")
-    string(APPEND CMAKE_CXX_FLAGS " /FS")
-    set(CMAKE_JOB_POOLS compile=1 link=1)
-    add_definitions(-DNOMINMAX -D_CRT_SECURE_NO_WARNINGS)
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDebug" CACHE STRING "" FORCE)
+# if(MSVC)
+#     add_compile_options(/FS /bigobj /MP /W3 /wd4244 /wd4267)
+#     string(APPEND CMAKE_C_FLAGS " /FS")
+#     string(APPEND CMAKE_CXX_FLAGS " /FS")
+#     set(CMAKE_JOB_POOLS compile=1 link=1)
+#     add_definitions(-DNOMINMAX -D_CRT_SECURE_NO_WARNINGS)
+#     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDebug" CACHE STRING "" FORCE)
 
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /FS" CACHE STRING "" FORCE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /FS" CACHE STRING "" FORCE)
-    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /FS" CACHE STRING "" FORCE)
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /FS" CACHE STRING "" FORCE)
-endif()
+#     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /FS" CACHE STRING "" FORCE)
+#     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /FS" CACHE STRING "" FORCE)
+#     set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /FS" CACHE STRING "" FORCE)
+#     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /FS" CACHE STRING "" FORCE)
+# endif()
 
-set(AIONE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/AIOne")
+# /==
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_definitions(QT_QML_DEBUG)
     add_compile_definitions(QT_DECLARATIVE_DEBUG)
 endif()
 
-add_subdirectory("AIOne" ${CMAKE_BINARY_DIR}/AIOneCore_build)
+
+
 
 # Qt setup - Find ALL required Qt6 components
 find_package(Qt6 REQUIRED COMPONENTS 
@@ -83,9 +81,12 @@ qt_add_qml_module(AIOne
         UIHandler.cpp
 )
 
-if(AIONE_VULKAN)
-    target_link_libraries(AIOne PRIVATE Vulkan::Vulkan)
-endif()
+# if(AIONE_VULKAN)
+#     target_link_libraries(AIOne PRIVATE Vulkan::Vulkan)
+# endif()
+set(AIONE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/AIOne")
+
+add_subdirectory("${AIONE_DIR}" ${CMAKE_BINARY_DIR}/AIOneCore_build)
 
 target_include_directories(AIOne PRIVATE
     ${AIONE_DIR}/external/llama.cpp/include
