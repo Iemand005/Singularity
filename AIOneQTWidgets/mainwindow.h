@@ -4,7 +4,8 @@
 #include <QMainWindow>
 
 #include <ModelFactory.hpp>
-#include "AIOneQTCore/QLLModel.hpp"
+
+#include "AIOneQTCore/QModelFactory.hpp"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -20,7 +21,7 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    std::unique_ptr<ModelFactory> factory = std::make_unique<ModelFactory>();
+    std::unique_ptr<QModelFactory> factory = std::make_unique<QModelFactory>();
     std::unique_ptr<QLLModel> llm = nullptr;
 
 private:

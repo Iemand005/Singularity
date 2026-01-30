@@ -15,8 +15,13 @@ class QModelFactory : public ModelFactory, public QObject {
     }
 
 public:
-    QLLModelPtr loadModel(QString &path) {
-        return ((ModelFactory *)this)->loadModel(path.toStdString());
+    QLLModelPtr loadLLM(QString &path) {
+        initLlama();
+        return path.toStdString();
+    }
+
+    QLLModelPtr loadSD(QString &path) {
+        return path.toStdString();
     }
 
 };

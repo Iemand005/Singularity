@@ -40,9 +40,7 @@ MainWindow::MainWindow(QWidget *parent)
             );
         qDebug() << "and this is the file" << fileName;
 
-        std::string path = fileName.toStdString();
-        this->llm = factory->loadLLM(path);
-        this->messages = llm->createContext();
+        this->llm = factory->loadLLM(fileName);
         qDebug() << "Loaded da modeellaaa";
     });
 
