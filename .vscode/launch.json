@@ -8,9 +8,9 @@
       "name": "(Windows) Debug AIOne",
       "type": "cppvsdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/build/default/bin/AIOned",
+      "program": "${command:cmake.launchTargetPath}",
       "args": [],
-      "stopAtEntry": true,
+      "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
       "environment": [
         {
