@@ -19,7 +19,23 @@
         }
       ],
       "console": "integratedTerminal",
-      "symbolSearchPath": "${workspaceFolder}/build/default/bin"
+      "symbolSearchPath": "${workspaceFolder}/build/default/bin",
+      "preLaunchTask": "Qt: Acquire Port"
+    },
+    {
+      "name": "Qt: QML: Launch",
+      "type": "qml",
+      "request": "launch",
+      "program": "${command:cmake.launchTargetPath}",
+      // "en"
+    },
+    {
+      "name": "Qt: QML: Attach by port",
+      "type": "qml",
+      "request": "attach",
+      "host": "localhost",
+      
+      "port": "Custom port or ${command:qt-qml.debugPort} for compound usage"
     },
     // {
     //   "name": "Debug CMake",

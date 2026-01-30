@@ -57,7 +57,7 @@ ApplicationWindow {
                 // Material.accent: Material.LightBlue
             }
             TabButton {
-                text: "Settings"
+                text: "Settingse"
                 // Material.accent: Material.Pink
             }
         }
