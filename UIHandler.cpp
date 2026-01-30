@@ -88,7 +88,7 @@ void UIHandler::loadModel(const QString &path) {
         QMutexLocker locker(&llmMutex);
         try {
             this->llm = modelFactory->loadLLM(pathStr);
-            this->context = std::make_shared<TextContext>(this->llm->newContext());
+            this->context = std::make_shared<MessageContext>(this->llm->newContext());
             this->llm->registerContext(context);
 
             qDebug() << "LLM model loaded successfully";
