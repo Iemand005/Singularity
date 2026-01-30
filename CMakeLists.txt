@@ -133,8 +133,10 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_definitions(QT_DECLARATIVE_DEBUG)
 endif()
 
-add_subdirectory(${LLAMA_CPP_DIR} ${CMAKE_BINARY_DIR}/llama.cpp_build)
-add_subdirectory(${STABLE_DIFFUSION_CPP_DIR} ${CMAKE_BINARY_DIR}/stable-diffusion.cpp_build)
+# add_subdirectory(${LLAMA_CPP_DIR} ${CMAKE_BINARY_DIR}/llama.cpp_build)
+# add_subdirectory(${STABLE_DIFFUSION_CPP_DIR} ${CMAKE_BINARY_DIR}/stable-diffusion.cpp_build)
+
+add_subdirectory("AIOne" ${CMAKE_BINARY_DIR}/AIOneCore_build)
 
 if(AIONE_VULKAN)
     find_package(Vulkan REQUIRED)
