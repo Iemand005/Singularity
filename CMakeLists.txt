@@ -14,8 +14,14 @@ option(AIONE_VULKAN "Enable Vulkan support" OFF) # Here's da vulkaannn
 
 set(QT_VERSION, "6.10.1")
 
-set(Qt6_DIR "/Qt/6.10.1/msvc2022_64/lib/cmake/Qt6")
-set(CMAKE_PREFIX_PATH "C:/Qt/${QT_VERSION}/msvc2022_64" ${CMAKE_PREFIX_PATH})
+if(MSVC)
+    set(Qt6_ROOT_DIR "/Qt/6.10.1/msvc2022_64")
+else()
+    set(Qt6_ROOT_DIR "/Qt/6.10.2/mingw_64")
+endif()
+
+set(Qt6_DIR "${Qt6_ROOT_DIR}/lib/cmake/Qt6")
+set(CMAKE_PREFIX_PATH Qt6_ROOT_DIR ${CMAKE_PREFIX_PATH})
 
 if(MSVC)
     add_compile_options(/FS /bigobj /MP /W3 /wd4244 /wd4267)
@@ -48,8 +54,13 @@ if(AIONE_VULKAN)
     # set(SD_VK_DEVICE ON CACHE BOOL "" FORCE)
     message(STATUS "Vulkan support: ENABLED")
 
-    # set(GGML_VULKAN_SHADER_SOURCE ON CACHE BOOL "Compile Vulkan shaders from source" FORCE)
-    # set(GGML_VULKAN_SHADER_BINARY OFF CACHE BOOL "Use precompiled shader binaries" FORCE)
+    set(GGML_VULKAN_VALIDATE OFF CACHE BOOL "" FORCE)
+    set(GGML_VULKAN_CHECK_RESULTS OFF CACHE BOOL "" FORCE)
+
+    set(GGML_VULKAN_SHADER_SOURCE ON CACHE BOOL "Compile Vulkan shaders from source" FORCE)
+    set(GGML_VULKAN_SHADER_BINARY OFF CACHE BOOL "Use precompiled shader binaries" FORCE)
+
+    add_definitions(-DGGML_USE_VULKAN -DSD_USE_VULKAN)
 else()
     set(LLAMA_VULKAN OFF CACHE BOOL "" FORCE)
     set(GGML_VULKAN OFF CACHE BOOL "" FORCE)
