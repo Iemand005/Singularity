@@ -16,10 +16,16 @@ MainWindow::MainWindow(QWidget *parent)
 
         QString message = ui->messageInput->toPlainText();
 
-        llm->completeAny(message.toStdString(), [this](std::string token) {
+        ui->listWidget->addItem("Response: ");
+
+        llm->generateAsync(message.toStdString(), [this](std::string token) {
             QString response(token.c_str());
             qDebug() << response;
-            ui->listWidget->addItem(response);
+            // ui->listWidget->addItem(response);
+            QString newText = ui->listWidget->currentItem()->text() + response;
+            auto lastItemIndex = ui->listWidget->count() - 1;
+            // auto lastItem =
+                ui->listWidget->item(lastItemIndex)->setText(newText);
         });
     });
 
@@ -37,6 +43,7 @@ MainWindow::MainWindow(QWidget *parent)
         std::string path = fileName.toStdString();
         this->llm = factory->loadLLM(path);
         this->messages = llm->createContext();
+        qDebug() << "Loaded da modeellaaa";
     });
 }
 
