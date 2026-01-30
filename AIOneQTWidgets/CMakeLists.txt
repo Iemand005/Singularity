@@ -29,6 +29,7 @@ qt_add_executable(AIOneQTWidgets
     mainwindow.h
     mainwindow.ui
     README.md
+    AIOneQTCore/core.hpp AIOneQTCore/QLLModel.hpp AIOneQTCore/QSDModel.hpp
 )
 
 

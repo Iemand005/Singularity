@@ -33,7 +33,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -85,14 +85,37 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <widget class="QGraphicsView" name="graphicsView"/>
+         <widget class="QPushButton" name="LoadSDButton">
+          <property name="text">
+           <string>Load Model</string>
+          </property>
+         </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_2">
+         <widget class="QPlainTextEdit" name="imageKeywordsInput">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>5</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="generateButton">
           <property name="text">
            <string>Generate</string>
           </property>
          </widget>
+        </item>
+        <item>
+         <widget class="QGraphicsView" name="imageView"/>
         </item>
        </layout>
       </widget>
