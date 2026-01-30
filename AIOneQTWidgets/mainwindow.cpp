@@ -14,6 +14,13 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->sendButton, &QPushButton::clicked, [this]() {
         qDebug() << "I felt that!";
 
+        QString message = ui->messageInput->toPlainText();
+
+        llm->completeAny(message.toStdString(), [this](std::string token) {
+            QString response(token.c_str());
+            qDebug() << token;
+            ui->listWidget->addItem(token.c_str());
+        });
     });
 
     connect(ui->loadLLMButton, &QPushButton::clicked, [this]() {
