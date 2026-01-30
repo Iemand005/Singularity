@@ -3,5 +3,6 @@
   "cmake.buildDirectory": "${workspaceFolder}/build",
   "cmake.configureOnOpen": true,
   "cmake.buildBeforeRun": true,
-  "cmake.automaticReconfigure": true
+  "cmake.automaticReconfigure": true,
+  "qt-qml.qmlls.additionalImportPaths": ["C:\\Qt\\6.10.1\\msvc2022_64\\qml"]
 }
