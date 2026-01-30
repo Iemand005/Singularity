@@ -176,11 +176,11 @@ qt_add_qml_module(AIOne
         AIOne/src/ModelFactory.hpp 
         AIOne/src/PreferredDevice.hpp 
         AIOne/src/SDModel.hpp 
-        AIOne/src/TextContext.hpp 
-        AIOne/src/TextContextOptions.hpp 
+        AIOne/src/MessageContext.hpp 
+        AIOne/src/MessageContextOptions.hpp 
         AIOne/src/TextGenerationOptions.hpp 
         AIOne/src/TextModelOptions.hpp
-        AIOne/src/TextContext.cpp
+        AIOne/src/MessageContext.cpp
 )
 
 if(AIONE_VULKAN)
