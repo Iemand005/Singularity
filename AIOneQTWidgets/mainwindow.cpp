@@ -74,15 +74,31 @@ MainWindow::MainWindow(QWidget *parent)
         options.height = ui->heightBox->value();
         options.stepCount = ui->stepCountSlider->value();
 
-        QImage image = sdm->generateImage(positive, negative, options);
+        sdm->generateAsync(positive, negative, options, [this](QImage image) {
+            showImage(image);
+        });
 
 
-        QGraphicsScene *scene = new QGraphicsScene();
-        QGraphicsPixmapItem *item = new QGraphicsPixmapItem(QPixmap::fromImage(image));
-        scene->addItem(item);
-        ui->imageView->setScene(scene);
+
+        // QGraphicsScene *scene = new QGraphicsScene();
+        // QGraphicsPixmapItem *item = new QGraphicsPixmapItem(QPixmap::fromImage(image));
+        // scene->addItem(item);
+        // ui->imageView->setScene(scene);
         qDebug() << "Loaded da SD modelk";
     });
+
+    connect(sdm.get(), &QSDModel::previewGenerated, this, &MainWindow::onPreviewGenerated);
+}
+
+void MainWindow::showImage(QImage image) {
+    QGraphicsScene *scene = new QGraphicsScene();
+    QGraphicsPixmapItem *item = new QGraphicsPixmapItem(QPixmap::fromImage(image));
+    scene->addItem(item);
+    ui->imageView->setScene(scene);
+}
+
+void MainWindow::onPreviewGenerated(int step, const QImage& preview, bool isNoisy) {
+    showImage(preview);
 }
 
 MainWindow::~MainWindow()

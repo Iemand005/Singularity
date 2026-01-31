@@ -116,6 +116,9 @@
                 <height>5</height>
                </size>
               </property>
+              <property name="plainText">
+               <string>high quality, masterpiece,</string>
+              </property>
              </widget>
             </item>
            </layout>
@@ -130,7 +133,11 @@
              </widget>
             </item>
             <item>
-             <widget class="QPlainTextEdit" name="negativeInput"/>
+             <widget class="QPlainTextEdit" name="negativeInput">
+              <property name="plainText">
+               <string>bad, ugly, low quality</string>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
@@ -146,7 +153,14 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QSpinBox" name="widthBox"/>
+           <widget class="QSpinBox" name="widthBox">
+            <property name="maximum">
+             <number>4096</number>
+            </property>
+            <property name="value">
+             <number>512</number>
+            </property>
+           </widget>
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="heightLabel">
@@ -156,7 +170,14 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QSpinBox" name="heightBox"/>
+           <widget class="QSpinBox" name="heightBox">
+            <property name="maximum">
+             <number>4096</number>
+            </property>
+            <property name="value">
+             <number>512</number>
+            </property>
+           </widget>
           </item>
           <item row="2" column="0">
            <widget class="QLabel" name="stepCountLabel">
@@ -167,8 +188,14 @@
           </item>
           <item row="2" column="1">
            <widget class="QSlider" name="stepCountSlider">
+            <property name="value">
+             <number>20</number>
+            </property>
             <property name="orientation">
              <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="tickInterval">
+             <number>1</number>
             </property>
            </widget>
           </item>
@@ -181,6 +208,9 @@
           </item>
           <item row="3" column="1">
            <widget class="QSlider" name="cfgSlider">
+            <property name="value">
+             <number>10</number>
+            </property>
             <property name="orientation">
              <enum>Qt::Orientation::Horizontal</enum>
             </property>
@@ -195,6 +225,12 @@
           </item>
           <item row="4" column="1">
            <widget class="QSlider" name="nThreadSlider">
+            <property name="maximum">
+             <number>20</number>
+            </property>
+            <property name="value">
+             <number>10</number>
+            </property>
             <property name="orientation">
              <enum>Qt::Orientation::Horizontal</enum>
             </property>
@@ -203,7 +239,7 @@
           <item row="5" column="0">
            <widget class="QLabel" name="clipSkipLabel">
             <property name="text">
-             <string>CLiP Skip</string>
+             <string>CLIP skip</string>
             </property>
            </widget>
           </item>

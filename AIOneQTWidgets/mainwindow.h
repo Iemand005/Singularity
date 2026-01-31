@@ -25,7 +25,12 @@ public:
     QLLModelPtr llm = nullptr;
     QSDModelPtr sdm = nullptr;
 
+private slots:
+    void onPreviewGenerated(int step, const QImage& preview, bool isNoisy);
+
 private:
     Ui::MainWindow *ui;
+
+    void showImage(QImage image);
 };
 #endif // MAINWINDOW_H

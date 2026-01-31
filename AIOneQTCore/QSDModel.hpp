@@ -32,13 +32,38 @@ class QSDModel : public QObject, public SDModel {
         return QImage();
     }
 
+
+
 public:
 
-    QSDModel(QString &path) : SDModel(path.toStdString()) {}
+    QSDModel(QString &path) : SDModel(path.toStdString()) {
+        this->setPreviewCallback([this](int step, int frameCount, sd_image_t* sdImage, bool isNoisy) {
+            QImage image = this->convertToQImage(*sdImage);
+            emit this->previewGenerated(step, image, isNoisy);
+        });
+    }
 
-    QImage generateImage(QString &positive, QString &negative, SDImageOptions options = {}, bool save = true) {
+    using QImageCallback = std::function<void(QImage &image)>;
+
+    void generateAsync(QString &positive, QString &negative, SDImageOptions options = SDImageOptions{}, QImageCallback callback = nullptr) {
+        super()->generateAsync(positive.toStdString(), negative.toStdString(), options, [this, callback](sd_image_t sdImage) {
+            QImage image = convertToQImage(sdImage);
+            if (callback) callback(image);
+        });
+    }
+
+    QImage generateImage(QString &positive, QString &negative, SDImageOptions options = {}) {
         const sd_image_t image = super()->generateImage(positive.toStdString(), negative.toStdString(), options);
-        if (save) this->saveImageAsPNG(image, positive.toStdString() + "rawr.png");
+        // if (save) this->saveImageAsPNG(image, positive.toStdString() + "rawr.png");
         return convertToQImage(image);
     }
+
+    
+
+    // using QPreviewCallback = std::function<void(int step, int frame_count, sd_image_t* image, bool is_noisy)>;
+
+signals:
+    void stepProgress(int step, int totalSteps);
+    
+    void previewGenerated(int step, const QImage& preview, bool isNoisy);
 };
