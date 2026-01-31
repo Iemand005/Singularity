@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 
 #include <QFileDialog>
+#include <QGraphicsPixmapItem>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -66,6 +67,12 @@ MainWindow::MainWindow(QWidget *parent)
         QString keywords = ui->imageKeywordsInput->toPlainText();
 
         QImage image = sdm->generateImage(keywords);
+
+
+        QGraphicsScene *scene = new QGraphicsScene();
+        QGraphicsPixmapItem *item = new QGraphicsPixmapItem(QPixmap::fromImage(image));
+        scene->addItem(item);
+        ui->imageView->setScene(scene);
         qDebug() << "Loaded da SD modelk";
     });
 }
