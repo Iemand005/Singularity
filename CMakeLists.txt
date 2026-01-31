@@ -69,6 +69,7 @@ qt_standard_project_setup(REQUIRES 6.8)
 
 qt_add_executable(AIOneQT 
     main.cpp
+    AIOneQTCore/QModelFactory.hpp AIOneQTCore/QLLModel.hpp AIOneQTCore/QSDModel.hpp
 )
 
 

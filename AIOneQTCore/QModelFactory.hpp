@@ -17,12 +17,12 @@ class QModelFactory : public QObject, public ModelFactory {
     }
 
 public:
-    QLLModelPtr loadLLM(QString &path) {
+    QLLModelPtr loadLLM(const QString &path) {
         initLlama();
         return std::make_unique<QLLModel>(path);
     }
 
-    QSDModelPtr loadSDM(QString &path) {
+    QSDModelPtr loadSDM(const QString &path) {
         return std::make_unique<QSDModel>(path);
     }
 

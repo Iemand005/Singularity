@@ -9,7 +9,7 @@ class QLLModel : public QObject, public LLModel {
 
 public:
 
-    QLLModel(QString path) : LLModel(path.toStdString()) {
+    QLLModel(const QString path) : LLModel(path.toStdString()) {
         messageContext = createContext();
     }
 

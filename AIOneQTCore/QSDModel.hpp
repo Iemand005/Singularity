@@ -36,7 +36,7 @@ class QSDModel : public QObject, public SDModel {
 
 public:
 
-    QSDModel(QString &path) : SDModel(path.toStdString()) {
+    QSDModel(const QString &path) : SDModel(path.toStdString()) {
         this->setPreviewCallback([this](int step, int frameCount, sd_image_t* sdImage, bool isNoisy) {
             QImage image = this->convertToQImage(*sdImage);
             emit this->previewGenerated(step, image, isNoisy);
@@ -45,7 +45,7 @@ public:
 
     using QImageCallback = std::function<void(QImage &image)>;
 
-    void generateAsync(QString &positive, QString &negative, SDImageOptions options = SDImageOptions{}, QImageCallback callback = nullptr) {
+    void generateAsync(const QString &positive, const QString &negative, SDImageOptions options = SDImageOptions{}, QImageCallback callback = nullptr) {
         super()->generateAsync(positive.toStdString(), negative.toStdString(), options, [this, callback](sd_image_t sdImage) {
             QImage image = convertToQImage(sdImage);
             if (callback) callback(image);

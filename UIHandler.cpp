@@ -4,25 +4,24 @@
 #include <QImage>
 #include <iostream>
 
-UIHandler::UIHandler(QObject *parent)
-    : QObject{parent}
+UIHandler::UIHandler(QObject *parent) : QObject{parent}
 {
-    modelFactory = std::make_unique<ModelFactory>();
+    modelFactory = std::make_unique<QModelFactory>();
     chatMessages = std::make_unique<std::vector<Message>>();
 
     std::cout << "Llama.cpp System Info: " << modelFactory->systemInfoStr() << std::endl;
 }
 
 
-void UIHandler::handleButtonClick() {
-    qDebug() << "Button clicked from C++!";
+// void UIHandler::handleButtonClick() {
+//     qDebug() << "Button clicked from C++!";
 
-    emit responseSent("Clicked handled in C++!");
-}
+//     emit responseSent("Clicked handled in C++!");
+// }
 
-void UIHandler::handleButtonClickWithParam(const QString &message) {
-    qDebug() << "Received from QML:" << message;
-}
+// void UIHandler::handleButtonClickWithParam(const QString &message) {
+//     qDebug() << "Received from QML:" << message;
+// }
 
 void UIHandler::loadModel(const QString &path) {
     qDebug() << "Loading model at:" << path;
@@ -32,7 +31,7 @@ void UIHandler::loadModel(const QString &path) {
         return;
     }
 
-    this->llm = modelFactory->loadLLM(pathStr);
+    this->llm = modelFactory->loadLLM(path);
 }
 
 void UIHandler::prompt(const QString &message) {
@@ -57,7 +56,7 @@ void UIHandler::prompt(const QString &message) {
             return;
         }
 
-        TextGenerationStats stats = this->llm->completeAny(finalPrompt, [this](const std::string &token) {
+        TextGenerationStats stats = this->llm->completeAny(finalPrompt, [this](const std::string token) {
             tokenReceived(QString(token.c_str()));
         });
 
