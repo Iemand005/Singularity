@@ -36,8 +36,9 @@ public:
 
     QSDModel(QString &path) : SDModel(path.toStdString()) {}
 
-    QImage generateImage(QString &prompt) {
+    QImage generateImage(QString &prompt, bool save = true) {
         const sd_image_t image = super()->generateImage(prompt.toStdString());
+        if (save) this->saveImageAsPNG(image, prompt.toStdString() + "rawr.png");
         return convertToQImage(image);
     }
 };

@@ -2,6 +2,19 @@ cmake_minimum_required(VERSION 3.19)
 project(AIOneQTWidgets LANGUAGES CXX)
 
 if(MSVC)
+    add_compile_options(/FS /bigobj /MP /W3 /wd4244 /wd4267)
+    set(CMAKE_JOB_POOLS compile=1 link=1)
+    add_definitions(-DNOMINMAX -D_CRT_SECURE_NO_WARNINGS)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDebug" CACHE STRING "" FORCE)
+    
+    set(CMAKE_C_FLAGS_INIT "/FS")
+    set(CMAKE_CXX_FLAGS_INIT "/FS")
+    string(APPEND CMAKE_C_FLAGS " /FS")
+    string(APPEND CMAKE_CXX_FLAGS " /FS")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /FS" CACHE STRING "" FORCE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /FS" CACHE STRING "" FORCE)
+    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /FS" CACHE STRING "" FORCE)
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /FS" CACHE STRING "" FORCE)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 endif()
 
@@ -18,7 +31,7 @@ endif()
 
 find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets LinguistTools)
 
-
+# option(AIONE_VULKAN "Enable Vulkan support" ON)
 
 qt_standard_project_setup()
 
@@ -29,7 +42,7 @@ qt_add_executable(AIOneQTWidgets
     mainwindow.h
     mainwindow.ui
     README.md
-    AIOneQTCore/QModelFactory.hpp AIOneQTCore/QLLModel.hpp AIOneQTCore/QSDModel.hpp
+    ../AIOneQTCore/QModelFactory.hpp ../AIOneQTCore/QLLModel.hpp ../AIOneQTCore/QSDModel.hpp
 )
 
 

@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.16)
 
-
-
 project(AIOneQT VERSION 0.1 LANGUAGES CXX C)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# option(AIONE_VULKAN "Enable Vulkan support" ON)
 
 # Better Qt detection - don't hardcode paths
 if(MSVC)
