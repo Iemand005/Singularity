@@ -96,6 +96,7 @@ target_include_directories(AIOneQT PRIVATE
     ${AIONE_DIR}/external/llama.cpp/src
     ${AIONE_DIR}/external/llama.cpp/include
     ${AIONE_DIR}/external/llama.cpp/ggml/include
+    ${AIONE_DIR}/external/llama.cpp/vendor
     ${AIONE_DIR}/external/stable-diffusion.cpp
     ${AIONE_DIR}/external/stable-diffusion.cpp/thirdparty
 )
