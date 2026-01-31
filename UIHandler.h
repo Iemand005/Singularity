@@ -21,6 +21,7 @@ public:
     std::unique_ptr<SDModel> sdm;
 
     std::shared_ptr<MessageContext> context;
+    std::unique_ptr<std::vector<Message>> chatMessages;
 
 public slots:
     void handleButtonClick();

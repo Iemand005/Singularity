@@ -28,8 +28,6 @@ int main(int argc, char *argv[])
 {
     qputenv("QT_IM_MODULE", QByteArray("qtvirtualkeyboard"));
 
-    QQuickWindow::setSceneGraphBackend(QSGRendererInterface::Software);
-
     QGuiApplication app(argc, argv);
 
     QQmlApplicationEngine engine;

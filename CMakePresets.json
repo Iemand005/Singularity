@@ -19,6 +19,24 @@
       }
     },
     {
+      "name": "default-Vulkan",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_C_COMPILER": "cl",
+        "CMAKE_CXX_COMPILER": "cl",
+        "AIONE_VULKAN": true
+      },
+      "environment": {
+        "PATH": "C:/Qt/6.10.1/msvc2022_64/bin;$penv{PATH}"
+      }
+    },
+    {
       "name": "MinGW",
       "generator": "MinGW Makefiles",
       "binaryDir": "${sourceDir}/build",
