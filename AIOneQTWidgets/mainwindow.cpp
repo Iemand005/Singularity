@@ -64,9 +64,17 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->generateButton, &QPushButton::clicked, [this]() {
         qDebug() << "I need to generat ya image!";
 
-        QString keywords = ui->imageKeywordsInput->toPlainText();
+        QString positive = ui->positiveInput->toPlainText();
+        QString negative = ui->negativeInput->toPlainText();
 
-        QImage image = sdm->generateImage(keywords);
+        SDImageOptions options;
+
+        options.cfgScale = ui->cfgSlider->value();
+        options.width = ui->widthBox->value();
+        options.height = ui->heightBox->value();
+        options.stepCount = ui->stepCountSlider->value();
+
+        QImage image = sdm->generateImage(positive, negative, options);
 
 
         QGraphicsScene *scene = new QGraphicsScene();

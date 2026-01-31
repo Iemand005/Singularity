@@ -96,16 +96,16 @@
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_4">
             <item>
-             <widget class="QLabel" name="label">
+             <widget class="QLabel" name="positiveLabel">
               <property name="text">
                <string>Positive prompt</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QPlainTextEdit" name="imageKeywordsInput">
+             <widget class="QPlainTextEdit" name="positiveInput">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
@@ -123,14 +123,14 @@
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_5">
             <item>
-             <widget class="QLabel" name="label_2">
+             <widget class="QLabel" name="negativeLabel">
               <property name="text">
                <string>Negative prompt</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QPlainTextEdit" name="plainTextEdit"/>
+             <widget class="QPlainTextEdit" name="negativeInput"/>
             </item>
            </layout>
           </item>
@@ -138,67 +138,81 @@
         </item>
         <item>
          <layout class="QFormLayout" name="formLayout">
-          <item row="4" column="0">
-           <widget class="QLabel" name="stepCountLabel">
-            <property name="text">
-             <string>Step count</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="1">
-           <widget class="QSlider" name="stepCountSlider">
-            <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="1">
-           <widget class="QSlider" name="nThreadSlider">
-            <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="1">
-           <widget class="QSlider" name="cfgSlider">
-            <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="0">
-           <widget class="QLabel" name="cfgLabel">
-            <property name="text">
-             <string>Config guidance scale</string>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="0">
-           <widget class="QLabel" name="nThreadLabel">
-            <property name="text">
-             <string>Core count</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="heightLabel">
-            <property name="text">
-             <string>Height</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
+          <item row="0" column="0">
            <widget class="QLabel" name="widthLabel">
             <property name="text">
              <string>Width</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
+          <item row="0" column="1">
            <widget class="QSpinBox" name="widthBox"/>
           </item>
-          <item row="3" column="1">
+          <item row="1" column="0">
+           <widget class="QLabel" name="heightLabel">
+            <property name="text">
+             <string>Height</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
            <widget class="QSpinBox" name="heightBox"/>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="stepCountLabel">
+            <property name="text">
+             <string>Step count</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QSlider" name="stepCountSlider">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="cfgLabel">
+            <property name="text">
+             <string>Config guidance scale</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QSlider" name="cfgSlider">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="nThreadLabel">
+            <property name="text">
+             <string>Thread count</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QSlider" name="nThreadSlider">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="clipSkipLabel">
+            <property name="text">
+             <string>CLiP Skip</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QSlider" name="horizontalSlider">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
