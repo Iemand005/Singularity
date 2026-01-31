@@ -78,7 +78,7 @@ MainWindow::MainWindow(QWidget *parent)
         options.stepCount = ui->stepCountSlider->value();
 
         sdm->generateAsync(positive, negative, options, [this](QImage image) {
-            showImage(image);
+            // showImage(image);
         });
 
         qDebug() << "Loaded da SD modelk";

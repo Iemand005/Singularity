@@ -6,7 +6,7 @@
 #include <QThread>
 #include <QMutex>
 
-#include <ModelFactory.hpp>
+#include "AIOneQTCore/QModelFactory.hpp"
 
 class UIHandler : public QObject
 {
@@ -15,12 +15,11 @@ class UIHandler : public QObject
 public:
     explicit UIHandler(QObject *parent = nullptr);
 
-    std::unique_ptr<ModelFactory> modelFactory;
+    QModelFactoryPtr modelFactory;
 
-    std::unique_ptr<LLModel> llm;
-    std::unique_ptr<SDModel> sdm;
+    QLLModelPtr llm;
+    QSDModelPtr sdm;
 
-    std::shared_ptr<MessageContext> context;
     std::unique_ptr<std::vector<Message>> chatMessages;
 
 public slots:
