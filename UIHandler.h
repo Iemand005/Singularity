@@ -23,9 +23,6 @@ public:
     std::unique_ptr<std::vector<Message>> chatMessages;
 
 public slots:
-    void handleButtonClick();
-    void handleButtonClickWithParam(const QString &message);
-
     void loadModel(const QString &path);
     void loadSDModel(const QString &path);
 
