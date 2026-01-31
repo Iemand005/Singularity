@@ -54,6 +54,7 @@ UIHandler::UIHandler(QObject *parent)
     : QObject{parent}
 {
     modelFactory = std::make_unique<ModelFactory>();
+    chatMessages = std::make_unique<std::vector<Message>>();
 
     std::cout << "Llama.cpp System Info: " << modelFactory->systemInfoStr() << std::endl;
 }
@@ -106,7 +107,11 @@ void UIHandler::loadModel(const QString &path) {
 }
 
 void UIHandler::prompt(const QString &message) {
-    qDebug() << "Generating response to:" << message;
+    Message chatMessage = {"user", message.toStdString()};
+    chatMessages->push_back(chatMessage);
+
+    std::string finalPrompt = this->llm->chatToPrompt(*chatMessages);
+    qDebug() << "Generating response to:" << finalPrompt;
 
     if (workerThread && workerThread->isRunning()) {
         qWarning() << "Already processing a prompt";
@@ -115,7 +120,7 @@ void UIHandler::prompt(const QString &message) {
 
     workerThread = new QThread();
 
-    QObject::connect(workerThread, &QThread::started, [this, message]() {
+    QObject::connect(workerThread, &QThread::started, [this, finalPrompt]() {
         QMutexLocker locker(&llmMutex);
 
         if (!llm) {
@@ -123,9 +128,16 @@ void UIHandler::prompt(const QString &message) {
             return;
         }
 
-        this->llm->completeAny(message.toStdString(), [this](const std::string &token) {
+        TextGenerationStats stats = this->llm->completeAny(finalPrompt, [this](const std::string &token) {
             tokenReceived(QString(token.c_str()));
         });
+
+        std::cout << "Finished generation" << std::endl;
+        std::cout << "- " << std::to_string(stats.tokensGenerated) << " tokens generated" << std::endl;
+        std::cout << std::endl;
+
+        Message resultMessage = {"assistant", stats.output};
+        chatMessages->push_back(resultMessage);
 
         workerThread->quit();
     });
