@@ -58,6 +58,9 @@ MainWindow::MainWindow(QWidget *parent)
         qDebug() << "and this is the file" << fileName;
 
         this->sdm = factory->loadSDM(fileName);
+
+        connect(this->sdm.get(), &QSDModel::previewGenerated, this, &MainWindow::onPreviewGenerated);
+
         qDebug() << "Loaded da SD modelk";
     });
 
@@ -78,23 +81,18 @@ MainWindow::MainWindow(QWidget *parent)
             showImage(image);
         });
 
-
-
-        // QGraphicsScene *scene = new QGraphicsScene();
-        // QGraphicsPixmapItem *item = new QGraphicsPixmapItem(QPixmap::fromImage(image));
-        // scene->addItem(item);
-        // ui->imageView->setScene(scene);
         qDebug() << "Loaded da SD modelk";
     });
 
-    connect(sdm.get(), &QSDModel::previewGenerated, this, &MainWindow::onPreviewGenerated);
+    QGraphicsScene *scene = new QGraphicsScene();
+    ui->imageView->setScene(scene);
+
 }
 
 void MainWindow::showImage(QImage image) {
-    QGraphicsScene *scene = new QGraphicsScene();
     QGraphicsPixmapItem *item = new QGraphicsPixmapItem(QPixmap::fromImage(image));
-    scene->addItem(item);
-    ui->imageView->setScene(scene);
+    ui->imageView->scene()->addItem(item);
+    ui->imageView->fitInView(item, Qt::KeepAspectRatio);
 }
 
 void MainWindow::onPreviewGenerated(int step, const QImage& preview, bool isNoisy) {
