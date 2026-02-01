@@ -28,7 +28,9 @@ MainWindow::MainWindow(QWidget *parent)
             this->chatManager = llm->createChatManager();
             qDebug() << "Loaded da modeellaaa";
         }, [this](const float &progress) {
-            ui->llmLoadProgressBar->setValue(progress * 100);
+            QMetaObject::invokeMethod(ui->llmLoadProgressBar, [this, progress]() {
+                ui->llmLoadProgressBar->setValue(progress * 100);
+            });
         });
     });
 
@@ -51,7 +53,9 @@ MainWindow::MainWindow(QWidget *parent)
            QString newText = lastItem->text() + token;
            lastItem->setText(newText);
         }, [this](const float &progress) {
-            ui->inputEvalProgressBar->setValue(progress * 100);
+            QMetaObject::invokeMethod(ui->inputEvalProgressBar, [this, progress]() {
+                ui->inputEvalProgressBar->setValue(progress * 100);
+            });
         });
     });
 

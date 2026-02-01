@@ -27,19 +27,12 @@ public:
         return std::make_unique<QLLModel>(path, options, onProgress);
     }
 
-    void loadLLMAsync(QObject *mainThread, const QString &path, const LLModelOptions &options = {}, QLoadLLModelFinished onDone = nullptr, ProgressCallback onProgress = nullptr) {
+    void loadLLMAsync(const QString &path, const LLModelOptions &options = {}, QLoadLLModelFinished onDone = nullptr, ProgressCallback onProgress = nullptr) {
         QThread *loaderThread = new QThread();
 
         // Use a lambda or function
-        QObject::connect(loaderThread, &QThread::started, [this, mainThread, path, options, onDone, onProgress]() {
-
-
-            onDone(loadLLM(path, options, [](const float &progress) {
-                QMetaObject::invokeMethod(mainThread, [onProgress, progress]() {
-                    // This lambda runs on UI thread
-                    onProgress(progress);
-                });
-            }));
+        QObject::connect(loaderThread, &QThread::started, [this, path, options, onDone, onProgress]() {
+            onDone(loadLLM(path, options, onProgress));
         });
 
         loaderThread->start();
