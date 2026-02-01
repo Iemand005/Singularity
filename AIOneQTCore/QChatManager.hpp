@@ -16,7 +16,7 @@ public:
 
     QChatManager(QLLModel *model);
 
-    void sendAsync(QString message, FinishCallback onDone, QTokenCallback onToken = nullptr, InputEvalCallback onInputEval = nullptr) {
+    void sendAsync(QString message, FinishCallback onDone, QTokenCallback onToken = nullptr, ProgressCallback onInputEval = nullptr) {
         super()->sendAsync(message.toStdString(), onDone, [onToken](std::string token) { onToken(QString(token.c_str())); }, onInputEval);
     }
 

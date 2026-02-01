@@ -18,17 +18,6 @@ MainWindow::MainWindow(QWidget *parent)
 
         ui->listWidget->addItem(message);
 
-        // llm->generateAsync(message.toStdString(), [this](std::string token) {
-        //     QString response(token.c_str());
-        //     qDebug() << response;
-        //     // ui->listWidget->addItem(response);
-        //     // QString newText = ui->listWidget->currentItem()->text() + response;
-        //     auto lastItemIndex = ui->listWidget->count() - 1;
-        //     auto lastItem = ui->listWidget->item(lastItemIndex);
-        //     QString newText = lastItem->text() + response;
-        //     lastItem->setText(newText);
-        // });
-
         ui->listWidget->addItem("");
         auto lastItemIndex = ui->listWidget->count() - 1;
         auto lastItem = ui->listWidget->item(lastItemIndex);
