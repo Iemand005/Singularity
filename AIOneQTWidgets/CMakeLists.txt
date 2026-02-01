@@ -42,7 +42,7 @@ qt_add_executable(AIOneQTWidgets
     mainwindow.h
     mainwindow.ui
     README.md
-    ../AIOneQTCore/QModelFactory.hpp ../AIOneQTCore/QLLModel.hpp ../AIOneQTCore/QSDModel.hpp
+    ../AIOneQTCore/QModelFactory.hpp ../AIOneQTCore/QLLModel.hpp ../AIOneQTCore/QSDModel.hpp ../AIOneQTCore/QChatManager.cpp ../AIOneQTCore/QChatManager.hpp
 )
 
 
