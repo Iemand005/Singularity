@@ -43,9 +43,15 @@ MainWindow::MainWindow(QWidget *parent)
             );
         qDebug() << "and this is the file" << fileName;
 
-        this->llm = factory->loadLLM(fileName);
-        this->chatManager = llm->createChatManager();
-        qDebug() << "Loaded da modeellaaa";
+        LLModelOptions options;
+
+        factory->loadLLMAsync(fileName, options, [this](QLLModelPtr model) {
+            this->llm = std::move(model);
+            this->chatManager = llm->createChatManager();
+            qDebug() << "Loaded da modeellaaa";
+        }, [this](const float &progress) {
+            ui->llmLoadProgressBar->setValue(progress * 100);
+        });
     });
 
 

@@ -15,7 +15,11 @@ public:
         return (LLModel *)this;
     }
 
-    QLLModel(const QString path) : LLModel(path.toStdString()) {
+    QLLModel(const QString &path) : QLLModel(path, nullptr) {}
+
+    QLLModel(const QString &path, ProgressCallback onProgress = nullptr) : QLLModel(path, LLModelOptions{}, onProgress) {}
+
+    QLLModel(const QString &path, const LLModelOptions &options = {}, ProgressCallback onProgress = nullptr) : LLModel(path.toStdString(), options, onProgress) {
         messageContext = createContext();
     }
 
