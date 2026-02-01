@@ -6,7 +6,9 @@
 #include "QLLModel.hpp"
 #include "QSDModel.hpp"
 
+// Large Language model pointer
 using QLLModelPtr = std::unique_ptr<QLLModel>;
+// Stable Diffusion model pointer
 using QSDModelPtr = std::unique_ptr<QSDModel>;
 
 class QModelFactory : public QObject, public ModelFactory {
