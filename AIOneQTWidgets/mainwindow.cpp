@@ -29,8 +29,7 @@ MainWindow::MainWindow(QWidget *parent)
         //     lastItem->setText(newText);
         // });
 
-        QString response = "";
-        ui->listWidget->addItem(response);
+        ui->listWidget->addItem("");
         auto lastItemIndex = ui->listWidget->count() - 1;
         auto lastItem = ui->listWidget->item(lastItemIndex);
 
@@ -39,10 +38,8 @@ MainWindow::MainWindow(QWidget *parent)
         }, [lastItem](const QString &token) {
             qDebug() << token;
 
-            QString newText = lastItem-> + token;
-
-
-
+            QString newText = lastItem->text() + token;
+            lastItem->setText(newText);
         });
     });
 
