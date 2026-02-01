@@ -72,6 +72,7 @@ target_include_directories(AIOneQTWidgets PRIVATE
     ${AIONE_DIR}/external/llama.cpp/ggml/include
     ${AIONE_DIR}/external/stable-diffusion.cpp
     ${AIONE_DIR}/external/stable-diffusion.cpp/thirdparty
+    ${AIONE_DIR}/external/llama.cpp/vendor
 )
 
 include(GNUInstallDirs)
