@@ -24,9 +24,23 @@ MainWindow::MainWindow(QWidget *parent)
         LLModelOptions options;
 
         factory->loadLLMAsync(fileName, options, [this](QLLModelPtr model) {
+            if (!model) {
+                qDebug() << "Umm this isn't normal ain't normal the model is empty bruh bro?!?!?!";
+                return;
+            }
             this->llm = std::move(model);
-            this->chatManager = llm->createChatManager();
+
             qDebug() << "Loaded da modeellaaa";
+
+            QMetaObject::invokeMethod(ui->systemPromptInput, [this]() {
+                QString systemPrompt = ui->systemPromptInput->toPlainText();
+                this->chatManager = llm->createChatManager(systemPrompt);
+
+                connect(ui->systemPromptInput, &QPlainTextEdit::textChanged, [this]() {
+                    QString systemPrompt = ui->systemPromptInput->toPlainText();
+                    this->chatManager->setSystemPrompt(systemPrompt);
+                });
+            });
         }, [this](const float &progress) {
             QMetaObject::invokeMethod(ui->llmLoadProgressBar, [this, progress]() {
                 ui->llmLoadProgressBar->setValue(progress * 100);

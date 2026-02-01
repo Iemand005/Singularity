@@ -14,11 +14,15 @@ class QChatManager : public QObject, public ChatManager {
 
 public:
 
-    QChatManager(QLLModel *model);
+    QChatManager(QLLModel *model, const QString systemPrompt = "");
 
     void sendAsync(QString message, FinishCallback onDone, QTokenCallback onToken = nullptr, ProgressCallback onInputEval = nullptr) {
         super()->sendAsync(message.toStdString(), onDone, [onToken](std::string token) { onToken(QString(token.c_str())); }, onInputEval);
     }
+
+    void setSystemPrompt(QString prompt) {
+        super()->setSystemPrompt(prompt.toStdString());
+    };
 
 };
 

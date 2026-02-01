@@ -23,8 +23,8 @@ public:
         messageContext = createContext();
     }
 
-    QChatManagerPtr createChatManager() {
-        return std::make_unique<QChatManager>(this);
+    QChatManagerPtr createChatManager(const QString systemPrompt = "") {
+        return std::make_unique<QChatManager>(this, systemPrompt);
     }
 
 };
