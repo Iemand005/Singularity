@@ -5,7 +5,7 @@
 
 class QLLModel : public QObject, public LLModel {
     Q_OBJECT
-    std::shared_ptr<MessageContext> messageContext = nullptr;
+    std::shared_ptr<TextContext> messageContext = nullptr;
 
 public:
 
