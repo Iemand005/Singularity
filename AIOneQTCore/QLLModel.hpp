@@ -1,7 +1,9 @@
 #pragma once
 
-#include <LLModel.hpp>
 #include <QObject>
+#include <LLModel.hpp>
+
+#include "QChatManager.hpp"
 
 class QLLModel : public QObject, public LLModel {
     Q_OBJECT
@@ -9,8 +11,16 @@ class QLLModel : public QObject, public LLModel {
 
 public:
 
+    LLModel *super() {
+        return (LLModel *)this;
+    }
+
     QLLModel(const QString path) : LLModel(path.toStdString()) {
         messageContext = createContext();
+    }
+
+    QChatManagerPtr createChatManager() {
+        return std::make_unique<QChatManager>(this);
     }
 
 };

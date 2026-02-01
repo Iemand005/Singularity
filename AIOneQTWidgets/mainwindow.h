@@ -21,9 +21,10 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    std::unique_ptr<QModelFactory> factory = std::make_unique<QModelFactory>();
+    QModelFactoryPtr factory = std::make_unique<QModelFactory>();
     QLLModelPtr llm = nullptr;
     QSDModelPtr sdm = nullptr;
+    QChatManagerPtr chatManager = nullptr;
 
 private slots:
     void onPreviewGenerated(int step, const QImage& preview, bool isNoisy);

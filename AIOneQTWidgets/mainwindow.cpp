@@ -18,15 +18,31 @@ MainWindow::MainWindow(QWidget *parent)
 
         ui->listWidget->addItem(message);
 
-        llm->generateAsync(message.toStdString(), [this](std::string token) {
-            QString response(token.c_str());
-            qDebug() << response;
-            // ui->listWidget->addItem(response);
-            // QString newText = ui->listWidget->currentItem()->text() + response;
-            auto lastItemIndex = ui->listWidget->count() - 1;
-            auto lastItem = ui->listWidget->item(lastItemIndex);
-            QString newText = lastItem->text() + response;
-            lastItem->setText(newText);
+        // llm->generateAsync(message.toStdString(), [this](std::string token) {
+        //     QString response(token.c_str());
+        //     qDebug() << response;
+        //     // ui->listWidget->addItem(response);
+        //     // QString newText = ui->listWidget->currentItem()->text() + response;
+        //     auto lastItemIndex = ui->listWidget->count() - 1;
+        //     auto lastItem = ui->listWidget->item(lastItemIndex);
+        //     QString newText = lastItem->text() + response;
+        //     lastItem->setText(newText);
+        // });
+
+        QString response = "";
+        ui->listWidget->addItem(response);
+        auto lastItemIndex = ui->listWidget->count() - 1;
+        auto lastItem = ui->listWidget->item(lastItemIndex);
+
+        chatManager->sendAsync(message, [](const TextGenerationStats &output) {
+
+        }, [lastItem](const QString &token) {
+            qDebug() << token;
+
+            QString newText = lastItem-> + token;
+
+
+
         });
     });
 
@@ -42,6 +58,7 @@ MainWindow::MainWindow(QWidget *parent)
         qDebug() << "and this is the file" << fileName;
 
         this->llm = factory->loadLLM(fileName);
+        this->chatManager = llm->createChatManager();
         qDebug() << "Loaded da modeellaaa";
     });
 

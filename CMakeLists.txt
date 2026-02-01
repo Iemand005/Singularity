@@ -83,6 +83,8 @@ qt_add_qml_module(AIOneQT
     SOURCES 
         UIHandler.h 
         UIHandler.cpp
+        SOURCES AIOneQTCore/QChatManager.hpp
+        SOURCES AIOneQTCore/QChatManager.cpp
 )
 
 # if(AIONE_VULKAN)

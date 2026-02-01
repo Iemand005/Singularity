@@ -1,7 +1,7 @@
 #pragma once
 
-#include <ModelFactory.hpp>
 #include <QObject>
+#include <ModelFactory.hpp>
 
 #include "QLLModel.hpp"
 #include "QSDModel.hpp"
