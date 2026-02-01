@@ -10,28 +10,6 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    connect(ui->sendButton, &QPushButton::clicked, [this]() {
-        qDebug() << "I felt that!";
-
-        QString message = ui->messageInput->toPlainText();
-        ui->messageInput->setPlainText("");
-
-        ui->listWidget->addItem(message);
-
-        ui->listWidget->addItem("");
-        auto lastItemIndex = ui->listWidget->count() - 1;
-        auto lastItem = ui->listWidget->item(lastItemIndex);
-
-        chatManager->sendAsync(message, [](const TextGenerationStats &output) {
-
-        }, [lastItem](const QString &token) {
-            qDebug() << token;
-
-            QString newText = lastItem->text() + token;
-            lastItem->setText(newText);
-        });
-    });
-
     connect(ui->loadLLMButton, &QPushButton::clicked, [this]() {
         qDebug() << "I need that!";
 
@@ -54,6 +32,28 @@ MainWindow::MainWindow(QWidget *parent)
         });
     });
 
+    connect(ui->sendButton, &QPushButton::clicked, [this]() {
+        qDebug() << "I felt that!";
+
+        QString message = ui->messageInput->toPlainText();
+        ui->messageInput->setPlainText("");
+
+        ui->listWidget->addItem(message);
+
+        ui->listWidget->addItem("");
+        auto lastItemIndex = ui->listWidget->count() - 1;
+        auto lastItem = ui->listWidget->item(lastItemIndex);
+
+        chatManager->sendAsync(message, [](const TextGenerationStats &output) {
+        }, [lastItem](const QString &token) {
+           qDebug() << token;
+
+           QString newText = lastItem->text() + token;
+           lastItem->setText(newText);
+        }, [this](const float &progress) {
+            ui->inputEvalProgressBar->setValue(progress * 100);
+        });
+    });
 
     connect(ui->loadSDButton, &QPushButton::clicked, [this]() {
         qDebug() << "I need that als too!";
