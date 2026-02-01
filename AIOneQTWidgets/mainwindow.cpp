@@ -57,6 +57,8 @@ MainWindow::MainWindow(QWidget *parent)
             );
         qDebug() << "and this is the file" << fileName;
 
+        if (this->sdm) this->sdm = nullptr;
+
         this->sdm = factory->loadSDM(fileName);
 
         connect(this->sdm.get(), &QSDModel::previewGenerated, this, &MainWindow::onPreviewGenerated);
@@ -78,7 +80,7 @@ MainWindow::MainWindow(QWidget *parent)
         options.stepCount = ui->stepCountSlider->value();
 
         sdm->generateAsync(positive, negative, options, [this](QImage image) {
-            // showImage(image);
+            showImage(image);
         });
 
         qDebug() << "Loaded da SD modelk";

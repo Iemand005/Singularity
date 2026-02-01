@@ -85,17 +85,14 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <widget class="QFrame" name="frame">
-          <property name="frameShape">
-           <enum>QFrame::Shape::StyledPanel</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Shadow::Raised</enum>
+         <widget class="QPushButton" name="loadSDButton">
+          <property name="text">
+           <string>Load Model</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QWidget" name="" native="true">
+         <widget class="QWidget" name="widget" native="true">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
             <horstretch>0</horstretch>
@@ -165,16 +162,6 @@
            </item>
           </layout>
          </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="loadSDButton">
-          <property name="text">
-           <string>Load Model</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QWidget" name="widget" native="true"/>
         </item>
         <item>
          <layout class="QFormLayout" name="formLayout">
