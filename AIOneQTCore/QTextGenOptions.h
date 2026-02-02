@@ -1,7 +1,7 @@
 
 #include <QString>
 
-#include <TextGenerationOptions.hpp>
+#include <TextGenOptions.hpp>
 
 typedef std::function<void(const QString &token)> QTokenCallback;
 
