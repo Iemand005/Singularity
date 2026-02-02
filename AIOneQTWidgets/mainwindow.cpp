@@ -59,11 +59,14 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->continueButton, &QPushButton::clicked, [this]() {
         QString message = ui->messageInput->toPlainText();
         // std::shared_ptr<Message> draft = std::make_shared<Message>(Role::User, message);
-        chatManager->completeAsync(message.toStdString(), nullptr, [this](const std::string &token) {
+        // AsyncGenerationCallbacks callbacks;
+        // callbacks.onToken
+        TextGenOptions options;
+        chatManager->completeAsync(message.toStdString(), options, [this](const std::string &token) {
             QMetaObject::invokeMethod(ui->llmInputFrame, [this, token]() {
-                                                                                                      ui->messageInput->insertPlainText(QString(token.c_str()));
+                ui->messageInput->insertPlainText(QString(token.c_str()));
             });
-        }, nullptr);
+        });
     });
 
     ui->messageInput->installEventFilter(this);
