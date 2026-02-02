@@ -102,8 +102,6 @@ MainWindow::MainWindow(QWidget *parent)
             this->sdm = std::move(model);
             connect(this->sdm.get(), &QSDModel::previewGenerated, this, &MainWindow::onPreviewGenerated);
 
-            qDebug() << "Loaded da SD modelk";
-
             QMetaObject::invokeMethod(ui->sdmLoadProgressBar, [this]() {
                 ui->sdmLoadProgressBar->hide();
             });
@@ -143,8 +141,8 @@ MainWindow::MainWindow(QWidget *parent)
     });
 
 
-    QGraphicsScene *scene = new QGraphicsScene();
-    ui->imageView->setScene(scene);
+    // QGraphicsScene *scene = new QGraphicsScene();
+    // ui->imageView->setScene(scene);
 
 }
 
@@ -202,10 +200,12 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
 }
 
 void MainWindow::showImage(QImage image) {
-    QMetaObject::invokeMethod(ui->imageView, [this, image]() {
-        QGraphicsPixmapItem *item = new QGraphicsPixmapItem(QPixmap::fromImage(image));
-        ui->imageView->scene()->addItem(item);
-        ui->imageView->fitInView(item, Qt::KeepAspectRatio);
+    QMetaObject::invokeMethod(ui->previewImage, [this, image]() {
+        // QGraphicsPixmapItem *item = new QGraphicsPixmapItem(QPixmap::fromImage(image));
+        // ui->imageView->scene()->addItem(item);
+        // ui->imageView->fitInView(item, Qt::KeepAspectRatio);
+        QPixmap pix = QPixmap::fromImage(image).scaled(ui->previewImage->size(), Qt::KeepAspectRatio);
+        ui->previewImage->setPixmap(pix);
     });
 }
 

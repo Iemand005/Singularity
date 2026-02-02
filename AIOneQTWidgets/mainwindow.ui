@@ -478,12 +478,15 @@
          </widget>
         </item>
         <item>
-         <widget class="QGraphicsView" name="imageView">
+         <widget class="QLabel" name="previewImage">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="text">
+           <string/>
           </property>
          </widget>
         </item>
