@@ -57,8 +57,9 @@ MainWindow::MainWindow(QWidget *parent)
     });
 
     connect(ui->generateButton, &QPushButton::clicked, [this]() {
-
-        chatManager->generateAsync(message, [this](const TextGenerationResult &output) {
+        QString message = ui->messageInput->toPlainText();
+        std::shared_ptr<Message> draft = std::make_shared<Message>(Role::User, message);
+        chatManager->generateAsync(message, , [this](const TextGenerationResult &output) {
             ui->tokensCachedDisplay->display((int)output.tokensCached);
             ui->tokensGeneratedDisplay->display((int)output.tokensGenerated);
             ui->tokensEvaluatedDisplay->display((int)output.tokensEvaluated);
@@ -101,8 +102,7 @@ MainWindow::MainWindow(QWidget *parent)
         options.stepCount = ui->stepCountSlider->value();
 
         sdm->generateAsync(positive, negative, options, [this](QImage image) {
-
-                showImage(image);
+            showImage(image);
         });
 
         qDebug() << "Loaded da SD modelk";
@@ -115,8 +115,8 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::send() {
     QString message = ui->messageInput->toPlainText();
-    ui->messageInput->setPlainText("");
 
+    ui->messageInput->setPlainText("");
     ui->listWidget->addItem(message);
 
     ui->listWidget->addItem("");
