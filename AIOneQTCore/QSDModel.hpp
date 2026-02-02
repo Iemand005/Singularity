@@ -58,6 +58,10 @@ public:
         return convertToQImage(image);
     }
 
+    void loadVAE(QString path) {
+        super()->loadVAE(path.toStdString());
+    }
+
     
 
     // using QPreviewCallback = std::function<void(int step, int frame_count, sd_image_t* image, bool is_noisy)>;

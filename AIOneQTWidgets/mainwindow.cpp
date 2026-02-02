@@ -102,7 +102,15 @@ MainWindow::MainWindow(QWidget *parent)
     });
 
     connect(ui->vaeButton, &QPushButton::clicked, [this]() {
+        QString fileName = QFileDialog::getOpenFileName(
+            this,                    // Parent widget
+            tr("Open SafeTensors file"),         // Dialog title
+            QDir::homePath(),        // Starting directory
+            tr("SafeTensors files (*.safetensors);")
+            );
+        qDebug() << "and this is the file" << fileName;
 
+        if (this->sdm) this->sdm->loadVAE(fileName);
     });
 
     connect(ui->generateButton, &QPushButton::clicked, [this]() {
