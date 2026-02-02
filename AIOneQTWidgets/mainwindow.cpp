@@ -92,7 +92,8 @@ MainWindow::MainWindow(QWidget *parent)
         options.stepCount = ui->stepCountSlider->value();
 
         sdm->generateAsync(positive, negative, options, [this](QImage image) {
-            showImage(image);
+
+                showImage(image);
         });
 
         qDebug() << "Loaded da SD modelk";
@@ -119,12 +120,16 @@ void MainWindow::send() {
         ui->tokensGeneratedDisplay->display((int)output.tokensGenerated);
         ui->tokensEvaluatedDisplay->display((int)output.tokensEvaluated);
     }, [this, lastItem](const QString &token) {
-       qDebug() << token;
 
-       QString newText = lastItem->text() + token;
-       lastItem->setText(newText);
+QMetaObject::invokeMethod(ui->listWidget, [this, lastItem, token]() {
+        
+       lastItem->setText(lastItem->text() + token);
+
+       ui->listWidget->scrollToBottom();
+
        auto display = ui->tokensGeneratedDisplay;
        display->display(display->intValue() + 1);
+                                                                                                                            });
    }, [this](const float &progress) {
        QMetaObject::invokeMethod(ui->inputEvalProgressBar, [this, progress]() {
            ui->inputEvalProgressBar->setValue(progress * 100);
@@ -144,10 +149,13 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
 }
 
 void MainWindow::showImage(QImage image) {
-    QGraphicsPixmapItem *item = new QGraphicsPixmapItem(QPixmap::fromImage(image));
-    ui->imageView->scene()->addItem(item);
-    ui->imageView->fitInView(item, Qt::KeepAspectRatio);
+    QMetaObject::invokeMethod(ui->imageView, [this, image]() {
+        QGraphicsPixmapItem *item = new QGraphicsPixmapItem(QPixmap::fromImage(image));
+        ui->imageView->scene()->addItem(item);
+        ui->imageView->fitInView(item, Qt::KeepAspectRatio);
+    });
 }
+
 
 void MainWindow::onPreviewGenerated(int step, const QImage& preview, bool isNoisy) {
     showImage(preview);
