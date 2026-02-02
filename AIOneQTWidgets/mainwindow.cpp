@@ -32,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
 
             qDebug() << "Loaded da modeellaaa";
 
-            QMetaObject::invokeMethod(ui->systemPromptInput, [this]() {
+            QMetaObject::invokeMethod(ui->llmInputFrame, [this]() {
                 QString systemPrompt = ui->systemPromptInput->toPlainText();
                 this->chatManager = llm->createChatManager(systemPrompt);
 
@@ -40,6 +40,8 @@ MainWindow::MainWindow(QWidget *parent)
                     QString systemPrompt = ui->systemPromptInput->toPlainText();
                     this->chatManager->setSystemPrompt(systemPrompt);
                 });
+
+                ui->llmInputFrame->setEnabled(true);
             });
         }, [this](const float &progress) {
             QMetaObject::invokeMethod(ui->llmLoadProgressBar, [this, progress]() {
@@ -51,27 +53,10 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->sendButton, &QPushButton::clicked, [this]() {
         qDebug() << "I felt that!";
 
-        QString message = ui->messageInput->toPlainText();
-        ui->messageInput->setPlainText("");
-
-        ui->listWidget->addItem(message);
-
-        ui->listWidget->addItem("");
-        auto lastItemIndex = ui->listWidget->count() - 1;
-        auto lastItem = ui->listWidget->item(lastItemIndex);
-
-        chatManager->sendAsync(message, [](const TextGenerationStats &output) {
-        }, [lastItem](const QString &token) {
-           qDebug() << token;
-
-           QString newText = lastItem->text() + token;
-           lastItem->setText(newText);
-        }, [this](const float &progress) {
-            QMetaObject::invokeMethod(ui->inputEvalProgressBar, [this, progress]() {
-                ui->inputEvalProgressBar->setValue(progress * 100);
-            });
-        });
+        send();
     });
+
+    ui->messageInput->installEventFilter(this);
 
     connect(ui->loadSDButton, &QPushButton::clicked, [this]() {
         qDebug() << "I need that als too!";
@@ -116,6 +101,43 @@ MainWindow::MainWindow(QWidget *parent)
     QGraphicsScene *scene = new QGraphicsScene();
     ui->imageView->setScene(scene);
 
+}
+
+void MainWindow::send() {
+    QString message = ui->messageInput->toPlainText();
+    ui->messageInput->setPlainText("");
+
+    ui->listWidget->addItem(message);
+
+    ui->listWidget->addItem("");
+    auto lastItemIndex = ui->listWidget->count() - 1;
+    auto lastItem = ui->listWidget->item(lastItemIndex);
+
+    chatManager->sendAsync(message, [this](const TextGenerationStats &output) {
+        ui->tokensCachedDisplay->display((int)output.tokensCached);
+        ui->tokensGeneratedDisplay->display((int)output.tokensGenerated);
+        ui->tokensEvaluatedDisplay->display((int)output.tokensEvaluated);
+    }, [lastItem](const QString &token) {
+       qDebug() << token;
+
+       QString newText = lastItem->text() + token;
+       lastItem->setText(newText);
+   }, [this](const float &progress) {
+       QMetaObject::invokeMethod(ui->inputEvalProgressBar, [this, progress]() {
+           ui->inputEvalProgressBar->setValue(progress * 100);
+       });
+   });
+}
+
+bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
+    if (obj == ui->messageInput && event->type() == QEvent::KeyPress) {
+        QKeyEvent *keyEvent = (QKeyEvent*)event;
+        if (keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter) {
+            send();
+            return true;
+        }
+    }
+    return false;
 }
 
 void MainWindow::showImage(QImage image) {

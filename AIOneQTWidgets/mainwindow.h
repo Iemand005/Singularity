@@ -26,8 +26,13 @@ public:
     QSDModelPtr sdm = nullptr;
     QChatManagerPtr chatManager = nullptr;
 
+    void send();
+
 private slots:
     void onPreviewGenerated(int step, const QImage& preview, bool isNoisy);
+
+protected:
+    bool eventFilter(QObject *watched, QEvent *event) override;
 
 private:
     Ui::MainWindow *ui;
