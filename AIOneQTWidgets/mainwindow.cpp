@@ -112,6 +112,7 @@ void MainWindow::send() {
     ui->listWidget->addItem("");
     auto lastItemIndex = ui->listWidget->count() - 1;
     auto lastItem = ui->listWidget->item(lastItemIndex);
+    ui->tokensGeneratedDisplay->display(0);
 
     chatManager->sendAsync(message, [this](const TextGenerationStats &output) {
         ui->tokensCachedDisplay->display((int)output.tokensCached);
