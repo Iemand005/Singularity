@@ -13,7 +13,7 @@ using QLLModelPtr = std::unique_ptr<QLLModel>;
 using QSDModelPtr = std::unique_ptr<QSDModel>;
 
 using QLoadLLModelFinished = std::function<void(QLLModelPtr model)>;
-using QFinishedHandler = std::function<void()>;
+using QLoadSDModelFinished = std::function<void(QSDModelPtr model)>;
 
 class QModelFactory : public QObject, public ModelFactory {
     Q_OBJECT
@@ -42,7 +42,7 @@ public:
         return std::make_unique<QSDModel>(path, vaePath);
     }
 
-    void loadSDMAsync(const QString &path, QFinishedHandler onDone = nullptr) {
+    void loadSDMAsync(const QString &path, QLoadSDModelFinished onDone = nullptr) {
         runAsync([this, path, onDone]() { onDone(loadSDM(path)); });
     }
 

@@ -275,6 +275,9 @@
           <property name="value">
            <number>0</number>
           </property>
+          <property name="textVisible">
+           <bool>false</bool>
+          </property>
           <property name="invertedAppearance">
            <bool>false</bool>
           </property>

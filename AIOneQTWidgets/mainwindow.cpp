@@ -95,14 +95,18 @@ MainWindow::MainWindow(QWidget *parent)
         if (this->sdm) this->sdm = nullptr;
 
         factory->loadSDMAsync(fileName, [this](QSDModelPtr model) {
-            this->sdm = model;
+            this->sdm = std::move(model);
+            connect(this->sdm.get(), &QSDModel::previewGenerated, this, &MainWindow::onPreviewGenerated);
+
+            qDebug() << "Loaded da SD modelk";
+
+            QMetaObject::invokeMethod(ui->sdmLoadProgressBar, [this]() {
+                ui->sdmLoadProgressBar->setMaximum(100);
+                ui->sdmLoadProgressBar->setValue(100);
+                ui->sdmLoadProgressBar->setTextVisible(true);
+                ui->sdmLoadProgressBar->hide();
+            });
         });
-
-        connect(this->sdm.get(), &QSDModel::previewGenerated, this, &MainWindow::onPreviewGenerated);
-
-        qDebug() << "Loaded da SD modelk";
-
-
     });
 
     connect(ui->vaeButton, &QPushButton::clicked, [this]() {
@@ -115,8 +119,6 @@ MainWindow::MainWindow(QWidget *parent)
         qDebug() << "and this is the file" << fileName;
 
         vaePath = fileName;
-
-        // if (this->sdm) this->sdm->loadVAE(fileName);
     });
 
     connect(ui->generateButton, &QPushButton::clicked, [this]() {
