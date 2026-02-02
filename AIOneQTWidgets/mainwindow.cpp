@@ -101,6 +101,10 @@ MainWindow::MainWindow(QWidget *parent)
         qDebug() << "Loaded da SD modelk";
     });
 
+    connect(ui->vaeButton, &QPushButton::clicked, [this]() {
+
+    });
+
     connect(ui->generateButton, &QPushButton::clicked, [this]() {
         qDebug() << "I need to generat ya image!";
 
