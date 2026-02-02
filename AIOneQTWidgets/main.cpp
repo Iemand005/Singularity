@@ -4,8 +4,6 @@
 #include <QLocale>
 #include <QTranslator>
 
-#include <crtdbg.h>
-
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -20,7 +18,6 @@ int main(int argc, char *argv[])
         }
     }
     MainWindow w;
-    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
     w.show();
     return a.exec();
 }
