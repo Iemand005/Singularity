@@ -94,11 +94,15 @@ MainWindow::MainWindow(QWidget *parent)
 
         if (this->sdm) this->sdm = nullptr;
 
-        this->sdm = factory->loadSDM(fileName, vaePath);
+        factory->loadSDMAsync(fileName, [this](QSDModelPtr model) {
+            this->sdm = model;
+        });
 
         connect(this->sdm.get(), &QSDModel::previewGenerated, this, &MainWindow::onPreviewGenerated);
 
         qDebug() << "Loaded da SD modelk";
+
+
     });
 
     connect(ui->vaeButton, &QPushButton::clicked, [this]() {

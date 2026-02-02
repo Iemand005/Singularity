@@ -13,12 +13,19 @@ using QLLModelPtr = std::unique_ptr<QLLModel>;
 using QSDModelPtr = std::unique_ptr<QSDModel>;
 
 using QLoadLLModelFinished = std::function<void(QLLModelPtr model)>;
+using QFinishedHandler = std::function<void()>;
 
 class QModelFactory : public QObject, public ModelFactory {
     Q_OBJECT
 
     ModelFactory *super() {
         return this;
+    }
+
+    void runAsync(std::function<void()> func) {
+        QThread *loaderThread = new QThread();
+        QObject::connect(loaderThread, &QThread::started, func);
+        loaderThread->start();
     }
 
 public:
@@ -28,18 +35,15 @@ public:
     }
 
     void loadLLMAsync(const QString &path, const LLModelOptions &options = {}, QLoadLLModelFinished onDone = nullptr, ProgressCallback onProgress = nullptr) {
-        QThread *loaderThread = new QThread();
-
-        // Use a lambda or function
-        QObject::connect(loaderThread, &QThread::started, [this, path, options, onDone, onProgress]() {
-            onDone(loadLLM(path, options, onProgress));
-        });
-
-        loaderThread->start();
+        runAsync([this, path, options, onDone, onProgress]() { onDone(loadLLM(path, options, onProgress)); });
     }
 
     QSDModelPtr loadSDM(const QString &path, const QString vaePath = "") {
         return std::make_unique<QSDModel>(path, vaePath);
+    }
+
+    void loadSDMAsync(const QString &path, QFinishedHandler onDone = nullptr) {
+        runAsync([this, path, onDone]() { onDone(loadSDM(path)); });
     }
 
 };
