@@ -53,15 +53,16 @@ MainWindow::MainWindow(QWidget *parent)
     });
 
     connect(ui->sendButton, &QPushButton::clicked, [this]() {
-        chatManager->generateAsync(message, [this](const TextGenerationStats &output) {
+        send();
+    });
+
+    connect(ui->generateButton, &QPushButton::clicked, [this]() {
+
+        chatManager->generateAsync(message, [this](const TextGenerationResult &output) {
             ui->tokensCachedDisplay->display((int)output.tokensCached);
             ui->tokensGeneratedDisplay->display((int)output.tokensGenerated);
             ui->tokensEvaluatedDisplay->display((int)output.tokensEvaluated);
         }, [this, lastItem](const QString &token) {
-    });
-
-    connect(ui->generateButton, &QPushButton::clicked, [this]() {
-        send();
     });
 
     ui->messageInput->installEventFilter(this);
