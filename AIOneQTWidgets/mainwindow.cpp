@@ -21,6 +21,8 @@ MainWindow::MainWindow(QWidget *parent)
             );
         qDebug() << "and this is the file" << fileName;
 
+        llm = nullptr; // Unload the old before reload TODO: check if the path is valid (exists) before unloading!
+
         LLModelOptions options;
 
         factory->loadLLMAsync(fileName, options, [this](QLLModelPtr model) {
@@ -30,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
             }
             this->llm = std::move(model);
 
-            qDebug() << "Loaded da modeellaaa";
+            qDebug() << "Loaded LLM";
 
             QMetaObject::invokeMethod(ui->llmInputFrame, [this]() {
                 QString systemPrompt = ui->systemPromptInput->toPlainText();
@@ -51,8 +53,14 @@ MainWindow::MainWindow(QWidget *parent)
     });
 
     connect(ui->sendButton, &QPushButton::clicked, [this]() {
-        qDebug() << "I felt that!";
+        chatManager->generateAsync(message, [this](const TextGenerationStats &output) {
+            ui->tokensCachedDisplay->display((int)output.tokensCached);
+            ui->tokensGeneratedDisplay->display((int)output.tokensGenerated);
+            ui->tokensEvaluatedDisplay->display((int)output.tokensEvaluated);
+        }, [this, lastItem](const QString &token) {
+    });
 
+    connect(ui->generateButton, &QPushButton::clicked, [this]() {
         send();
     });
 
