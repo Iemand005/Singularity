@@ -37,6 +37,8 @@ protected:
 private:
     Ui::MainWindow *ui;
 
+    QString vaePath = "";
+
     void showImage(QImage image);
 };
 #endif // MAINWINDOW_H

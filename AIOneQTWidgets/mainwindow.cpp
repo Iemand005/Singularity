@@ -110,7 +110,9 @@ MainWindow::MainWindow(QWidget *parent)
             );
         qDebug() << "and this is the file" << fileName;
 
-        if (this->sdm) this->sdm->loadVAE(fileName);
+        vaePath = fileName;
+
+        // if (this->sdm) this->sdm->loadVAE(fileName);
     });
 
     connect(ui->generateButton, &QPushButton::clicked, [this]() {

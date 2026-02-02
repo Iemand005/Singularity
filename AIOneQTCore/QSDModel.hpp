@@ -36,7 +36,7 @@ class QSDModel : public QObject, public SDModel {
 
 public:
 
-    QSDModel(const QString &path) : SDModel(path.toStdString()) {
+    QSDModel(const QString &path, const QString vaePath = "") : SDModel(path.toStdString()) {
         this->setPreviewCallback([this](int step, int frameCount, sd_image_t* sdImage, bool isNoisy) {
             QImage image = this->convertToQImage(*sdImage);
             emit this->previewGenerated(step, image, isNoisy);

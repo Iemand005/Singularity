@@ -38,7 +38,7 @@ public:
         loaderThread->start();
     }
 
-    QSDModelPtr loadSDM(const QString &path) {
+    QSDModelPtr loadSDM(const QString &path, const QString vaePath = "") {
         return std::make_unique<QSDModel>(path);
     }
 
