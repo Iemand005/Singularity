@@ -81,6 +81,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Stable Diffusion
 
+    ui->sdmLoadProgressBar->hide();
+
     connect(ui->loadSDButton, &QPushButton::clicked, [this]() {
         qDebug() << "I need that als too!";
 
@@ -92,6 +94,8 @@ MainWindow::MainWindow(QWidget *parent)
             );
         qDebug() << "and this is the file" << fileName;
 
+        ui->sdmLoadProgressBar->show();
+
         if (this->sdm) this->sdm = nullptr;
 
         factory->loadSDMAsync(fileName, [this](QSDModelPtr model) {
@@ -101,9 +105,6 @@ MainWindow::MainWindow(QWidget *parent)
             qDebug() << "Loaded da SD modelk";
 
             QMetaObject::invokeMethod(ui->sdmLoadProgressBar, [this]() {
-                ui->sdmLoadProgressBar->setMaximum(100);
-                ui->sdmLoadProgressBar->setValue(100);
-                ui->sdmLoadProgressBar->setTextVisible(true);
                 ui->sdmLoadProgressBar->hide();
             });
         });
