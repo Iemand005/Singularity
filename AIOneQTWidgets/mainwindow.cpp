@@ -61,16 +61,15 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->continueButton, &QPushButton::clicked, [this]() {
         QString message = ui->messageInput->toPlainText();
         // std::shared_ptr<Message> draft = std::make_shared<Message>(Role::User, message);
-        TextGenOptions options;
+        AsyncTextGenOptions options;
         options.maxTokens = 1;
-        AsyncGenerationCallbacks callbacks;
-        callbacks.onToken = [this](const std::string &token) {
+        options.onToken = [this](const std::string &token) {
             QMetaObject::invokeMethod(ui->llmInputFrame, [this, token]() {
                 ui->messageInput->insertPlainText(QString(token.c_str()));
             });
         };
 
-        chatManager->completeAsync(message.toStdString(), options, callbacks);
+        chatManager->completeAsync(message.toStdString(), options);
     });
 
     ui->messageInput->installEventFilter(this);
@@ -139,27 +138,35 @@ void MainWindow::send() {
     auto lastItem = ui->listWidget->item(lastItemIndex);
     ui->tokensGeneratedDisplay->display(0);
 
-    chatManager->sendAsync(message, [this](const TextGenerationResult &output) {
+    QAsyncTextGenOptions options;
+
+    options.onDone = [this](const TextGenResult &output) {
         ui->tokensCachedDisplay->display((int)output.tokensCached);
         ui->tokensGeneratedDisplay->display((int)output.tokensGenerated);
         ui->tokensEvaluatedDisplay->display((int)output.tokensEvaluated);
-    }, [this, lastItem](const QString &token) {
+    };
 
-    QMetaObject::invokeMethod(ui->listWidget, [this, lastItem, token]() {
+    options.onToken = [this, lastItem](const QString &token) {
 
-           lastItem->setText(lastItem->text() + token);
+        QMetaObject::invokeMethod(ui->listWidget, [this, lastItem, token]() {
 
-           ui->listWidget->scrollToBottom();
+            lastItem->setText(lastItem->text() + token);
 
-           auto display = ui->tokensGeneratedDisplay;
-           display->display(display->intValue() + 1);
-                                                                                                                             })
+            ui->listWidget->scrollToBottom();
 
-   }, [this](const float &progress) {
-       QMetaObject::invokeMethod(ui->inputEvalProgressBar, [this, progress]() {
-           ui->inputEvalProgressBar->setValue(progress * 100);
-       });
-   });
+            auto display = ui->tokensGeneratedDisplay;
+            display->display(display->intValue() + 1);
+        });
+
+    };
+
+    options.onInputEval = [this](const float &progress) {
+        QMetaObject::invokeMethod(ui->inputEvalProgressBar, [this, progress]() {
+            ui->inputEvalProgressBar->setValue(progress * 100);
+        });
+    };
+
+    chatManager->sendAsync(message, options);
 }
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event) {

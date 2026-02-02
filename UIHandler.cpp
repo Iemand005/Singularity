@@ -56,7 +56,7 @@ void UIHandler::prompt(const QString &message) {
             return;
         }
 
-        TextGenerationResult stats = this->llm->completeAny(finalPrompt, [this](const std::string token) {
+        TextGenResult stats = this->llm->completeAny(finalPrompt, [this](const std::string token) {
             tokenReceived(QString(token.c_str()));
         });
 
