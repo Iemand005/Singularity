@@ -122,8 +122,8 @@ void MainWindow::send() {
 
        QString newText = lastItem->text() + token;
        lastItem->setText(newText);
-
-       ui->tokensGeneratedDisplay->sizeIncrement();
+       auto display = ui->tokensGeneratedDisplay;
+       display->display(display->intValue() + 1);
    }, [this](const float &progress) {
        QMetaObject::invokeMethod(ui->inputEvalProgressBar, [this, progress]() {
            ui->inputEvalProgressBar->setValue(progress * 100);
