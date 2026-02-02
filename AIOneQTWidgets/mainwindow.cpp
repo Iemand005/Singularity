@@ -94,7 +94,7 @@ MainWindow::MainWindow(QWidget *parent)
 
         if (this->sdm) this->sdm = nullptr;
 
-        this->sdm = factory->loadSDM(fileName);
+        this->sdm = factory->loadSDM(fileName, vaePath);
 
         connect(this->sdm.get(), &QSDModel::previewGenerated, this, &MainWindow::onPreviewGenerated);
 

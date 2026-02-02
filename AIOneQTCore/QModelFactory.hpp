@@ -39,7 +39,7 @@ public:
     }
 
     QSDModelPtr loadSDM(const QString &path, const QString vaePath = "") {
-        return std::make_unique<QSDModel>(path);
+        return std::make_unique<QSDModel>(path, vaePath);
     }
 
 };

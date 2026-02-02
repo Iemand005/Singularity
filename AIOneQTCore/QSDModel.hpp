@@ -36,7 +36,7 @@ class QSDModel : public QObject, public SDModel {
 
 public:
 
-    QSDModel(const QString &path, const QString vaePath = "") : SDModel(path.toStdString()) {
+    QSDModel(const QString &path, const QString vaePath = "") : SDModel(path.toStdString(), vaePath.toStdString()) {
         this->setPreviewCallback([this](int step, int frameCount, sd_image_t* sdImage, bool isNoisy) {
             QImage image = this->convertToQImage(*sdImage);
             emit this->previewGenerated(step, image, isNoisy);
@@ -54,17 +54,8 @@ public:
 
     QImage generateImage(QString &positive, QString &negative, SDImageOptions options = {}) {
         const sd_image_t image = super()->generateImage(positive.toStdString(), negative.toStdString(), options);
-        // if (save) this->saveImageAsPNG(image, positive.toStdString() + "rawr.png");
         return convertToQImage(image);
     }
-
-    void loadVAE(QString path) {
-        super()->loadVAE(path.toStdString());
-    }
-
-    
-
-    // using QPreviewCallback = std::function<void(int step, int frame_count, sd_image_t* image, bool is_noisy)>;
 
 signals:
     void stepProgress(int step, int totalSteps);
