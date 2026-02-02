@@ -56,14 +56,14 @@ MainWindow::MainWindow(QWidget *parent)
         send();
     });
 
-    connect(ui->generateButton, &QPushButton::clicked, [this]() {
+    connect(ui->continueButton, &QPushButton::clicked, [this]() {
         QString message = ui->messageInput->toPlainText();
-        std::shared_ptr<Message> draft = std::make_shared<Message>(Role::User, message);
-        chatManager->generateAsync(message, , [this](const TextGenerationResult &output) {
-            ui->tokensCachedDisplay->display((int)output.tokensCached);
-            ui->tokensGeneratedDisplay->display((int)output.tokensGenerated);
-            ui->tokensEvaluatedDisplay->display((int)output.tokensEvaluated);
-        }, [this, lastItem](const QString &token) {
+        // std::shared_ptr<Message> draft = std::make_shared<Message>(Role::User, message);
+        chatManager->completeAsync(message.toStdString(), nullptr, [this](const std::string &token) {
+            QMetaObject::invokeMethod(ui->llmInputFrame, [this, token]() {
+                                                                                                      ui->messageInput->insertPlainText(QString(token.c_str()));
+            });
+        }, nullptr);
     });
 
     ui->messageInput->installEventFilter(this);
@@ -124,7 +124,7 @@ void MainWindow::send() {
     auto lastItem = ui->listWidget->item(lastItemIndex);
     ui->tokensGeneratedDisplay->display(0);
 
-    chatManager->sendAsync(message, [this](const TextGenerationStats &output) {
+    chatManager->sendAsync(message, [this](const TextGenerationResult &output) {
         ui->tokensCachedDisplay->display((int)output.tokensCached);
         ui->tokensGeneratedDisplay->display((int)output.tokensGenerated);
         ui->tokensEvaluatedDisplay->display((int)output.tokensEvaluated);
