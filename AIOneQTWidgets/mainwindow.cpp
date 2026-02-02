@@ -10,6 +10,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    // LLM
+
     connect(ui->loadLLMButton, &QPushButton::clicked, [this]() {
         qDebug() << "I need that!";
 
@@ -59,17 +61,26 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->continueButton, &QPushButton::clicked, [this]() {
         QString message = ui->messageInput->toPlainText();
         // std::shared_ptr<Message> draft = std::make_shared<Message>(Role::User, message);
-        // AsyncGenerationCallbacks callbacks;
-        // callbacks.onToken
         TextGenOptions options;
-        chatManager->completeAsync(message.toStdString(), options, [this](const std::string &token) {
+        options.maxTokens = 1;
+        AsyncGenerationCallbacks callbacks;
+        callbacks.onToken = [this](const std::string &token) {
             QMetaObject::invokeMethod(ui->llmInputFrame, [this, token]() {
                 ui->messageInput->insertPlainText(QString(token.c_str()));
             });
-        });
+        };
+
+        chatManager->completeAsync(message.toStdString(), options, callbacks);
     });
 
     ui->messageInput->installEventFilter(this);
+
+    connect(ui->maxTokensInput, &QSpinBox::valueChanged, [this]() {
+        chatManager->currentChatOptions()->maxTokens = ui->maxTokensInput->value();
+    });
+
+
+    // Stable Diffusion
 
     connect(ui->loadSDButton, &QPushButton::clicked, [this]() {
         qDebug() << "I need that als too!";
@@ -111,6 +122,7 @@ MainWindow::MainWindow(QWidget *parent)
         qDebug() << "Loaded da SD modelk";
     });
 
+
     QGraphicsScene *scene = new QGraphicsScene();
     ui->imageView->setScene(scene);
 
@@ -133,15 +145,16 @@ void MainWindow::send() {
         ui->tokensEvaluatedDisplay->display((int)output.tokensEvaluated);
     }, [this, lastItem](const QString &token) {
 
-QMetaObject::invokeMethod(ui->listWidget, [this, lastItem, token]() {
-        
-       lastItem->setText(lastItem->text() + token);
+    QMetaObject::invokeMethod(ui->listWidget, [this, lastItem, token]() {
 
-       ui->listWidget->scrollToBottom();
+           lastItem->setText(lastItem->text() + token);
 
-       auto display = ui->tokensGeneratedDisplay;
-       display->display(display->intValue() + 1);
-                                                                                                                            });
+           ui->listWidget->scrollToBottom();
+
+           auto display = ui->tokensGeneratedDisplay;
+           display->display(display->intValue() + 1);
+                                                                                                                             })
+
    }, [this](const float &progress) {
        QMetaObject::invokeMethod(ui->inputEvalProgressBar, [this, progress]() {
            ui->inputEvalProgressBar->setValue(progress * 100);
