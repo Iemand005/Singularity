@@ -385,7 +385,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QLCDNumber" name="tokensCachedDisplay"/>
+       <widget class="QLCDNumber" name="tokensCachedDisplay">
+        <property name="smallDecimalPoint">
+         <bool>false</bool>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QLabel" name="tokensEvaluatedLabel">

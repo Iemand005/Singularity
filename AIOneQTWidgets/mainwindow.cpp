@@ -117,11 +117,13 @@ void MainWindow::send() {
         ui->tokensCachedDisplay->display((int)output.tokensCached);
         ui->tokensGeneratedDisplay->display((int)output.tokensGenerated);
         ui->tokensEvaluatedDisplay->display((int)output.tokensEvaluated);
-    }, [lastItem](const QString &token) {
+    }, [this, lastItem](const QString &token) {
        qDebug() << token;
 
        QString newText = lastItem->text() + token;
        lastItem->setText(newText);
+       int newValue = ui->tokensGeneratedDisplay->intValue() + 1;
+       ui->tokensGeneratedDisplay->display(newValue);
    }, [this](const float &progress) {
        QMetaObject::invokeMethod(ui->inputEvalProgressBar, [this, progress]() {
            ui->inputEvalProgressBar->setValue(progress * 100);
