@@ -83,6 +83,7 @@ MainWindow::MainWindow(QWidget *parent)
     // Stable Diffusion
 
     ui->sdmLoadProgressBar->hide();
+    ui->generationProgressBar->hide();
 
     connect(ui->loadSDButton, &QPushButton::clicked, [this]() {
         qDebug() << "I need that als too!";
@@ -101,6 +102,7 @@ MainWindow::MainWindow(QWidget *parent)
         // sdm->setProgressCallback();
 
         ui->sdmLoadProgressBar->show();
+        ui->statusbar->showMessage("Loading model...");
 
         if (this->sdm) this->sdm = nullptr;
 
@@ -129,6 +131,8 @@ MainWindow::MainWindow(QWidget *parent)
                 ui->sdmLoadProgressBar->hide();
                 ui->sdmLoadProgressBar->setMaximum(0);
                 ui->sdmLoadProgressBar->setTextVisible(false);
+
+                ui->statusbar->showMessage("Done!");
             });
         });
     });
@@ -148,6 +152,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->generateButton, &QPushButton::clicked, [this]() {
         qDebug() << "I need to generat ya image!";
 
+        ui->generationProgressBar->show();
+        ui->generationProgressBar->setValue(0);
+
         QString positive = ui->positiveInput->toPlainText();
         QString negative = ui->negativeInput->toPlainText();
 
@@ -161,6 +168,11 @@ MainWindow::MainWindow(QWidget *parent)
 
         sdm->generateAsync(positive, negative, options, [this](QImage image) {
             showImage(image);
+            QMetaObject::invokeMethod(ui->generationProgressBar, [this]() {
+                ui->generationProgressBar->hide();
+                ui->generationProgressBar->setTextVisible(true);
+                ui->statusbar->showMessage("Done!");
+            });
         });
 
         qDebug() << "Loaded da SD modelk";
@@ -229,14 +241,29 @@ void MainWindow::showImage(QImage image) {
         // QGraphicsPixmapItem *item = new QGraphicsPixmapItem(QPixmap::fromImage(image));
         // ui->imageView->scene()->addItem(item);
         // ui->imageView->fitInView(item, Qt::KeepAspectRatio);
-        QPixmap pix = QPixmap::fromImage(image).scaled(ui->previewImage->size(), Qt::KeepAspectRatio);
-        ui->previewImage->setPixmap(pix);
+        ui->previewImage->setImage(image);
+        // ui->previewImage->setScaledContents(true);  // This makes it fill the label
+        // ui->previewImage->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+        // QPixmap pix = QPixmap::fromImage(image).scaled(ui->previewImage->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        // ui->previewImage->setPixmap(pix);
     });
 }
 
+// void MainWindow::resizeEvent(QResizeEvent *event) {
 
-void MainWindow::onPreviewGenerated(int step, const QImage& preview, bool isNoisy) {
+// }
+
+
+void MainWindow::onPreviewGenerated(int step, int frameCount, const QImage& preview, bool isNoisy) {
     showImage(preview);
+    ui->generationProgressBar->setMaximum(frameCount);
+    ui->generationProgressBar->setValue(step);
+    if (step == frameCount) {
+        ui->generationProgressBar->setMaximum(0);
+        ui->generationProgressBar->setValue(0);
+        ui->generationProgressBar->setTextVisible(false);
+        ui->statusbar->showMessage("VAE Decoding...");
+    }
 }
 
 MainWindow::~MainWindow()
