@@ -97,6 +97,12 @@ MainWindow::MainWindow(QWidget *parent)
 
         // ui->loadSDButton->
         // TODO: disable lod button
+
+        sdm->setProgressCallback([this](float progress) {
+            ui->sdmLoadProgressBar->setMaximum(100);
+            ui->sdmLoadProgressBar->setValue(progress * 100);
+        });
+
         ui->sdmLoadProgressBar->show();
 
         if (this->sdm) this->sdm = nullptr;
