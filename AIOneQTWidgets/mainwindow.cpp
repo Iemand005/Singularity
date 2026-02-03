@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // LLM
 
+    ui->llmLoadProgressBar->hide();
     connect(ui->loadLLMButton, &QPushButton::clicked, [this]() {
         qDebug() << "I need that!";
 
@@ -22,6 +23,8 @@ MainWindow::MainWindow(QWidget *parent)
             tr("GGUF files (*.gguf);")
             );
         qDebug() << "and this is the file" << fileName;
+
+        ui->llmLoadProgressBar->hide();
 
         llm = nullptr; // Unload the old before reload TODO: check if the path is valid (exists) before unloading!
 
@@ -44,7 +47,7 @@ MainWindow::MainWindow(QWidget *parent)
                     QString systemPrompt = ui->systemPromptInput->toPlainText();
                     this->chatManager->setSystemPrompt(systemPrompt);
                 });
-
+                ui->llmLoadProgressBar->hide();
                 ui->llmInputFrame->setEnabled(true);
             });
         }, [this](const float &progress) {
