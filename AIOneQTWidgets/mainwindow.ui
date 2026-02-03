@@ -33,7 +33,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -51,13 +51,6 @@
          <widget class="QProgressBar" name="llmLoadProgressBar">
           <property name="value">
            <number>0</number>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="Line" name="line">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
           </property>
          </widget>
         </item>
@@ -329,13 +322,6 @@
          </widget>
         </item>
         <item>
-         <widget class="Line" name="line_2">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="QFrame" name="frame_2">
           <property name="frameShape">
            <enum>QFrame::Shape::StyledPanel</enum>
@@ -539,13 +525,6 @@
             </widget>
            </item>
           </layout>
-         </widget>
-        </item>
-        <item>
-         <widget class="Line" name="line_3">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
-          </property>
          </widget>
         </item>
         <item>

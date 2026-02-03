@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.19)
 project(AIOneQTWidgets LANGUAGES CXX)
 
 if(MSVC)
-    add_compile_options(/FS /bigobj /MP /W3 /wd4244 /wd4267)
+    add_compile_options(/FS /bigobj /MP /W3 /wd4244 /wd4267 /fsanitize=address /Zi)
     set(CMAKE_JOB_POOLS compile=1 link=1)
     add_definitions(-DNOMINMAX -D_CRT_SECURE_NO_WARNINGS)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDebug" CACHE STRING "" FORCE)
@@ -44,6 +44,7 @@ qt_add_executable(AIOneQTWidgets
     README.md
     ../AIOneQTCore/QModelFactory.hpp ../AIOneQTCore/QLLModel.hpp ../AIOneQTCore/QSDModel.hpp ../AIOneQTCore/QChatManager.cpp ../AIOneQTCore/QChatManager.hpp
     ../AIOneQTCore/QTextGenOptions.h
+    ../AIOne/src/Chat.hpp ../AIOne/src/ChatManager.hpp ../AIOne/src/ContextInvalidError.hpp ../AIOne/src/LlamaUtil.hpp ../AIOne/src/LLModel.cpp ../AIOne/src/LLModel.hpp ../AIOne/src/LLModelOptions.hpp ../AIOne/src/Message.hpp ../AIOne/src/Model.cpp ../AIOne/src/Model.hpp ../AIOne/src/ModelFactory.cpp ../AIOne/src/ModelFactory.hpp ../AIOne/src/PreferredDevice.h ../AIOne/src/Role.h ../AIOne/src/SDImageOptions.h ../AIOne/src/SDModel.cpp ../AIOne/src/SDModel.hpp ../AIOne/src/SDModelOptions.hpp ../AIOne/src/TextContext.cpp ../AIOne/src/TextContext.hpp ../AIOne/src/TextContextOptions.h ../AIOne/src/TextGenOptions.hpp ../AIOne/src/TextGenResult.hpp ../AIOne/src/Timeable.hpp
 )
 
 
