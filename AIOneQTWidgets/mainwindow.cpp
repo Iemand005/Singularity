@@ -24,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent)
             );
         qDebug() << "and this is the file" << fileName;
 
-        ui->llmLoadProgressBar->show();
+        ui->llmLoadProgressBar->showIntermediate();
 
         llm = nullptr; // Unload the old before reload TODO: check if the path is valid (exists) before unloading!
 
@@ -41,19 +41,14 @@ MainWindow::MainWindow(QWidget *parent)
             qDebug() << "Loaded LLM";
 
             QMetaObject::invokeMethod(ui->llmInputFrame, [this]() {
-                QString systemPrompt = ui->systemPromptInput->toPlainText();
-
                 connect(ui->systemPromptInput, &QPlainTextEdit::textChanged, [this]() {
-                    QString systemPrompt = ui->systemPromptInput->toPlainText();
-                    this->chatManager->setSystemPrompt(systemPrompt);
+                    this->chatManager->setSystemPrompt(ui->systemPromptInput->toPlainText());
                 });
                 ui->llmLoadProgressBar->hide();
                 ui->llmInputFrame->setEnabled(true);
             });
         }, [this](const float &progress) {
-            QMetaObject::invokeMethod(ui->llmLoadProgressBar, [this, progress]() {
-                ui->llmLoadProgressBar->setValue(progress * 100);
-            });
+            QMetaObject::invokeMethod(ui->llmLoadProgressBar, &ProgressBar::setPercentage, Qt::QueuedConnection, progress);
         });
     });
 
@@ -99,28 +94,23 @@ MainWindow::MainWindow(QWidget *parent)
         // ui->loadSDButton->
         // TODO: disable lod button
 
-        // sdm->setProgressCallback();
-
-        ui->sdmLoadProgressBar->show();
+        ui->sdmLoadProgressBar->showIntermediate();
         ui->statusbar->showMessage("Loading model...");
 
         if (this->sdm) this->sdm = nullptr;
 
         SDModelOptions options;
-        options.flashAttention = ui->flashAttentionBox->isChecked();
-        options.freeParamsImmediately = ui->freeParamsBox->isChecked();
-        options.keepClipOnCpu = ui->clipOnCpuBox->isChecked();
-        options.keepControlNetOnCpu = ui->controlNetOnCpuBox->isChecked();
-        options.keepVaeOnCpu = ui->vaeOnCpuBox->isChecked();
+        options.flashAttention = ui->flashAttentionBox->checked();
+        options.freeParamsImmediately = ui->freeParamsBox->checked();
+        options.keepClipOnCpu = ui->clipOnCpuBox->checked();
+        options.keepControlNetOnCpu = ui->controlNetOnCpuBox->checked();
+        options.keepVaeOnCpu = ui->vaeOnCpuBox->checked();
         if (ui->customVaeBox->isEnabled()) options.vaePath = vaePath.toStdString();
 
         options.onProgress = [this](float progress) {
-            QMetaObject::invokeMethod(ui->sdmLoadProgressBar, [this, progress]() {
-                ui->sdmLoadProgressBar->setValue(progress * 100);
-
-                ui->sdmLoadProgressBar->setMaximum(100);
-                ui->sdmLoadProgressBar->setTextVisible(true);
-            });
+            // QMetaObject::invokeMethod(ui->sdmLoadProgressBar, &ProgressBar::setPercentage, Qt::QueuedConnection, Q_ARG(float, progress));
+            // QMetaObject::invokeMethod(ui->sdmLoadProgressBar, "setPercentage", Qt::QueuedConnection, Q_ARG(float, progress));
+            QMetaObject::invokeMethod(ui->sdmLoadProgressBar, &ProgressBar::setPercentage, Qt::QueuedConnection, progress);
         };
 
         factory->loadSDMAsync(fileName, options, [this](QSDModelPtr model) {
@@ -129,8 +119,6 @@ MainWindow::MainWindow(QWidget *parent)
 
             QMetaObject::invokeMethod(ui->sdmLoadProgressBar, [this]() {
                 ui->sdmLoadProgressBar->hide();
-                ui->sdmLoadProgressBar->setMaximum(0);
-                ui->sdmLoadProgressBar->setTextVisible(false);
 
                 ui->statusbar->showMessage("Done!");
             });
@@ -156,7 +144,7 @@ MainWindow::MainWindow(QWidget *parent)
         options.stepCount = ui->stepCountInput->value();
         options.clipSkip = ui->clipSkipInput->value();
 
-        options.tiling.enabled = ui->vaeTilingBox->isChecked();
+        options.tiling.enabled = ui->vaeTilingBox->checked();
         options.tiling.overlap = ui->tilingOverlapInput->value();
         options.tiling.tileHeight = ui->tilingHeightInput->value();
         options.tiling.tileWidth = ui->tilingWidthInput->value();
@@ -181,11 +169,6 @@ MainWindow::MainWindow(QWidget *parent)
 
         qDebug() << "Loaded Stable Diffusion model.";
     });
-
-
-    // QGraphicsScene *scene = new QGraphicsScene();
-    // ui->imageView->setScene(scene);
-
 }
 
 void MainWindow::send() {
@@ -221,9 +204,7 @@ void MainWindow::send() {
     };
 
     options.onInputEval = [this](const float &progress) {
-        QMetaObject::invokeMethod(ui->inputEvalProgressBar, [this, progress]() {
-            ui->inputEvalProgressBar->setValue(progress * 100);
-        });
+        QMetaObject::invokeMethod(ui->inputEvalProgressBar, &ProgressBar::setPercentage, Qt::QueuedConnection, progress);
     };
 
     chatManager->sendAsync(message, options);

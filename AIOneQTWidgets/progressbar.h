@@ -18,6 +18,20 @@ public:
         this->setMaximum(max);
     }
 
+    void showIntermediate() {
+        setIndeterminate();
+        show();
+    }
+
+public slots:
+
+    void setPercentage(float percentage) {
+        int scale = 10000;
+        if (indeterminate) setIndeterminate(false);
+        this->setValue(percentage * scale);
+        this->setMaximum(scale);
+    }
+
     void setIndeterminate(bool indeterminate = true) {
         this->indeterminate = indeterminate;
         this->setMaximum(indeterminate ? 0 : 100);

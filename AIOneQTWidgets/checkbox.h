@@ -10,7 +10,7 @@ public:
     CheckBox();
     CheckBox(QWidget *parent = nullptr) : QCheckBox(parent) {}
 
-    bool isChecked() {
+    bool checked() {
         return checkState() == Qt::Checked;
     }
 };
