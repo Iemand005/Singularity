@@ -90,7 +90,7 @@ MainWindow::MainWindow(QWidget *parent)
 
         QString fileName = QFileDialog::getOpenFileName(
             this,                    // Parent widget
-            tr("Open SafeTensors file"),         // Dialog title
+            tr("Open .safetensors file"),         // Dialog title
             nullptr,        // Starting directory
             tr("SafeTensors files (*.safetensors);")
             );
@@ -138,22 +138,15 @@ MainWindow::MainWindow(QWidget *parent)
     });
 
     connect(ui->vaeButton, &QPushButton::clicked, [this]() {
-        QString fileName = QFileDialog::getOpenFileName(
-            this,                    // Parent widget
-            tr("Open SafeTensors file"),         // Dialog title
-            QDir::homePath(),        // Starting directory
-            tr("SafeTensors files (*.safetensors);")
-            );
+        QString fileName = QFileDialog::getOpenFileName(this, tr("Open .safetensors file"), QDir::homePath(), tr("SafeTensors files (*.safetensors);"));
         qDebug() << "and this is the file" << fileName;
-
         vaePath = fileName;
     });
 
     connect(ui->generateButton, &QPushButton::clicked, [this]() {
-        qDebug() << "I need to generat ya image!";
+        qDebug() << "Generating image...";
 
-        ui->generationProgressBar->show();
-        ui->generationProgressBar->setValue(0);
+        ui->generationProgressBar->showAndReset();
 
         QString positive = ui->positiveInput->toPlainText();
         QString negative = ui->negativeInput->toPlainText();
@@ -170,12 +163,11 @@ MainWindow::MainWindow(QWidget *parent)
             showImage(image);
             QMetaObject::invokeMethod(ui->generationProgressBar, [this]() {
                 ui->generationProgressBar->hide();
-                ui->generationProgressBar->setTextVisible(true);
                 ui->statusbar->showMessage("Done!");
             });
         });
 
-        qDebug() << "Loaded da SD modelk";
+        qDebug() << "Loaded Stable Diffusion model.";
     });
 
 
@@ -237,32 +229,16 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
 }
 
 void MainWindow::showImage(QImage image) {
-    QMetaObject::invokeMethod(ui->previewImage, [this, image]() {
-        // QGraphicsPixmapItem *item = new QGraphicsPixmapItem(QPixmap::fromImage(image));
-        // ui->imageView->scene()->addItem(item);
-        // ui->imageView->fitInView(item, Qt::KeepAspectRatio);
-        ui->previewImage->setImage(image);
+    QMetaObject::invokeMethod(ui->imagePreview, [this, image]() {
         ui->imagePreview->setImage(image);
-        // ui->previewImage->setScaledContents(true);  // This makes it fill the label
-        // ui->previewImage->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-        // QPixmap pix = QPixmap::fromImage(image).scaled(ui->previewImage->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        // ui->previewImage->setPixmap(pix);
     });
 }
 
-// void MainWindow::resizeEvent(QResizeEvent *event) {
-
-// }
-
-
 void MainWindow::onPreviewGenerated(int step, int frameCount, const QImage& preview, bool isNoisy) {
     showImage(preview);
-    ui->generationProgressBar->setMaximum(frameCount);
-    ui->generationProgressBar->setValue(step);
+    ui->generationProgressBar->setValueWithMax(step, frameCount);
     if (step == frameCount) {
-        ui->generationProgressBar->setMaximum(0);
-        ui->generationProgressBar->setValue(0);
-        ui->generationProgressBar->setTextVisible(false);
+        ui->generationProgressBar->setIndeterminate();
         ui->statusbar->showMessage("VAE Decoding...");
     }
 }

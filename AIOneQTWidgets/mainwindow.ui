@@ -377,7 +377,7 @@
          </layout>
         </item>
         <item>
-         <widget class="QProgressBar" name="sdmLoadProgressBar">
+         <widget class="ProgressBar" name="sdmLoadProgressBar">
           <property name="minimum">
            <number>0</number>
           </property>
@@ -490,7 +490,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QProgressBar" name="generationProgressBar">
+            <widget class="ProgressBar" name="generationProgressBar">
              <property name="value">
               <number>0</number>
              </property>
@@ -605,19 +605,6 @@
           <item>
            <widget class="ImagePreview" name="imagePreview"/>
           </item>
-          <item>
-           <widget class="PreviewImage" name="previewImage">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
          </layout>
         </item>
        </layout>
@@ -640,14 +627,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>PreviewImage</class>
-   <extends>QLabel</extends>
-   <header>previewimage.h</header>
-  </customwidget>
-  <customwidget>
    <class>ImagePreview</class>
    <extends>QGraphicsView</extends>
    <header>imagepreview.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ProgressBar</class>
+   <extends>QProgressBar</extends>
+   <header>progressbar.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

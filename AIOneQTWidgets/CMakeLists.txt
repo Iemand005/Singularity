@@ -49,8 +49,8 @@ qt_add_executable(AIOneQTWidgets
     ../AIOneQTCore/QTextGenOptions.h
     ../AIOne/src/Chat.hpp ../AIOne/src/ChatManager.hpp ../AIOne/src/ContextInvalidError.hpp ../AIOne/src/LlamaUtil.hpp ../AIOne/src/LLModel.cpp ../AIOne/src/LLModel.hpp ../AIOne/src/LLModelOptions.hpp ../AIOne/src/Message.hpp ../AIOne/src/Model.cpp ../AIOne/src/Model.hpp ../AIOne/src/ModelFactory.cpp ../AIOne/src/ModelFactory.hpp ../AIOne/src/PreferredDevice.h ../AIOne/src/Role.h ../AIOne/src/SDImageOptions.h ../AIOne/src/SDModel.cpp ../AIOne/src/SDModel.hpp ../AIOne/src/SDModelOptions.hpp ../AIOne/src/TextContext.cpp ../AIOne/src/TextContext.hpp ../AIOne/src/TextContextOptions.h ../AIOne/src/TextGenOptions.hpp ../AIOne/src/TextGenResult.hpp ../AIOne/src/Timeable.hpp
     ../AIOne/src/ModelOptions.h
-    previewimage.h previewimage.cpp
     imagepreview.h imagepreview.cpp
+    progressbar.h progressbar.cpp
 )
 
 
