@@ -37,9 +37,9 @@ class QSDModel : public QObject, public SDModel {
 public:
 
     QSDModel(const QString &path, SDModelOptions options = {}) : SDModel(path.toStdString(), options) {
-        this->setPreviewCallback([this](int step, int frameCount, sd_image_t* sdImage, bool isNoisy) {
+        this->setPreviewCallback([this](int step, sd_image_t* sdImage, bool isNoisy) {
             QImage image = this->convertToQImage(*sdImage);
-            emit this->previewGenerated(step, frameCount, image, isNoisy);
+            emit this->previewGenerated(step, image, isNoisy);
         });
     }
 
@@ -60,5 +60,5 @@ public:
 signals:
     void stepProgress(int step, int totalSteps);
     
-    void previewGenerated(int step, int frameCount, const QImage& preview, bool isNoisy);
+    void previewGenerated(int step, const QImage& preview, bool isNoisy);
 };

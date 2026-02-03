@@ -107,11 +107,11 @@ MainWindow::MainWindow(QWidget *parent)
         if (this->sdm) this->sdm = nullptr;
 
         SDModelOptions options;
-        options.flashAttention = ui->flashAttentionBox->checkState() == Qt::Checked;
-        options.freeParamsImmediately = ui->freeParamsBox->checkState() == Qt::Checked;
-        options.keepClipOnCpu = ui->clipOnCpuBox->checkState() == Qt::Checked;
-        options.keepControlNetOnCpu = ui->controlNetOnCpuBox->checkState() == Qt::Checked;
-        options.keepVaeOnCpu = ui->vaeOnCpuBox->checkState() == Qt::Checked;
+        options.flashAttention = ui->flashAttentionBox->isChecked();
+        options.freeParamsImmediately = ui->freeParamsBox->isChecked();
+        options.keepClipOnCpu = ui->clipOnCpuBox->isChecked();
+        options.keepControlNetOnCpu = ui->controlNetOnCpuBox->isChecked();
+        options.keepVaeOnCpu = ui->vaeOnCpuBox->isChecked();
         if (ui->customVaeBox->isEnabled()) options.vaePath = vaePath.toStdString();
 
         options.onProgress = [this](float progress) {
@@ -146,10 +146,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->generateButton, &QPushButton::clicked, [this]() {
         qDebug() << "Generating image...";
 
-        ui->generationProgressBar->showAndReset();
-
-        QString positive = ui->positiveInput->toPlainText();
-        QString negative = ui->negativeInput->toPlainText();
+        ui->statusbar->showMessage("Generating...");
 
         SDImageOptions options;
 
@@ -158,6 +155,14 @@ MainWindow::MainWindow(QWidget *parent)
         options.height = ui->heightBox->value();
         options.stepCount = ui->stepCountInput->value();
         options.clipSkip = ui->clipSkipInput->value();
+        options.tiling.enabled = ui->vaeTilingBox->isChecked();
+
+        auto bar = ui->generationProgressBar;
+        bar->showAndReset();
+        bar->setMaximum(options.stepCount);
+
+        QString positive = ui->positiveInput->toPlainText();
+        QString negative = ui->negativeInput->toPlainText();
 
         sdm->generateAsync(positive, negative, options, [this](QImage image) {
             showImage(image);
@@ -234,11 +239,12 @@ void MainWindow::showImage(QImage image) {
     });
 }
 
-void MainWindow::onPreviewGenerated(int step, int frameCount, const QImage& preview, bool isNoisy) {
+void MainWindow::onPreviewGenerated(int step, const QImage& preview, bool isNoisy) {
     showImage(preview);
-    ui->generationProgressBar->setValueWithMax(step, frameCount);
-    if (step == frameCount) {
-        ui->generationProgressBar->setIndeterminate();
+    auto bar = ui->generationProgressBar;
+    bar->setValue(step);
+    if (step == bar->maximum()) {
+        bar->setIndeterminate();
         ui->statusbar->showMessage("VAE Decoding...");
     }
 }

@@ -51,6 +51,7 @@ qt_add_executable(AIOneQTWidgets
     ../AIOne/src/ModelOptions.h
     imagepreview.h imagepreview.cpp
     progressbar.h progressbar.cpp
+    checkbox.h checkbox.cpp
 )
 
 
