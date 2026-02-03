@@ -40,6 +40,11 @@ private:
     QString vaePath = "";
     QString taePath = "";
 
+    SDImageOptions sdImageOptions;
+    SDModelOptions sdModelOptions;
+
+    QString quantModelPath = "";
+
     void showImage(QImage image);
 };
 #endif // MAINWINDOW_H

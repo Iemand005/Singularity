@@ -84,10 +84,10 @@ MainWindow::MainWindow(QWidget *parent)
         qDebug() << "I need that als too!";
 
         QString fileName = QFileDialog::getOpenFileName(
-            this,                    // Parent widget
-            tr("Open .safetensors file"),         // Dialog title
-            nullptr,        // Starting directory
-            tr("SafeTensors files (*.safetensors);")
+            this,
+            tr("Open Stable Diffusion model file"),
+            nullptr,
+            tr("Stable Diffusion models (*.safetensors *.gguf);;All Files (*)")
             );
         qDebug() << "and this is the file" << fileName;
 
@@ -99,18 +99,16 @@ MainWindow::MainWindow(QWidget *parent)
 
         if (this->sdm) this->sdm = nullptr;
 
-        SDModelOptions options;
+        auto options = sdModelOptions;
         options.flashAttention = ui->flashAttentionBox->checked();
         options.freeParamsImmediately = ui->freeParamsBox->checked();
         options.keepClipOnCpu = ui->clipOnCpuBox->checked();
         options.keepControlNetOnCpu = ui->controlNetOnCpuBox->checked();
         options.keepVaeOnCpu = ui->vaeOnCpuBox->checked();
         if (ui->customVaeBox->checked()) options.vaePath = vaePath.toStdString();
-        if (ui->useTaeBox->checked())
+        if (ui->useTaeBox->checked()) options.taePath = taePath.toStdString();
 
         options.onProgress = [this](float progress) {
-            // QMetaObject::invokeMethod(ui->sdmLoadProgressBar, &ProgressBar::setPercentage, Qt::QueuedConnection, Q_ARG(float, progress));
-            // QMetaObject::invokeMethod(ui->sdmLoadProgressBar, "setPercentage", Qt::QueuedConnection, Q_ARG(float, progress));
             QMetaObject::invokeMethod(ui->sdmLoadProgressBar, &ProgressBar::setPercentage, Qt::QueuedConnection, progress);
         };
 
@@ -127,15 +125,27 @@ MainWindow::MainWindow(QWidget *parent)
     });
 
     connect(ui->vaeButton, &QPushButton::clicked, [this]() {
-        QString fileName = QFileDialog::getOpenFileName(this, tr("Open .safetensors file"), QDir::homePath(), tr("SafeTensors files (*.safetensors);"));
+        QString fileName = QFileDialog::getOpenFileName(this, tr("Open VAE .safetensors file"), QDir::homePath(), tr("SafeTensors files (*.safetensors);"));
         qDebug() << "and this is the file" << fileName;
-        vaePath = fileName;
+        this->vaePath = fileName;
     });
 
     connect(ui->chooseTaeButton, &QPushButton::clicked, [this]() {
-        QString fileName = QFileDialog::getOpenFileName(this, tr("Open .safetensors file"), QDir::homePath(), tr("SafeTensors files (*.safetensors);"));
+        QString fileName = QFileDialog::getOpenFileName(this, tr("Open TAE .safetensors file"), QDir::homePath(), tr("SafeTensors files (*.safetensors);"));
         qDebug() << "and this is the file" << fileName;
         this->taePath = fileName;
+    });
+
+    connect(ui->clipGButton, &QPushButton::clicked, [this]() {
+        QString fileName = QFileDialog::getOpenFileName(this, tr("Open CLIP G .safetensors file"), QDir::homePath(), tr("SafeTensors files (*.safetensors);"));
+        qDebug() << "and this is the file" << fileName;
+        this->sdModelOptions.clipGPath = fileName.toStdString();
+    });
+
+    connect(ui->clipLButton, &QPushButton::clicked, [this]() {
+        QString fileName = QFileDialog::getOpenFileName(this, tr("Open CLIP L .safetensors file"), QDir::homePath(), tr("SafeTensors files (*.safetensors);"));
+        qDebug() << "and this is the file" << fileName;
+        this->sdModelOptions.clipLPath = fileName.toStdString();
     });
 
     connect(ui->generateButton, &QPushButton::clicked, [this]() {
@@ -143,8 +153,8 @@ MainWindow::MainWindow(QWidget *parent)
 
         ui->statusbar->showMessage("Generating...");
 
-        SDImageOptions options;
-
+        // SDImageOptions options;
+        auto options = sdImageOptions;
         options.cfgScale = ui->cfgInput->value();
         options.width = ui->widthBox->value();
         options.height = ui->heightBox->value();
@@ -157,6 +167,8 @@ MainWindow::MainWindow(QWidget *parent)
         options.tiling.tileWidth = ui->tilingWidthInput->value();
 
         options.seed = ui->seedInput->value();
+
+        if (ui->useTaeBox->checked()) options.previewMode = SDPreviewMode::TAE;
 
         auto bar = ui->generationProgressBar;
         bar->showAndReset();
@@ -175,6 +187,23 @@ MainWindow::MainWindow(QWidget *parent)
         });
 
         qDebug() << "Loaded Stable Diffusion model.";
+    });
+
+    // SD Quantization o tpions
+
+    connect(ui->selectQuantSourceButton, &QPushButton::clicked, [this]() {
+        qDebug() << "Selecting model...";
+        QString fileName = QFileDialog::getOpenFileName(this, tr("Open CLIP L .safetensors file"), QDir::homePath(), tr("SafeTensors files (*.safetensors);"));
+        qDebug() << "and this is the file" << fileName;
+        this->quantModelPath = fileName.toStdString();
+    });
+
+    connect(ui->quantizeButton, &QPushButton::clicked, [this]() {
+        qDebug() << "Quantizing...";
+        QString fileName = QFileDialog::getOpenFileName(this, tr("Open CLIP L .safetensors file"), QDir::homePath(), tr("SafeTensors files (*.safetensors);"));
+        qDebug() << "and this is the file" << fileName;
+
+        factory->convertSDModel(this->quantModelPath, QuantizationLevels::Q4, fileName);
     });
 }
 
