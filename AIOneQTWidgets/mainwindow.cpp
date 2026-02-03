@@ -36,12 +36,12 @@ MainWindow::MainWindow(QWidget *parent)
                 return;
             }
             this->llm = std::move(model);
+            this->chatManager = llm->createChatManager();
 
             qDebug() << "Loaded LLM";
 
             QMetaObject::invokeMethod(ui->llmInputFrame, [this]() {
                 QString systemPrompt = ui->systemPromptInput->toPlainText();
-                this->chatManager = llm->createChatManager(systemPrompt);
 
                 connect(ui->systemPromptInput, &QPlainTextEdit::textChanged, [this]() {
                     QString systemPrompt = ui->systemPromptInput->toPlainText();
