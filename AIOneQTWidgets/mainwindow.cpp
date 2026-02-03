@@ -57,7 +57,7 @@ MainWindow::MainWindow(QWidget *parent)
         });
     });
 
-    connect(ui->sendButton, &QPushButton::clicked, &MainWindow::send);
+    connect(ui->sendButton, &QPushButton::clicked, [this](){send();});
 
     connect(ui->continueButton, &QPushButton::clicked, [this]() {
         QString message = ui->messageInput->toPlainText();
