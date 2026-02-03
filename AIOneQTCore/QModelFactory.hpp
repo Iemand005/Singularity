@@ -46,6 +46,10 @@ public:
         runAsync([this, path, onDone]() { onDone(loadSDM(path)); });
     }
 
+    void loadSDMAsync(const QString &path, SDModelOptions options, QLoadSDModelFinished onDone = nullptr) {
+        runAsync([this, path, onDone]() { onDone(loadSDM(path)); });
+    }
+
 };
 
 using QModelFactoryPtr = std::unique_ptr<QModelFactory>;

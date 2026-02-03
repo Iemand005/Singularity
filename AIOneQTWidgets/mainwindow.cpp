@@ -101,7 +101,9 @@ MainWindow::MainWindow(QWidget *parent)
 
         if (this->sdm) this->sdm = nullptr;
 
-        factory->loadSDMAsync(fileName, [this](QSDModelPtr model) {
+        SDModelOptions options;
+
+        factory->loadSDMAsync(fileName, options, [this](QSDModelPtr model) {
             this->sdm = std::move(model);
             connect(this->sdm.get(), &QSDModel::previewGenerated, this, &MainWindow::onPreviewGenerated);
 
@@ -131,10 +133,11 @@ MainWindow::MainWindow(QWidget *parent)
 
         SDImageOptions options;
 
-        options.cfgScale = ui->cfgSlider->value();
+        options.cfgScale = ui->cfgInput->value();
         options.width = ui->widthBox->value();
         options.height = ui->heightBox->value();
-        options.stepCount = ui->stepCountSlider->value();
+        options.stepCount = ui->stepCountInput->value();
+        options.clipSkip = ui->clipSkipInput->value();
 
         sdm->generateAsync(positive, negative, options, [this](QImage image) {
             showImage(image);
