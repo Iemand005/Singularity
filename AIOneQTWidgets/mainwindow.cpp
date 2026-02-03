@@ -114,8 +114,10 @@ MainWindow::MainWindow(QWidget *parent)
 
         options.onProgress = [this](float progress) {
             QMetaObject::invokeMethod(ui->sdmLoadProgressBar, [this, progress]() {
-                ui->sdmLoadProgressBar->setMaximum(100);
                 ui->sdmLoadProgressBar->setValue(progress * 100);
+
+                ui->sdmLoadProgressBar->setMaximum(100);
+                ui->sdmLoadProgressBar->setTextVisible(true);
             });
         };
 
@@ -125,6 +127,8 @@ MainWindow::MainWindow(QWidget *parent)
 
             QMetaObject::invokeMethod(ui->sdmLoadProgressBar, [this]() {
                 ui->sdmLoadProgressBar->hide();
+                ui->sdmLoadProgressBar->setMaximum(0);
+                ui->sdmLoadProgressBar->setTextVisible(false);
             });
         });
     });
