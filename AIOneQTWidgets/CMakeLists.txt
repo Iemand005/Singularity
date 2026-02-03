@@ -52,6 +52,7 @@ qt_add_executable(AIOneQTWidgets
     imagepreview.h imagepreview.cpp
     progressbar.h progressbar.cpp
     checkbox.h checkbox.cpp
+    longspinbox.h longspinbox.cpp
 )
 
 
