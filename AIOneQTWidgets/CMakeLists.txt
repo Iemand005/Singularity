@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.19)
 project(AIOneQTWidgets LANGUAGES CXX)
 
 if(MSVC)
-    add_compile_options(/FS /bigobj /MP /W3 /wd4244 /wd4267)
+    add_compile_options(/FS /bigobj /MP /W3 /wd4244 /wd4267 /wd4305)
     set(CMAKE_JOB_POOLS compile=1 link=1)
     add_definitions(-DNOMINMAX -D_CRT_SECURE_NO_WARNINGS)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDebug" CACHE STRING "" FORCE)

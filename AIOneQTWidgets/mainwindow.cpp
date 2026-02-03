@@ -155,7 +155,13 @@ MainWindow::MainWindow(QWidget *parent)
         options.height = ui->heightBox->value();
         options.stepCount = ui->stepCountInput->value();
         options.clipSkip = ui->clipSkipInput->value();
+
         options.tiling.enabled = ui->vaeTilingBox->isChecked();
+        options.tiling.overlap = ui->tilingOverlapInput->value();
+        options.tiling.tileHeight = ui->tilingHeightInput->value();
+        options.tiling.tileWidth = ui->tilingWidthInput->value();
+
+        options.seed = ui->seedInput->value();
 
         auto bar = ui->generationProgressBar;
         bar->showAndReset();
@@ -169,6 +175,7 @@ MainWindow::MainWindow(QWidget *parent)
             QMetaObject::invokeMethod(ui->generationProgressBar, [this]() {
                 ui->generationProgressBar->hide();
                 ui->statusbar->showMessage("Done!");
+                if (ui->randomizeSeedBox->isChecked()) ui->seedInput->value();
             });
         });
 

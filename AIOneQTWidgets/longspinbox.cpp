@@ -1,8 +1,6 @@
 #include "longspinbox.h"
 
 #include <QLineEdit>
-#include <limits>
-#include <climits>
 
 LongSpinBox::LongSpinBox() {}
 

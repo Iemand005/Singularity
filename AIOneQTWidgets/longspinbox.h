@@ -11,12 +11,13 @@ public:
     LongSpinBox();
     LongSpinBox(QWidget *parent = nullptr);
 
-    qint64 minimum() const;
-    void setMinimum(qint64 min);
-    qint64 maximum() const;
-    void setMaximum(qint64 max);
-    void setRange(qint64 min, qint64 max);
     qint64 value() const;
+    qint64 minimum() const;
+    qint64 maximum() const;
+
+    void setRange(qint64 min, qint64 max);
+    void setMinimum(qint64 min);
+    void setMaximum(qint64 max);
 
 public slots:
     void setValue(qint64 val);

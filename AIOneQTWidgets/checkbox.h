@@ -8,6 +8,7 @@ class CheckBox : public QCheckBox
     Q_OBJECT
 public:
     CheckBox();
+    CheckBox(QWidget *parent = nullptr) : QCheckBox(parent) {}
 
     bool isChecked() {
         return checkState() == Qt::Checked;
