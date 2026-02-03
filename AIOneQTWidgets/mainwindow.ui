@@ -33,7 +33,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -288,7 +288,7 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QCheckBox" name="checkBox_2">
+           <widget class="QCheckBox" name="flashAttentionBox">
             <property name="text">
              <string>Flash attention</string>
             </property>
@@ -297,21 +297,21 @@
           <item row="2" column="1">
            <layout class="QHBoxLayout" name="horizontalLayout_6">
             <item>
-             <widget class="QCheckBox" name="checkBox_4">
+             <widget class="QCheckBox" name="controlNetOnCpuBox">
               <property name="text">
-               <string>CheckBox</string>
+               <string>ControlNet</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QCheckBox" name="checkBox_3">
+             <widget class="QCheckBox" name="vaeOnCpuBox">
               <property name="text">
-               <string>LoRA</string>
+               <string>VAE</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QCheckBox" name="checkBox">
+             <widget class="QCheckBox" name="clipOnCpuBox">
               <property name="text">
                <string>CLIIP</string>
               </property>
@@ -327,9 +327,29 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QCheckBox" name="checkBox_5">
+           <widget class="QCheckBox" name="freeParamsBox">
             <property name="text">
              <string>Unload model immediately</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QPushButton" name="vaeButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Choose custom VAE</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QCheckBox" name="customVaeBox">
+            <property name="text">
+             <string>Custom VAE</string>
             </property>
            </widget>
           </item>
@@ -341,19 +361,6 @@
            <widget class="QPushButton" name="loadSDButton">
             <property name="text">
              <string>Load Model</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="vaeButton">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string>Load VAE</string>
             </property>
            </widget>
           </item>

@@ -24,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent)
             );
         qDebug() << "and this is the file" << fileName;
 
-        ui->llmLoadProgressBar->hide();
+        ui->llmLoadProgressBar->show();
 
         llm = nullptr; // Unload the old before reload TODO: check if the path is valid (exists) before unloading!
 
@@ -102,6 +102,12 @@ MainWindow::MainWindow(QWidget *parent)
         if (this->sdm) this->sdm = nullptr;
 
         SDModelOptions options;
+        options.flashAttention = ui->flashAttentionBox->isEnabled();
+        options.freeParamsImmediately = ui->freeParamsBox->isEnabled();
+        options.keepClipOnCpu = ui->clipOnCpuBox->isEnabled();
+        options.keepControlNetOnCpu = ui->controlNetOnCpuBox->isEnabled();
+        options.keepVaeOnCpu = ui->vaeOnCpuBox->isEnabled();
+        if (ui->customVaeBox->isEnabled()) options.vaePath = vaePath.toStdString();
 
         factory->loadSDMAsync(fileName, options, [this](QSDModelPtr model) {
             this->sdm = std::move(model);
