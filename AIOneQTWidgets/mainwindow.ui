@@ -33,7 +33,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="llmTab">
        <attribute name="title">
@@ -361,9 +361,26 @@
               </property>
              </widget>
             </item>
+            <item>
+             <widget class="CheckBox" name="useTaeBox">
+              <property name="text">
+               <string>Use TAE</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="chooseTaeButton">
+              <property name="text">
+               <string>Choose TAE</string>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
          </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_11"/>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_5">

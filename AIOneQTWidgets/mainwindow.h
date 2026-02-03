@@ -38,6 +38,7 @@ private:
     Ui::MainWindow *ui;
 
     QString vaePath = "";
+    QString taePath = "";
 
     void showImage(QImage image);
 };

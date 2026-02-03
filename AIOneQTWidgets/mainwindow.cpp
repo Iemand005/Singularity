@@ -105,7 +105,8 @@ MainWindow::MainWindow(QWidget *parent)
         options.keepClipOnCpu = ui->clipOnCpuBox->checked();
         options.keepControlNetOnCpu = ui->controlNetOnCpuBox->checked();
         options.keepVaeOnCpu = ui->vaeOnCpuBox->checked();
-        if (ui->customVaeBox->isEnabled()) options.vaePath = vaePath.toStdString();
+        if (ui->customVaeBox->checked()) options.vaePath = vaePath.toStdString();
+        if (ui->useTaeBox->checked())
 
         options.onProgress = [this](float progress) {
             // QMetaObject::invokeMethod(ui->sdmLoadProgressBar, &ProgressBar::setPercentage, Qt::QueuedConnection, Q_ARG(float, progress));
@@ -129,6 +130,12 @@ MainWindow::MainWindow(QWidget *parent)
         QString fileName = QFileDialog::getOpenFileName(this, tr("Open .safetensors file"), QDir::homePath(), tr("SafeTensors files (*.safetensors);"));
         qDebug() << "and this is the file" << fileName;
         vaePath = fileName;
+    });
+
+    connect(ui->chooseTaeButton, &QPushButton::clicked, [this]() {
+        QString fileName = QFileDialog::getOpenFileName(this, tr("Open .safetensors file"), QDir::homePath(), tr("SafeTensors files (*.safetensors);"));
+        qDebug() << "and this is the file" << fileName;
+        this->taePath = fileName;
     });
 
     connect(ui->generateButton, &QPushButton::clicked, [this]() {
