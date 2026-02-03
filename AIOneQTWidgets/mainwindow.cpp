@@ -195,15 +195,15 @@ MainWindow::MainWindow(QWidget *parent)
         qDebug() << "Selecting model...";
         QString fileName = QFileDialog::getOpenFileName(this, tr("Open CLIP L .safetensors file"), QDir::homePath(), tr("SafeTensors files (*.safetensors);"));
         qDebug() << "and this is the file" << fileName;
-        this->quantModelPath = fileName.toStdString();
+        this->quantModelPath = fileName;
     });
 
     connect(ui->quantizeButton, &QPushButton::clicked, [this]() {
         qDebug() << "Quantizing...";
-        QString fileName = QFileDialog::getOpenFileName(this, tr("Open CLIP L .safetensors file"), QDir::homePath(), tr("SafeTensors files (*.safetensors);"));
+        QString fileName = QFileDialog::getSaveFileName(this, tr("Open L SAVE TO RAARRAwwawawa .gguf file"), QDir::homePath(), tr("SafeTensors shit files (*.gguf);"));
         qDebug() << "and this is the file" << fileName;
 
-        factory->convertSDModel(this->quantModelPath, QuantizationLevels::Q4, fileName);
+        factory->convertSDModel(this->quantModelPath.toStdString(), Q4, fileName.toStdString());
     });
 }
 
