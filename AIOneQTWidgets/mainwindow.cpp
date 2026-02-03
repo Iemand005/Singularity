@@ -19,7 +19,7 @@ MainWindow::MainWindow(QWidget *parent)
         QString fileName = QFileDialog::getOpenFileName(
             this,                    // Parent widget
             tr("Open GGUF file"),         // Dialog title
-            QDir::homePath(),        // Starting directory
+            nullptr,        // Starting directory
             tr("GGUF files (*.gguf);")
             );
         qDebug() << "and this is the file" << fileName;
@@ -63,7 +63,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->continueButton, &QPushButton::clicked, [this]() {
         QString message = ui->messageInput->toPlainText();
-        // std::shared_ptr<Message> draft = std::make_shared<Message>(Role::User, message);
+
         AsyncTextGenOptions options;
         options.maxTokens = 1;
         options.onToken = [this](const std::string &token) {
@@ -92,7 +92,7 @@ MainWindow::MainWindow(QWidget *parent)
         QString fileName = QFileDialog::getOpenFileName(
             this,                    // Parent widget
             tr("Open SafeTensors file"),         // Dialog title
-            QDir::homePath(),        // Starting directory
+            nullptr,        // Starting directory
             tr("SafeTensors files (*.safetensors);")
             );
         qDebug() << "and this is the file" << fileName;

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.19)
 project(AIOneQTWidgets LANGUAGES CXX)
 
 if(MSVC)
-    add_compile_options(/FS /bigobj /MP /W3 /wd4244 /wd4267 /fsanitize=address /Zi)
+    add_compile_options(/FS /bigobj /MP /W3 /wd4244 /wd4267)
     set(CMAKE_JOB_POOLS compile=1 link=1)
     add_definitions(-DNOMINMAX -D_CRT_SECURE_NO_WARNINGS)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDebug" CACHE STRING "" FORCE)
@@ -16,6 +16,9 @@ if(MSVC)
     set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /FS" CACHE STRING "" FORCE)
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /FS" CACHE STRING "" FORCE)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+
+    # add_compile_options(/fsanitize=address /Zi)
+    # add_link_options(/fsanitize=address)
 endif()
 
 if(MSVC)
@@ -36,7 +39,7 @@ find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets LinguistTools)
 qt_standard_project_setup()
 
 qt_add_executable(AIOneQTWidgets
-    WIN32 MACOSX_BUNDLE
+    # WIN32 MACOSX_BUNDLE
     main.cpp
     mainwindow.cpp
     mainwindow.h
