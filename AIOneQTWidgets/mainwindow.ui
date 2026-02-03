@@ -603,6 +603,9 @@
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_10">
           <item>
+           <widget class="ImagePreview" name="imagePreview"/>
+          </item>
+          <item>
            <widget class="PreviewImage" name="previewImage">
             <property name="sizePolicy">
              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
@@ -640,6 +643,11 @@
    <class>PreviewImage</class>
    <extends>QLabel</extends>
    <header>previewimage.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ImagePreview</class>
+   <extends>QGraphicsView</extends>
+   <header>imagepreview.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

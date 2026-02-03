@@ -242,6 +242,7 @@ void MainWindow::showImage(QImage image) {
         // ui->imageView->scene()->addItem(item);
         // ui->imageView->fitInView(item, Qt::KeepAspectRatio);
         ui->previewImage->setImage(image);
+        ui->imagePreview->setImage(image);
         // ui->previewImage->setScaledContents(true);  // This makes it fill the label
         // ui->previewImage->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
         // QPixmap pix = QPixmap::fromImage(image).scaled(ui->previewImage->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
