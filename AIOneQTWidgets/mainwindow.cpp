@@ -57,9 +57,7 @@ MainWindow::MainWindow(QWidget *parent)
         });
     });
 
-    connect(ui->sendButton, &QPushButton::clicked, [this]() {
-        send();
-    });
+    connect(ui->sendButton, &QPushButton::clicked, &MainWindow::send);
 
     connect(ui->continueButton, &QPushButton::clicked, [this]() {
         QString message = ui->messageInput->toPlainText();
@@ -165,8 +163,7 @@ void MainWindow::send() {
     ui->listWidget->addItem(message);
 
     ui->listWidget->addItem("");
-    auto lastItemIndex = ui->listWidget->count() - 1;
-    auto lastItem = ui->listWidget->item(lastItemIndex);
+    auto lastItem = ui->listWidget->item(ui->listWidget->count() - 1);
     ui->tokensGeneratedDisplay->display(0);
 
     QAsyncTextGenOptions options;

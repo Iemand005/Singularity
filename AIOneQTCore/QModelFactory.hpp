@@ -38,8 +38,8 @@ public:
         runAsync([this, path, options, onDone, onProgress]() { onDone(loadLLM(path, options, onProgress)); });
     }
 
-    QSDModelPtr loadSDM(const QString &path, const QString vaePath = "") {
-        return std::make_unique<QSDModel>(path, vaePath);
+    QSDModelPtr loadSDM(const QString &path, SDModelOptions options = {}) {
+        return std::make_unique<QSDModel>(path, options);
     }
 
     void loadSDMAsync(const QString &path, QLoadSDModelFinished onDone = nullptr) {
@@ -47,7 +47,7 @@ public:
     }
 
     void loadSDMAsync(const QString &path, SDModelOptions options, QLoadSDModelFinished onDone = nullptr) {
-        runAsync([this, path, onDone]() { onDone(loadSDM(path)); });
+        runAsync([this, path, options, onDone]() { onDone(loadSDM(path, options)); });
     }
 
 };
