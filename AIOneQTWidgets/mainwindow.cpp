@@ -98,10 +98,7 @@ MainWindow::MainWindow(QWidget *parent)
         // ui->loadSDButton->
         // TODO: disable lod button
 
-        sdm->setProgressCallback([this](float progress) {
-            ui->sdmLoadProgressBar->setMaximum(100);
-            ui->sdmLoadProgressBar->setValue(progress * 100);
-        });
+        // sdm->setProgressCallback();
 
         ui->sdmLoadProgressBar->show();
 
@@ -114,6 +111,13 @@ MainWindow::MainWindow(QWidget *parent)
         options.keepControlNetOnCpu = ui->controlNetOnCpuBox->checkState() == Qt::Checked;
         options.keepVaeOnCpu = ui->vaeOnCpuBox->checkState() == Qt::Checked;
         if (ui->customVaeBox->isEnabled()) options.vaePath = vaePath.toStdString();
+
+        options.onProgress = [this](float progress) {
+            QMetaObject::invokeMethod(ui->sdmLoadProgressBar, [this, progress]() {
+                ui->sdmLoadProgressBar->setMaximum(100);
+                ui->sdmLoadProgressBar->setValue(progress * 100);
+            });
+        };
 
         factory->loadSDMAsync(fileName, options, [this](QSDModelPtr model) {
             this->sdm = std::move(model);
