@@ -175,7 +175,7 @@ MainWindow::MainWindow(QWidget *parent)
             QMetaObject::invokeMethod(ui->generationProgressBar, [this]() {
                 ui->generationProgressBar->hide();
                 ui->statusbar->showMessage("Done!");
-                if (ui->randomizeSeedBox->isChecked()) ui->seedInput->value();
+                if (ui->randomizeSeedBox->isChecked()) ui->seedInput->setValue(sdm->newSeed());
             });
         });
 
