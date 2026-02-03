@@ -95,16 +95,18 @@ MainWindow::MainWindow(QWidget *parent)
             );
         qDebug() << "and this is the file" << fileName;
 
+        // ui->loadSDButton->
+        // TODO: disable lod button
         ui->sdmLoadProgressBar->show();
 
         if (this->sdm) this->sdm = nullptr;
 
         SDModelOptions options;
-        options.flashAttention = ui->flashAttentionBox->isEnabled();
-        options.freeParamsImmediately = ui->freeParamsBox->isEnabled();
-        options.keepClipOnCpu = ui->clipOnCpuBox->isEnabled();
-        options.keepControlNetOnCpu = ui->controlNetOnCpuBox->isEnabled();
-        options.keepVaeOnCpu = ui->vaeOnCpuBox->isEnabled();
+        options.flashAttention = ui->flashAttentionBox->checkState() == Qt::Checked;
+        options.freeParamsImmediately = ui->freeParamsBox->checkState() == Qt::Checked;
+        options.keepClipOnCpu = ui->clipOnCpuBox->checkState() == Qt::Checked;
+        options.keepControlNetOnCpu = ui->controlNetOnCpuBox->checkState() == Qt::Checked;
+        options.keepVaeOnCpu = ui->vaeOnCpuBox->checkState() == Qt::Checked;
         if (ui->customVaeBox->isEnabled()) options.vaePath = vaePath.toStdString();
 
         factory->loadSDMAsync(fileName, options, [this](QSDModelPtr model) {
