@@ -7,6 +7,8 @@
 
 #include "../AIOneQTCore/QModelFactory.hpp"
 
+#include "progressbar.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -44,6 +46,8 @@ private:
     SDModelOptions sdModelOptions;
 
     QString quantModelPath = "";
+
+    ProgressCallback progressFor(ProgressBar *bar);
 
     void showImage(QImage image);
 };
