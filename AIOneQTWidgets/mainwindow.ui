@@ -815,6 +815,9 @@
                 </property>
                </widget>
               </item>
+              <item>
+               <layout class="QVBoxLayout" name="verticalLayout_12"/>
+              </item>
              </layout>
             </widget>
            </widget>
