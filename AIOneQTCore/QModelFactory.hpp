@@ -26,8 +26,7 @@ public:
         return std::make_unique<QLLModel>(path, options);
     }
 
-    void loadLLMAsync(const QString &path, LLModelOptions options = {}, QLoadLLModelFinished onDone = nullptr, ProgressCallback onProgress = nullptr) {
-        options.onProgress = onProgress;
+    void loadLLMAsync(const QString &path, LLModelOptions options = {}, QLoadLLModelFinished onDone = nullptr) {
         runAsync([this, path, options, onDone]() { onDone(loadLLM(path, options)); });
     }
 
@@ -43,9 +42,9 @@ public:
         runAsync([this, path, options, onDone]() { onDone(loadSDM(path, options)); });
     }
 
-    void convertSDModelAsync(const QString source, QuantTypes level, const QString destination, ProgressCallback onProgress = nullptr) {
+    void convertSDModelAsync(const QString source, QuantTypes level, const QString destination, ProgressCallback onProgress = nullptr, FinishedCallback<bool> onDone = nullptr) {
         std::string src = source.toStdString(), dxt = destination.toStdString();
-        super()->convertSDModelAsync(src, level, dxt, onProgress);
+        super()->convertSDModelAsync(src, level, dxt, onProgress, onDone);
     }
 
 };

@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QDir>
 
 #include <ModelFactory.hpp>
 
@@ -49,6 +50,9 @@ private:
 
     ProgressCallback progressFor(ProgressBar *bar);
 
-    void showImage(QImage image);
+    void showImage(QImage image, bool smooth = false);
+
+    QString lastPath = QDir::homePath(); // TOOD:: load dis from a file or somthng yaya
+    QString openFileDialog(const QString &title, QString fileTypes = tr("SafeTensors files (*.safetensors);"));
 };
 #endif // MAINWINDOW_H

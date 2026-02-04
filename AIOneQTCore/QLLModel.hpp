@@ -12,14 +12,10 @@ class QLLModel : public QObject, public LLModel {
 public:
 
     LLModel *super() {
-        return (LLModel *)this;
+        return this;
     }
 
-    QLLModel(const QString &path) : QLLModel(path, nullptr) {}
-
-    QLLModel(const QString &path, ProgressCallback onProgress = nullptr) : QLLModel(path, LLModelOptions{}, onProgress) {}
-
-    QLLModel(const QString &path, const LLModelOptions &options = {}, ProgressCallback onProgress = nullptr) : LLModel(path.toStdString(), options, onProgress) {
+    QLLModel(const QString &path, const LLModelOptions &options = {}) : LLModel(path.toStdString(), options) {
         messageContext = createContext();
     }
 

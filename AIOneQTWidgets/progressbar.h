@@ -25,6 +25,10 @@ public:
         show();
     }
 
+    bool full() {
+        return value() == maximum();
+    }
+
 public slots:
 
     void setPercentage(float percentage) {
@@ -32,7 +36,6 @@ public slots:
         if (indeterminate) setIndeterminate(false);
         this->setValue(percentage * scale);
         this->setMaximum(scale);
-        this->show();
     }
 
     void setIndeterminate(bool indeterminate = true) {

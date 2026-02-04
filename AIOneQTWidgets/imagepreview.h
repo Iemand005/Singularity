@@ -2,8 +2,7 @@
 #define IMAGEPREVIEW_H
 
 #include <QGraphicsView>
-#include <QObject>
-#include <QWidget>
+#include <QGraphicsPixmapItem>
 
 class ImagePreview : public QGraphicsView
 {
@@ -19,14 +18,26 @@ public:
         setMinimumSize(10, 10);
     }
 
-    void setImage(const QPixmap &pixmap) {
+public slots:
+    void setPixmap(const QPixmap &pixmap) {
         scene()->clear();
         pixmapItem = scene()->addPixmap(pixmap);
+        pixmapItem->setTransformationMode(mode);
         updateView();
     }
 
     void setImage(const QImage &image) {
-        setImage(QPixmap::fromImage(image));
+        setPixmap(QPixmap::fromImage(image));
+    }
+
+    void setImageWithTransform(const QImage &image, bool enabled = false) {
+        setPixmap(QPixmap::fromImage(image));
+        setSmoothTransform(enabled);
+    }
+
+    void setSmoothTransform(bool enabled = true) {
+        mode = enabled ? Qt::SmoothTransformation : Qt::FastTransformation;
+        pixmapItem->setTransformationMode(mode);
     }
 
 protected:
@@ -39,6 +50,8 @@ private:
     void updateView() {
         if (pixmapItem) fitInView(scene()->itemsBoundingRect(), Qt::KeepAspectRatio);
     }
+
+    Qt::TransformationMode mode = Qt::FastTransformation;
 
     QGraphicsPixmapItem *pixmapItem = nullptr;
 };

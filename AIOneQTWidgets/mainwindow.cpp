@@ -30,6 +30,8 @@ MainWindow::MainWindow(QWidget *parent)
 
         LLModelOptions options;
 
+        options.onProgress = progressFor(ui->llmLoadProgressBar);
+
         factory->loadLLMAsync(fileName, options, [this](QLLModelPtr model) {
             if (!model) {
                 qDebug() << "Umm this isn't normal ain't normal the model is empty bruh bro?!?!?!";
@@ -47,8 +49,6 @@ MainWindow::MainWindow(QWidget *parent)
                 ui->llmLoadProgressBar->hide();
                 ui->llmInputFrame->setEnabled(true);
             });
-        }, [this](const float &progress) {
-            QMetaObject::invokeMethod(ui->llmLoadProgressBar, &ProgressBar::setPercentage, Qt::QueuedConnection, progress);
         });
     });
 
@@ -83,13 +83,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->loadSDButton, &QPushButton::clicked, [this]() {
         qDebug() << "I need that als too!";
 
-        QString fileName = QFileDialog::getOpenFileName(
-            this,
-            tr("Open Stable Diffusion model file"),
-            nullptr,
-            tr("Stable Diffusion models (*.safetensors *.gguf);;All Files (*)")
-            );
-        qDebug() << "and this is the file" << fileName;
+        QString fileName = openFileDialog(tr("Open Stable Diffusion model file"), tr("Stable Diffusion models (*.safetensors *.gguf);;All Files (*)"));
 
         // ui->loadSDButton->
         // TODO: disable lod button
@@ -108,9 +102,7 @@ MainWindow::MainWindow(QWidget *parent)
         if (ui->customVaeBox->checked()) options.vaePath = vaePath.toStdString();
         if (ui->useTaeBox->checked()) options.taePath = taePath.toStdString();
 
-        options.onProgress = [this](float progress) {
-            QMetaObject::invokeMethod(ui->sdmLoadProgressBar, &ProgressBar::setPercentage, Qt::QueuedConnection, progress);
-        };
+        options.onProgress = progressFor(ui->sdmLoadProgressBar);
 
         factory->loadSDMAsync(fileName, options, [this](QSDModelPtr model) {
             this->sdm = std::move(model);
@@ -125,27 +117,19 @@ MainWindow::MainWindow(QWidget *parent)
     });
 
     connect(ui->vaeButton, &QPushButton::clicked, [this]() {
-        QString fileName = QFileDialog::getOpenFileName(this, tr("Open VAE .safetensors file"), QDir::homePath(), tr("SafeTensors files (*.safetensors);"));
-        qDebug() << "and this is the file" << fileName;
-        this->vaePath = fileName;
+        this->vaePath = openFileDialog(tr("Open VAE .safetensors file"));
     });
 
     connect(ui->chooseTaeButton, &QPushButton::clicked, [this]() {
-        QString fileName = QFileDialog::getOpenFileName(this, tr("Open TAE .safetensors file"), QDir::homePath(), tr("SafeTensors files (*.safetensors);"));
-        qDebug() << "and this is the file" << fileName;
-        this->taePath = fileName;
+        this->taePath = openFileDialog(tr("Open TAE .safetensors file"));
     });
 
     connect(ui->clipGButton, &QPushButton::clicked, [this]() {
-        QString fileName = QFileDialog::getOpenFileName(this, tr("Open CLIP G .safetensors file"), QDir::homePath(), tr("SafeTensors files (*.safetensors);"));
-        qDebug() << "and this is the file" << fileName;
-        this->sdModelOptions.clipGPath = fileName.toStdString();
+        this->sdModelOptions.clipGPath = openFileDialog(tr("Open CLIP G .safetensors file")).toStdString();
     });
 
     connect(ui->clipLButton, &QPushButton::clicked, [this]() {
-        QString fileName = QFileDialog::getOpenFileName(this, tr("Open CLIP L .safetensors file"), QDir::homePath(), tr("SafeTensors files (*.safetensors);"));
-        qDebug() << "and this is the file" << fileName;
-        this->sdModelOptions.clipLPath = fileName.toStdString();
+        this->sdModelOptions.clipLPath = openFileDialog(tr("Open CLIP L .safetensors file")).toStdString();
     });
 
     connect(ui->generateButton, &QPushButton::clicked, [this]() {
@@ -178,7 +162,7 @@ MainWindow::MainWindow(QWidget *parent)
         QString negative = ui->negativeInput->toPlainText();
 
         sdm->generateAsync(positive, negative, options, [this](QImage image) {
-            showImage(image);
+            showImage(image, true);
             QMetaObject::invokeMethod(ui->generationProgressBar, [this]() {
                 ui->generationProgressBar->hide();
                 ui->statusbar->showMessage("Done!");
@@ -193,22 +177,21 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->selectQuantSourceButton, &QPushButton::clicked, [this]() {
         qDebug() << "Selecting model...";
-        QString fileName = QFileDialog::getOpenFileName(this, tr("Open CLIP L .safetensors file"), QDir::homePath(), tr("SafeTensors files (*.safetensors);"));
-        qDebug() << "and this is the file" << fileName;
+        QString fileName = openFileDialog("Open CLIP L .safetensors file", "SafeTensors files (*.safetensors);");
         this->quantModelPath = fileName;
     });
 
     connect(ui->quantizeButton, &QPushButton::clicked, [this]() {
         qDebug() << "Quantizing...";
-        QString fileName = QFileDialog::getSaveFileName(this, tr("Open L SAVE TO RAARRAwwawawa .gguf file"), QDir::homePath(), tr("SafeTensors shit files (*.gguf);"));
-        qDebug() << "and this is the file" << fileName;
+        auto bar = ui->quantProgressBar;
+        bar->showIntermediate();
+
+        QString fileName = openFileDialog("Open L SAVE TO RAARRAwwawawa .gguf file", "SafeTensors shit files (*.gguf);");
 
         auto type = QuantTypes(ui->quantInputBox->currentIndex());
-        factory->convertSDModelAsync(this->quantModelPath, type, fileName, [this](const float &progress) {
-            QMetaObject::invokeMethod(ui->quantProgressBar, &ProgressBar::setPercentage, Qt::QueuedConnection, progress);
+        factory->convertSDModelAsync(this->quantModelPath, type, fileName, progressFor(bar), [bar](bool success){
+            QMetaObject::invokeMethod(bar, &ProgressBar::hide);
         });
-        // auto ee = progressFor(ui->quantProgressBar);
-        // factory->convertSDModelAsync(this->quantModelPath, type, fileName, ee);
     });
 }
 
@@ -216,6 +199,12 @@ ProgressCallback MainWindow::progressFor(ProgressBar *bar) {
     return [bar](const float &progress) {
         QMetaObject::invokeMethod(bar, &ProgressBar::setPercentage, Qt::QueuedConnection, progress);
     };
+}
+
+QString MainWindow::openFileDialog(const QString &title, QString fileTypes) {
+    lastPath = QFileDialog::getOpenFileName(this, title, lastPath, fileTypes);
+    qDebug() << "and this is the file" << lastPath;
+    return lastPath;
 }
 
 void MainWindow::send() {
@@ -250,9 +239,7 @@ void MainWindow::send() {
 
     };
 
-    options.onInputEval = [this](const float &progress) {
-        QMetaObject::invokeMethod(ui->inputEvalProgressBar, &ProgressBar::setPercentage, Qt::QueuedConnection, progress);
-    };
+    options.onInputEval = progressFor(ui->inputEvalProgressBar);
 
     chatManager->sendAsync(message, options);
 }
@@ -268,17 +255,16 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
     return false;
 }
 
-void MainWindow::showImage(QImage image) {
-    QMetaObject::invokeMethod(ui->imagePreview, [this, image]() {
-        ui->imagePreview->setImage(image);
-    });
+void MainWindow::showImage(QImage image, bool smoorthTransform) {
+    QMetaObject::invokeMethod(ui->imagePreview, &ImagePreview::setImageWithTransform, Qt::QueuedConnection, image, smoorthTransform);
 }
 
 void MainWindow::onPreviewGenerated(int step, const QImage& preview, bool isNoisy) {
     showImage(preview);
+
     auto bar = ui->generationProgressBar;
     bar->setValue(step);
-    if (step == bar->maximum()) {
+    if (bar->full()) {
         bar->setIndeterminate();
         ui->statusbar->showMessage("VAE Decoding...");
     }
