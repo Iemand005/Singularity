@@ -50,17 +50,9 @@ public:
         runAsync([this, path, options, onDone]() { onDone(loadSDM(path, options)); });
     }
 
-    void convertSDModelAsync(const QString &source, QuantTypes level, const QString &destination, ProgressCallback onProgress = nullptr) {
-        // auto thread = new QThread();
-        std::string src = source.toStdString();
-        std::string dst = destination.toStdString();
-        // auto src_ptr = std::make_shared<std::string>(src);
-        // auto dst_ptr = std::make_shared<std::string>(dst);
-        // QObject::connect(thread, &QThread::started, [this, src_ptr = std::move(src_ptr), level, dst_ptr = std::move(dst_ptr), onProgress]() {
-        //     convertSDModel(*src_ptr, level, *dst_ptr, std::move(onProgress));
-        // });
-        // thread->start();
-        super()->convertSDModelAsync(src, level, dst, onProgress);
+    void convertSDModelAsync(const QString source, QuantTypes level, const QString destination, ProgressCallback onProgress = nullptr) {
+        std::string src = source.toStdString(), dxt = destination.toStdString();
+        super()->convertSDModelAsync(src, level, dxt, onProgress);
     }
 
 };
