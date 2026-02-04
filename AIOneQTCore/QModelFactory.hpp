@@ -7,13 +7,11 @@
 #include "QLLModel.hpp"
 #include "QSDModel.hpp"
 
-// Large Language model pointer
-using QLLModelPtr = std::unique_ptr<QLLModel>;
-// Stable Diffusion model pointer
-using QSDModelPtr = std::unique_ptr<QSDModel>;
+typedef std::unique_ptr<QLLModel> QLLModelPtr;
+typedef std::unique_ptr<QSDModel> QSDModelPtr;
 
-using QLoadLLModelFinished = std::function<void(QLLModelPtr model)>;
-using QLoadSDModelFinished = std::function<void(QSDModelPtr model)>;
+typedef FinishedCallback<QLLModelPtr> QLoadLLModelFinished;
+typedef FinishedCallback<QSDModelPtr> QLoadSDModelFinished;
 
 class QModelFactory : public QObject, public ModelFactory {
     Q_OBJECT
@@ -22,20 +20,15 @@ class QModelFactory : public QObject, public ModelFactory {
         return this;
     }
 
-    void runAsync(std::function<void()> func) {
-        QThread *loaderThread = new QThread();
-        QObject::connect(loaderThread, &QThread::started, func);
-        loaderThread->start();
-    }
-
 public:
-    QLLModelPtr loadLLM(const QString &path, const LLModelOptions &options = {}, ProgressCallback onProgress = nullptr) {
+    QLLModelPtr loadLLM(const QString &path, const LLModelOptions &options = {}) {
         initLlama();
-        return std::make_unique<QLLModel>(path, options, onProgress);
+        return std::make_unique<QLLModel>(path, options);
     }
 
-    void loadLLMAsync(const QString &path, const LLModelOptions &options = {}, QLoadLLModelFinished onDone = nullptr, ProgressCallback onProgress = nullptr) {
-        runAsync([this, path, options, onDone, onProgress]() { onDone(loadLLM(path, options, onProgress)); });
+    void loadLLMAsync(const QString &path, LLModelOptions options = {}, QLoadLLModelFinished onDone = nullptr, ProgressCallback onProgress = nullptr) {
+        options.onProgress = onProgress;
+        runAsync([this, path, options, onDone]() { onDone(loadLLM(path, options)); });
     }
 
     QSDModelPtr loadSDM(const QString &path, SDModelOptions options = {}) {
