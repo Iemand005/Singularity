@@ -762,16 +762,41 @@
               <item>
                <widget class="QComboBox" name="quantInputBox">
                 <property name="currentIndex">
-                 <number>1</number>
+                 <number>0</number>
                 </property>
                 <item>
                  <property name="text">
-                  <string>Q8</string>
+                  <string>Q4_0</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
-                  <string>Q4</string>
+                  <string>Q4_1</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Q5_0</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Q5_1</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Q8_0</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>FP16</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>FP32</string>
                  </property>
                 </item>
                </widget>

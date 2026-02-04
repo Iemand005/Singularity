@@ -50,6 +50,12 @@ public:
         runAsync([this, path, options, onDone]() { onDone(loadSDM(path, options)); });
     }
 
+    void convertSDModelAsync(const QString & source, QuantTypes level, const QString & destination, ProgressCallback onProgress = nullptr) {
+        runAsync([this, source, level, destination, onProgress]() {
+            convertSDModel(source.toStdString(), level, destination.toStdString(), onProgress);
+        });
+    }
+
 };
 
 using QModelFactoryPtr = std::unique_ptr<QModelFactory>;

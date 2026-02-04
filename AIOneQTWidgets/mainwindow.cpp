@@ -203,7 +203,13 @@ MainWindow::MainWindow(QWidget *parent)
         QString fileName = QFileDialog::getSaveFileName(this, tr("Open L SAVE TO RAARRAwwawawa .gguf file"), QDir::homePath(), tr("SafeTensors shit files (*.gguf);"));
         qDebug() << "and this is the file" << fileName;
 
-        factory->convertSDModel(this->quantModelPath.toStdString(), Q4, fileName.toStdString());
+        auto type = QuantTypes(ui->quantInputBox->currentIndex());
+        // switch (ui->quantInputBox->currentIndex()) {
+        //     case 1:
+        //     default: type = Q4_0; break;
+        // }
+
+        factory->convertSDModel(this->quantModelPath.toStdString(), type, fileName.toStdString());
     });
 }
 
