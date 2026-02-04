@@ -223,7 +223,8 @@ void MainWindow::send() {
 
     QAsyncTextGenOptions options;
 
-    options.onDone = [this](const TextGenResult &output) {
+    options.onDone = [this, lastItem](const TextGenResult &output) {
+        lastItem->setText(output.output.content.c_str());
         ui->tokensCachedDisplay->display((int)output.tokensCached);
         ui->tokensGeneratedDisplay->display((int)output.tokensGenerated);
         ui->tokensEvaluatedDisplay->display((int)output.tokensEvaluated);
