@@ -10,7 +10,9 @@ class ProgressBar : public QProgressBar
     Q_OBJECT
 public:
     ProgressBar();
-    ProgressBar(QWidget *parent = nullptr) : QProgressBar(parent) {}
+    ProgressBar(QWidget *parent = nullptr) : QProgressBar(parent) {
+        hide();
+    }
 
     void setValueWithMax(int value, int max) {
         if (indeterminate) setIndeterminate(false);
