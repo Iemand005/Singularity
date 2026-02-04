@@ -204,9 +204,9 @@ MainWindow::MainWindow(QWidget *parent)
         qDebug() << "and this is the file" << fileName;
 
         auto type = QuantTypes(ui->quantInputBox->currentIndex());
-        factory->convertSDModelAsync(this->quantModelPath, type, fileName, std::make_shared<ProgressCallback>([this](const float &progress) {
+        factory->convertSDModelAsync(this->quantModelPath, type, fileName, [this](const float &progress) {
             QMetaObject::invokeMethod(ui->quantProgressBar, &ProgressBar::setPercentage, Qt::QueuedConnection, progress);
-        }));
+        });
         // auto ee = progressFor(ui->quantProgressBar);
         // factory->convertSDModelAsync(this->quantModelPath, type, fileName, ee);
     });
