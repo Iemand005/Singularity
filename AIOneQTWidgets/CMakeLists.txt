@@ -34,6 +34,8 @@ endif()
 
 find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets LinguistTools)
 
+set(AIONE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../AIOne")
+
 # option(AIONE_VULKAN "Enable Vulkan support" ON)
 
 qt_standard_project_setup()
@@ -47,8 +49,8 @@ qt_add_executable(AIOneQTWidgets
     README.md
     ../AIOneQTCore/QModelFactory.hpp ../AIOneQTCore/QLLModel.hpp ../AIOneQTCore/QSDModel.hpp ../AIOneQTCore/QChatManager.cpp ../AIOneQTCore/QChatManager.hpp
     ../AIOneQTCore/QTextGenOptions.h
-    ../AIOne/src/Chat.hpp ../AIOne/src/ChatManager.hpp ../AIOne/src/ContextInvalidError.hpp ../AIOne/src/LlamaUtil.hpp ../AIOne/src/LLModel.cpp ../AIOne/src/LLModel.hpp ../AIOne/src/LLModelOptions.hpp ../AIOne/src/Message.hpp ../AIOne/src/Model.cpp ../AIOne/src/Model.hpp ../AIOne/src/ModelFactory.cpp ../AIOne/src/ModelFactory.hpp ../AIOne/src/PreferredDevice.h ../AIOne/src/Role.h ../AIOne/src/SDImageOptions.h ../AIOne/src/SDModel.cpp ../AIOne/src/SDModel.hpp ../AIOne/src/SDModelOptions.hpp ../AIOne/src/TextContext.cpp ../AIOne/src/TextContext.hpp ../AIOne/src/TextContextOptions.h ../AIOne/src/TextGenOptions.hpp ../AIOne/src/TextGenResult.hpp ../AIOne/src/Timeable.hpp
-    ../AIOne/src/ModelOptions.h
+    ${AIONE_DIR}/src/Chat.hpp ${AIONE_DIR}/src/ChatManager.hpp ${AIONE_DIR}/src/ContextInvalidError.hpp ${AIONE_DIR}/src/LlamaUtil.hpp ${AIONE_DIR}/src/LLModel.cpp ${AIONE_DIR}/src/LLModel.hpp ${AIONE_DIR}/src/LLModelOptions.hpp ${AIONE_DIR}/src/Message.hpp ${AIONE_DIR}/src/Model.cpp ${AIONE_DIR}/src/Model.hpp ${AIONE_DIR}/src/ModelFactory.cpp ${AIONE_DIR}/src/ModelFactory.hpp ${AIONE_DIR}/src/PreferredDevice.h ${AIONE_DIR}/src/Role.h ${AIONE_DIR}/src/SDImageOptions.h ${AIONE_DIR}/src/SDModel.cpp ${AIONE_DIR}/src/SDModel.hpp ${AIONE_DIR}/src/SDModelOptions.hpp ${AIONE_DIR}/src/TextContext.cpp ${AIONE_DIR}/src/TextContext.hpp ${AIONE_DIR}/src/TextContextOptions.h ${AIONE_DIR}/src/TextGenOptions.hpp ${AIONE_DIR}/src/TextGenResult.hpp ${AIONE_DIR}/src/Timeable.hpp
+    ${AIONE_DIR}/src/ModelOptions.h
     imagepreview.h imagepreview.cpp
     progressbar.h progressbar.cpp
     checkbox.h checkbox.cpp
@@ -71,7 +73,7 @@ target_link_libraries(AIOneQTWidgets
     PRIVATE AIOne::Core
 )
 
-set(AIONE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../AIOne")
+
 
 add_subdirectory("${AIONE_DIR}" ${CMAKE_BINARY_DIR}/AIOneCore_build)
 
