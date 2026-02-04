@@ -16,6 +16,7 @@ public:
     explicit UIHandler(QObject *parent = nullptr);
 
     QModelFactoryPtr modelFactory;
+    QChatManagerPtr chatManager;
 
     QLLModelPtr llm;
     QSDModelPtr sdm;

@@ -3,6 +3,10 @@ cmake_minimum_required(VERSION 3.16)
 project(AIOneQT VERSION 0.1 LANGUAGES CXX C)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+option(AIONEQT_USE_QT_WIDGETS "Use QT Widgets" ON)
+
+
+
 # option(AIONE_VULKAN "Enable Vulkan support" ON)
 
 # Better Qt detection - don't hardcode paths
@@ -93,6 +97,10 @@ qt_add_qml_module(AIOneQT
 set(AIONE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/AIOne")
 
 add_subdirectory("${AIONE_DIR}" ${CMAKE_BINARY_DIR}/AIOneCore_build)
+
+if(AIONEQT_USE_QT_WIDGETS)
+    add_subdirectory("./AIOneQTWidgets")
+endif()
 
 target_include_directories(AIOneQT PRIVATE
     ${AIONE_DIR}/src

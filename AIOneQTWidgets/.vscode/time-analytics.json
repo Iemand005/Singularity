@@ -1,0 +1,25 @@
+{
+  "version": "1.0",
+  "project": {
+    "totalFocusTime": 3701818,
+    "totalActiveTime": 1561
+  },
+  "files": {
+    ".vscode/launch.json": {
+      "pending": 0,
+      "focus": 58293
+    },
+    ".vscode/settings.json": {
+      "pending": 1561,
+      "focus": 167932
+    },
+    "CMakeLists.txt": {
+      "pending": 0,
+      "focus": 50489
+    },
+    "mainwindow.cpp": {
+      "pending": 0,
+      "focus": 5229
+    }
+  }
+}

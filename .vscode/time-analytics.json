@@ -1,0 +1,69 @@
+{
+  "version": "1.0",
+  "project": {
+    "totalFocusTime": 1777962,
+    "totalActiveTime": 177090
+  },
+  "files": {
+    "AIOneQTCore/QModelFactory.hpp": {
+      "pending": 0,
+      "focus": 13991
+    },
+    "AIOneQTCore/QLLModel.hpp": {
+      "pending": 0,
+      "focus": 31969
+    },
+    "AIOneQTWidgets/mainwindow.h": {
+      "pending": 0,
+      "focus": 168453
+    },
+    "CMakeLists.txt": {
+      "pending": 4665,
+      "focus": 260070
+    },
+    "AIOneQTWidgets/CMakeLists.txt": {
+      "pending": 6829,
+      "focus": 229706
+    },
+    "UIHandler.cpp": {
+      "pending": 155389,
+      "focus": 820880
+    },
+    "AIOne/src/Message.hpp": {
+      "pending": 0,
+      "focus": 25501
+    },
+    "AIOneQTCore/QTextGenOptions.h": {
+      "pending": 0,
+      "focus": 11375
+    },
+    "AIOne/src/LLModel.hpp": {
+      "pending": 0,
+      "focus": 12353
+    },
+    "AIOneQTCore/QSDModel.hpp": {
+      "pending": 0,
+      "focus": 1250
+    },
+    "UIHandler.h": {
+      "pending": 10207,
+      "focus": 62548
+    },
+    "AIOneQTWidgets/mainwindow.cpp": {
+      "pending": 0,
+      "focus": 18445
+    },
+    "AIOneQTCore/QChatManager.hpp": {
+      "pending": 0,
+      "focus": 10644
+    },
+    "AIOne/src/ChatManager.hpp": {
+      "pending": 0,
+      "focus": 40186
+    },
+    "AIOne/src/Chat.hpp": {
+      "pending": 0,
+      "focus": 6225
+    }
+  }
+}

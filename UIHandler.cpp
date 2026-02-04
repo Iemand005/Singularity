@@ -12,17 +12,6 @@ UIHandler::UIHandler(QObject *parent) : QObject{parent}
     std::cout << "Llama.cpp System Info: " << modelFactory->systemInfoStr() << std::endl;
 }
 
-
-// void UIHandler::handleButtonClick() {
-//     qDebug() << "Button clicked from C++!";
-
-//     emit responseSent("Clicked handled in C++!");
-// }
-
-// void UIHandler::handleButtonClickWithParam(const QString &message) {
-//     qDebug() << "Received from QML:" << message;
-// }
-
 void UIHandler::loadModel(const QString &path) {
     qDebug() << "Loading model at:" << path;
     
@@ -31,61 +20,73 @@ void UIHandler::loadModel(const QString &path) {
         return;
     }
 
-    this->llm = modelFactory->loadLLM(path);
+    LLModelOptions options;
+
+    modelFactory->loadLLMAsync(path, options, [this](QLLModelPtr model) {
+        llm = std::move(model);
+        chatManager = llm->createChatManager();
+    });
+
 }
 
 void UIHandler::prompt(const QString &message) {
-    Message chatMessage = {"user", message.toStdString()};
-    chatMessages->push_back(chatMessage);
+    QAsyncTextGenOptions options;
+    options.onToken = [this](const QString &token) {
+        tokenReceived(token);
+    };
+    chatManager->sendAsync(message, options); // This does what all that garble below used todo
+    // Message chatMessage = {"user", message.toStdString()};
+    // chatMessages->push_back(chatMessage);
 
-    std::string finalPrompt = this->llm->chatToPrompt(*chatMessages);
-    qDebug() << "Generating response to:" << finalPrompt;
+    // std::string finalPrompt = this->llm->chatToPrompt(*chatMessages);
+    // qDebug() << "Generating response to:" << finalPrompt;
 
-    if (workerThread && workerThread->isRunning()) {
-        qWarning() << "Already processing a prompt";
-        return;
-    }
+    // if (workerThread && workerThread->isRunning()) {
+    //     qWarning() << "Already processing a prompt";
+    //     return;
+    // }
 
-    workerThread = new QThread();
+    // workerThread = new QThread();
 
-    QObject::connect(workerThread, &QThread::started, [this, finalPrompt]() {
-        QMutexLocker locker(&llmMutex);
+    // QObject::connect(workerThread, &QThread::started, [this, finalPrompt]() {
+    //     QMutexLocker locker(&llmMutex);
 
-        if (!llm) {
-            qWarning() << "LLM model not loaded";
-            return;
-        }
+    //     if (!llm) {
+    //         qWarning() << "LLM model not loaded";
+    //         return;
+    //     }
 
-        TextGenResult stats = this->llm->completeAny(finalPrompt, [this](const std::string token) {
-            tokenReceived(QString(token.c_str()));
-        });
+    //     TextGenOptions options;
+    //     options.onToken = [this](const std::string token)
+    //     {
+    //         tokenReceived(token.c_str());
+    //     };
 
-        std::cout << "Finished generation" << std::endl;
-        std::cout << "- " << std::to_string(stats.tokensGenerated) << " tokens generated" << std::endl;
-        std::cout << std::endl;
+    //     TextGenResult stats = this->llm->completeAny(finalPrompt, options);
 
-        Message resultMessage = {"assistant", stats.output};
-        chatMessages->push_back(resultMessage);
+    //     std::cout << "Finished generation" << std::endl;
+    //     std::cout << "- " << std::to_string(stats.tokensGenerated) << " tokens generated" << std::endl;
+    //     std::cout << std::endl;
 
-        workerThread->quit();
-    });
-    QObject::connect(workerThread, &QThread::finished, [this]() {
-        workerThread->deleteLater();
-        workerThread = nullptr;
-    });
+    //     chatMessages->push_back(stats.output);
 
-    workerThread->start();
+    //     workerThread->quit();
+    // });
+    // QObject::connect(workerThread, &QThread::finished, [this]() {
+    //     workerThread->deleteLater();
+    //     workerThread = nullptr;
+    // });
+
+    // workerThread->start();
 }
 
 void UIHandler::loadSDModel(const QString &path) {
     qDebug() << "Loading SD model at:" << path;
     
-    if (sdWorkerThread && sdWorkerThread->isRunning()) {
-        qWarning() << "Already loading SD model";
-        return;
-    }
-
-    sdm = modelFactory->loadSDM(path);
+    sdm = nullptr; // Unload old first
+    modelFactory->loadSDMAsync(path, [this](QSDModelPtr model) {
+        sdm = std::move(model);
+    });
 }
 
 

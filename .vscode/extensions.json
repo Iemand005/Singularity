@@ -2,6 +2,11 @@
   "recommendations": [
     "ms-vscode.cpptools-extension-pack",
     "ms-vscode.cmake-tools",
-    "ms-vscode.cpptools"
+    "ms-vscode.cpptools",
+    "twxs.cmake",
+    "eamodio.gitlens"
+  ],
+  "unwantedRecommendations": [
+    "ms-edgedevtools.vscode-edge-devtools"
   ]
 }
