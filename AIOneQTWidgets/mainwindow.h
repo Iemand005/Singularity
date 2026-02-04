@@ -52,6 +52,11 @@ private:
 
     void showImage(QImage image, bool smooth = false);
 
+    // void reloadSeed() {
+    //     if (ui->randomizeSeedBox->isChecked()) ui->seedInput->setValue(sdm->newSeed());
+    // }
+    void updateSeed();
+
     QString lastPath = QDir::homePath(); // TOOD:: load dis from a file or somthng yaya
     QString openFileDialog(const QString &title, QString fileTypes = tr("SafeTensors files (*.safetensors);"));
 };

@@ -283,7 +283,7 @@
           <item>
            <widget class="QTabWidget" name="sdTabWidget">
             <property name="currentIndex">
-             <number>1</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="sdGenerationTab">
              <attribute name="title">
@@ -620,8 +620,11 @@
                       <layout class="QHBoxLayout" name="seedLayout">
                        <item>
                         <widget class="QSpinBox" name="seedInput">
+                         <property name="minimum">
+                          <number>-2147483647</number>
+                         </property>
                          <property name="maximum">
-                          <number>1000000218</number>
+                          <number>2147483647</number>
                          </property>
                          <property name="value">
                           <number>42</number>

@@ -207,6 +207,10 @@ QString MainWindow::openFileDialog(const QString &title, QString fileTypes) {
     return lastPath;
 }
 
+void MainWindow::updateSeed() {
+    if (ui->randomizeSeedBox->isChecked()) ui->seedInput->setValue(sdm->newSeed());
+}
+
 void MainWindow::send() {
     QString message = ui->messageInput->toPlainText();
 
