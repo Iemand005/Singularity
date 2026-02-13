@@ -2,6 +2,7 @@
 #include <QString>
 
 #include <TextGenOptions.hpp>
+#include <Callbacks.h>
 
 typedef std::function<void(const QString &token)> QTokenCallback;
 
@@ -12,5 +13,6 @@ struct QTextGenOptions : TextGenOptionsBase
 };
 
 struct QAsyncTextGenOptions : QTextGenOptions {
-    FinishCallback onDone = nullptr;
+    // FinishedTCallback<const TextGenResult &> onDone = nullptr;
+    TextFinishCallback onDone = nullptr;
 };

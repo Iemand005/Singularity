@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QThread>
 #include <ModelFactory.hpp>
+#include <Callbacks.h>
 
 #include "QLLModel.hpp"
 #include "QSDModel.hpp"
@@ -10,8 +11,8 @@
 typedef std::unique_ptr<QLLModel> QLLModelPtr;
 typedef std::unique_ptr<QSDModel> QSDModelPtr;
 
-typedef FinishedCallback<QLLModelPtr> QLoadLLModelFinished;
-typedef FinishedCallback<QSDModelPtr> QLoadSDModelFinished;
+typedef FinishedTCallback<QLLModelPtr> QLoadLLModelFinished;
+typedef FinishedTCallback<QSDModelPtr> QLoadSDModelFinished;
 
 class QModelFactory : public QObject, public ModelFactory {
     Q_OBJECT
@@ -42,7 +43,7 @@ public:
         runAsync([this, path, options, onDone]() { onDone(loadSDM(path, options)); });
     }
 
-    void convertSDModelAsync(const QString source, QuantTypes level, const QString destination, ProgressCallback onProgress = nullptr, FinishedCallback<bool> onDone = nullptr) {
+    void convertSDModelAsync(const QString source, QuantTypes level, const QString destination, ProgressCallback onProgress = nullptr, FinishedTCallback<bool> onDone = nullptr) {
         std::string src = source.toStdString(), dxt = destination.toStdString();
         super()->convertSDModelAsync(src, level, dxt, onProgress, onDone);
     }

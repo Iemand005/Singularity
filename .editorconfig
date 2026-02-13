@@ -1,0 +1,4 @@
+root = true
+
+[*.{cpp,hpp,h,cc,cxx,ixx}]
+clang_format_fallback_style = file

@@ -3,7 +3,7 @@
 #include <QObject>
 #include <QImage>
 #include <SDModel.hpp>
-
+#include <Callbacks.h>
 
 class QSDModel : public QObject, public SDModel {
     Q_OBJECT
@@ -12,22 +12,20 @@ class QSDModel : public QObject, public SDModel {
         return (SDModel *)this;
     }
 
-    QImage convertToQImage(const sd_image_t& sd_img) {
-        if (sd_img.channel == 3) {
-            QImage image(sd_img.width, sd_img.height, QImage::Format_RGB32);
+    QImage convertToQImage(const SDImage& sdImage) {
+        if (sdImage.channel == 3) {
+            QImage qImage(sdImage.width, sdImage.height, QImage::Format_RGB32);
 
-            for (int y = 0; y < sd_img.height; y++) {
-                QRgb* scanline = (QRgb*)image.scanLine(y);
-                const uint8_t* src = sd_img.data + (y * sd_img.width * 3);
+            for (uint32_t y = 0; y < sdImage.height; y++) {
+                QRgb* scanline = (QRgb*)qImage.scanLine(y);
+                const uint8_t* src = sdImage.data + (y * sdImage.width * 3);
 
-                for (int x = 0; x < sd_img.width; x++)
+                for (uint32_t x = 0; x < sdImage.width; x++)
                     scanline[x] = qRgb(src[x * 3], src[x * 3 + 1], src[x * 3 + 2]);
             }
-            return image;
-        } else if (sd_img.channel == 4) {
-            return QImage(sd_img.data, sd_img.width, sd_img.height,
-                          sd_img.width * 4, QImage::Format_RGBA8888).copy();
-        }
+            return qImage;
+        } else if (sdImage.channel == 4)
+            return QImage(sdImage.data, sdImage.width, sdImage.height, sdImage.width * 4, QImage::Format_RGBA8888).copy();
 
         return QImage();
     }
@@ -37,7 +35,7 @@ class QSDModel : public QObject, public SDModel {
 public:
 
     QSDModel(const QString &path, SDModelOptions options = {}) : SDModel(path.toStdString(), options) {
-        this->setPreviewCallback([this](int step, sd_image_t* sdImage, bool isNoisy) {
+        this->setPreviewCallback([this](int step, SDImage* sdImage, bool isNoisy) {
             QImage image = this->convertToQImage(*sdImage);
             emit this->previewGenerated(step, image, isNoisy);
         });
@@ -46,14 +44,14 @@ public:
     using QImageCallback = std::function<void(QImage &image)>;
 
     void generateAsync(const QString &positive, const QString &negative, SDImageOptions options = SDImageOptions{}, QImageCallback callback = nullptr) {
-        super()->generateAsync(positive.toStdString(), negative.toStdString(), options, [this, callback](sd_image_t sdImage) {
+        super()->generateAsync(positive.toStdString(), negative.toStdString(), options, [this, callback](SDImage sdImage) {
             QImage image = convertToQImage(sdImage);
             if (callback) callback(image);
         });
     }
 
     QImage generateImage(QString &positive, QString &negative, SDImageOptions options = {}) {
-        const sd_image_t image = super()->generateImage(positive.toStdString(), negative.toStdString(), options);
+        const SDImage image = super()->generateImage(positive.toStdString(), negative.toStdString(), options);
         return convertToQImage(image);
     }
 
