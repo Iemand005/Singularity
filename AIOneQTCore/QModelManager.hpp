@@ -23,7 +23,7 @@ class QModelManager {
     factory->loadLLMAsync(path, syncOptions, [this, options](QLLModelPtr model) {
       llm = std::move(model);
       chatManager = std::make_unique<QChatManager>(llm);
-      if (options.onDone) options.onDone();
+      options.done();
     });
   }
 
@@ -35,9 +35,10 @@ class QModelManager {
     });
   }
 
-  QLLModel* getLLM() { return llm.get(); }
-  QSDModel* getSDM() { return sdm.get(); }
-  QChatManager* getChatManager() { return chatManager.get(); }
+  QLLModel *getLLM() { return llm.get(); }
+  QSDModel *getSDM() { return sdm.get(); }
+  QChatManager *getChatManager() { return chatManager.get(); }
+  QModelFactory *getFactory() { return factory.get(); }
 };
 
 typedef std::unique_ptr<QModelManager> QModelManagerPtr;

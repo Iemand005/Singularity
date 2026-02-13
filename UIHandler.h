@@ -16,15 +16,7 @@ class UIHandler : public QObject
 public:
     explicit UIHandler(QObject *parent = nullptr);
 
-    QModelFactoryPtr modelFactory;
-    QChatManagerPtr chatManager;
-
-    QLLModelPtr llm;
-    QSDModelPtr sdm;
-
     QModelManagerPtr modelManager;
-
-    std::unique_ptr<std::vector<Message>> chatMessages;
 
 public slots:
     void loadModel(const QString &path);

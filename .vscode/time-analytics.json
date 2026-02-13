@@ -1,16 +1,21 @@
 {
   "version": "1.0",
   "project": {
-    "totalFocusTime": 40354
+    "totalFocusTime": 223881,
+    "totalActiveTime": 1380
   },
   "files": {
-    "UIHandler.cpp": {
+    "AIOne/src/ModelFactory.hpp": {
+      "pending": 1380,
+      "focus": 20449
+    },
+    "AIOneQTCore/QModelManager.hpp": {
       "pending": 0,
-      "focus": 11013
+      "focus": 5873
     },
     "UIHandler.h": {
       "pending": 0,
-      "focus": 1288
+      "focus": 1617
     }
   }
 }
