@@ -1,8 +1,8 @@
 {
   "version": "1.0",
   "project": {
-    "totalFocusTime": 1626361,
-    "totalActiveTime": 54022
+    "totalFocusTime": 2074394,
+    "totalActiveTime": 63594
   },
   "files": {
     "AIOneQTCore/QSDModel.hpp": {
@@ -27,7 +27,7 @@
     },
     "AIOneQTCore/QModelFactory.hpp": {
       "pending": 6310,
-      "focus": 100710
+      "focus": 134011
     },
     "AIOne/src/Callbacks.h": {
       "pending": 0,
@@ -56,6 +56,14 @@
     "AIOne/src/SDModel.hpp": {
       "pending": 0,
       "focus": 5486
+    },
+    "AIOButton.ui.qml": {
+      "pending": 0,
+      "focus": 1080
+    },
+    "Main.qml": {
+      "pending": 9572,
+      "focus": 115343
     }
   }
 }

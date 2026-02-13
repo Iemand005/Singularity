@@ -50,15 +50,19 @@ ApplicationWindow {
 
             TabButton {
                 text: "Chat"
-                // Material.accent: Material.Orange
+                Material.accent: Material.Orange
             }
             TabButton {
                 text: "Stable Diffusion"
-                // Material.accent: Material.LightBlue
+                Material.accent: Material.LightBlue
             }
             TabButton {
-                text: "Settingse"
-                // Material.accent: Material.Pink
+                text: "Settings"
+                Material.accent: Material.Pink
+            }
+            TabButton {
+                text: "Finetune"
+                Material.accent: Material.Pink
             }
         }
 
@@ -358,6 +362,10 @@ ApplicationWindow {
                     }
                 }
                 }
+            }
+
+            ColumnLayout {
+
             }
         }
         // }
