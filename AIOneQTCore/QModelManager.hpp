@@ -13,20 +13,30 @@ class QModelManager {
   QChatManagerPtr chatManager;
 
   QLLModelPtr llm;
+  QSDModelPtr sdm;
 
  public:
   QModelManager() : factory(std::make_unique<QModelFactory>()) {}
 
   void loadLLMAsync(QString path, LLModelOptionsAsync options = {}) {
-    LLModelOptions& syncOptions = dynamic_cast<LLModelOptions&>(options);
+    auto syncOptions = dynamic_cast<LLModelOptions&>(options);
     factory->loadLLMAsync(path, syncOptions, [this, options](QLLModelPtr model) {
       llm = std::move(model);
-      chatManager = std::make_unique<QChatManager>(getLLM());
+      chatManager = std::make_unique<QChatManager>(llm);
       if (options.onDone) options.onDone();
     });
   }
 
+  void loadSDMAsync(QString path, SDModelOptionsAsync options = {}) {
+    auto syncOptions = dynamic_cast<SDModelOptions&>(options);
+    factory->loadSDMAsync(path, syncOptions, [this, options](QSDModelPtr model) {
+      sdm = std::move(model);
+      options.done();
+    });
+  }
+
   QLLModel* getLLM() { return llm.get(); }
+  QSDModel* getSDM() { return sdm.get(); }
   QChatManager* getChatManager() { return chatManager.get(); }
 };
 

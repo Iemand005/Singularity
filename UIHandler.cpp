@@ -6,8 +6,10 @@
 
 UIHandler::UIHandler(QObject *parent) : QObject{parent}
 {
-    modelFactory = std::make_unique<QModelFactory>();
-    chatMessages = std::make_unique<std::vector<Message>>();
+    // modelFactory = std::make_unique<QModelFactory>();
+    // chatMessages = std::make_unique<std::vector<Message>>();
+
+    modelManager = std::make_unique<QModelManager>();
 
     std::cout << "Llama.cpp System Info: " << modelFactory->systemInfoStr() << std::endl;
 }
@@ -20,13 +22,13 @@ void UIHandler::loadModel(const QString &path) {
         return;
     }
 
-    LLModelOptions options;
+    LLModelOptionsAsync options;
 
-    modelFactory->loadLLMAsync(path, options, [this](QLLModelPtr model) {
-        llm = std::move(model);
-        chatManager = llm->createChatManager();
-    });
+    options.onDone = [&]() {
+        // TODO: Enable UI
+    };
 
+    modelManager->loadLLMAsync(path, options);
 }
 
 void UIHandler::prompt(const QString &message) {
@@ -34,16 +36,22 @@ void UIHandler::prompt(const QString &message) {
     options.onToken = [this](const QString &token) {
         tokenReceived(token);
     };
-    chatManager->sendAsync(message, options); // This does what all that garble below used todo
+    modelManager->getChatManager()->sendAsync(message, options); // This does what all that garble below used todo
 }
 
 void UIHandler::loadSDModel(const QString &path) {
     qDebug() << "Loading SD model at:" << path;
     
-    sdm = nullptr; // Unload old first
-    modelFactory->loadSDMAsync(path, [this](QSDModelPtr model) {
-        sdm = std::move(model);
-    });
+    // sdm = nullptr; // Unload old first
+    SDModelOptionsAsync options = {};
+    options.onDone = [](){};
+    modelManager->loadSDMAsync(path, options);
+
+    auto D= 8;
+    if (8==D) std::cout << "EEE";
+
+    // auto e = []<>(){};
+
 }
 
 

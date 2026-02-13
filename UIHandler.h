@@ -22,7 +22,7 @@ public:
     QLLModelPtr llm;
     QSDModelPtr sdm;
 
-    
+    QModelManagerPtr modelManager;
 
     std::unique_ptr<std::vector<Message>> chatMessages;
 
