@@ -7,6 +7,7 @@
 #include <QMutex>
 
 #include "AIOneQTCore/QModelFactory.hpp"
+#include "AIOneQTCore/QModelManager.hpp"
 
 class UIHandler : public QObject
 {
@@ -20,6 +21,8 @@ public:
 
     QLLModelPtr llm;
     QSDModelPtr sdm;
+
+    
 
     std::unique_ptr<std::vector<Message>> chatMessages;
 
