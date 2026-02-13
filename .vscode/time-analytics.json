@@ -1,8 +1,8 @@
 {
   "version": "1.0",
   "project": {
-    "totalFocusTime": 2497113,
-    "totalActiveTime": 179296
+    "totalFocusTime": 6849438,
+    "totalActiveTime": 678728
   },
   "files": {
     "AIOneQTCore/QModelFactory.hpp": {
@@ -19,27 +19,27 @@
     },
     "CMakeLists.txt": {
       "pending": 4665,
-      "focus": 260070
+      "focus": 392819
     },
     "AIOneQTWidgets/CMakeLists.txt": {
       "pending": 6829,
       "focus": 229706
     },
     "UIHandler.cpp": {
-      "pending": 157595,
-      "focus": 912937
+      "pending": 158116,
+      "focus": 1003279
     },
     "AIOne/src/Message.hpp": {
-      "pending": 0,
-      "focus": 25501
+      "pending": 6924,
+      "focus": 32425
     },
     "AIOneQTCore/QTextGenOptions.h": {
       "pending": 0,
       "focus": 11375
     },
     "AIOne/src/LLModel.hpp": {
-      "pending": 0,
-      "focus": 12353
+      "pending": 227675,
+      "focus": 801590
     },
     "AIOneQTCore/QSDModel.hpp": {
       "pending": 0,
@@ -58,12 +58,92 @@
       "focus": 10644
     },
     "AIOne/src/ChatManager.hpp": {
-      "pending": 0,
-      "focus": 40186
+      "pending": 6911,
+      "focus": 47097
     },
     "AIOne/src/Chat.hpp": {
       "pending": 0,
       "focus": 6225
+    },
+    "AIOne/src/LLModel.cpp": {
+      "pending": 93722,
+      "focus": 2395996
+    },
+    "AIOne/external/llama.cpp/src/llama-vocab.cpp": {
+      "pending": 3289,
+      "focus": 149025
+    },
+    "AIOne/src/TextGenOptions.hpp": {
+      "pending": 63936,
+      "focus": 652480
+    },
+    "AIOneQTWidgets/mainwindow.ui": {
+      "pending": 0,
+      "focus": 4282
+    },
+    ".vscode/launch.json": {
+      "pending": 6892,
+      "focus": 128140
+    },
+    ".vscode/tasks.json": {
+      "pending": 23938,
+      "focus": 355833
+    },
+    "CMakePresets.json": {
+      "pending": 0,
+      "focus": 157267
+    },
+    ".vscode/settings.json": {
+      "pending": 1744,
+      "focus": 39637
+    },
+    "AIOne/external/llama.cpp/vendor/cpp-httplib/CMakeLists.txt": {
+      "pending": 3295,
+      "focus": 361072
+    },
+    "AIOne/external/llama.cpp/src/unicode.cpp": {
+      "pending": 1518,
+      "focus": 27033
+    },
+    "AIOne/src/SDModel.cpp": {
+      "pending": 6923,
+      "focus": 6923
+    },
+    "AIOne/src/SDModel.hpp": {
+      "pending": 6918,
+      "focus": 6918
+    },
+    "AIOne/CMakeLists.txt": {
+      "pending": 6909,
+      "focus": 6909
+    },
+    "AIOne/src/LLModelOptions.hpp": {
+      "pending": 6907,
+      "focus": 6907
+    },
+    "AIOne/src/Model.hpp": {
+      "pending": 6904,
+      "focus": 6904
+    },
+    "AIOne/src/ModelFactory.hpp": {
+      "pending": 6903,
+      "focus": 6903
+    },
+    "AIOne/src/TextContext.hpp": {
+      "pending": 6902,
+      "focus": 6902
+    },
+    "AIOne/src/TextContext.cpp": {
+      "pending": 6900,
+      "focus": 6900
+    },
+    "AIOne/external/llama.cpp/common/common.cpp": {
+      "pending": 3292,
+      "focus": 3292
+    },
+    "AIOne/external/stable-diffusion.cpp/model.cpp": {
+      "pending": 509,
+      "focus": 509
     }
   }
 }

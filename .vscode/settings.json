@@ -4,5 +4,6 @@
   "cmake.configureOnOpen": true,
   "cmake.buildBeforeRun": true,
   "cmake.automaticReconfigure": true,
+  "cmake.cmakePath": "C:/Program Files/CMake/bin/cmake.exe",
   "qt-qml.qmlls.additionalImportPaths": ["C:\\Qt\\6.10.1\\msvc2022_64\\qml"]
 }
