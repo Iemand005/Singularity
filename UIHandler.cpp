@@ -11,7 +11,7 @@ UIHandler::UIHandler(QObject *parent) : QObject{parent}
 
     modelManager = std::make_unique<QModelManager>();
 
-    std::cout << "Llama.cpp System Info: " << modelFactory->systemInfoStr() << std::endl;
+    std::cout << "Llama.cpp System Info: " << modelManager->getFactory()->systemInfoStr() << std::endl;
 }
 
 void UIHandler::loadModel(const QString &path) {
@@ -49,7 +49,7 @@ void UIHandler::generateImage(const QString &positive) {
     QString negative = "";
     SDImageOptions options; // Fetch thos settings from the UI and insert into this
 
-    sdm->generateAsync(positive, negative, options, [this](QImage image) {
+    modelManager->getSDM()->generateAsync(positive, negative, options, [this](QImage image) {
         emit imageGenerated(image);
     });
 }

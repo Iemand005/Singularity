@@ -1,8 +1,8 @@
 {
   "version": "1.0",
   "project": {
-    "totalFocusTime": 223881,
-    "totalActiveTime": 1380
+    "totalFocusTime": 323095,
+    "totalActiveTime": 8842
   },
   "files": {
     "AIOne/src/ModelFactory.hpp": {
@@ -15,7 +15,15 @@
     },
     "UIHandler.h": {
       "pending": 0,
-      "focus": 1617
+      "focus": 5345
+    },
+    "UIHandler.cpp": {
+      "pending": 7462,
+      "focus": 64533
+    },
+    "README.md": {
+      "pending": 0,
+      "focus": 611
     }
   }
 }
