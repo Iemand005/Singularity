@@ -364,7 +364,43 @@ ApplicationWindow {
                 }
             }
 
-            ColumnLayout {
+            RowLayout {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.margins: 20
+
+            FileDialog {
+                        id: finetuneModelDialog
+                        title: "Please choose a gguf file"
+                        nameFilters: ["GGUF files (*.gguf)"]
+
+                        onAccepted: {
+                            if (selectedFile) console.log("There is a file", selectedFile)
+                            var path = selectedFile.toString().replace("file:///", "")
+                            console.log("Selected file:", path, selectedFile)
+                            inputHandler.loadModel(path)
+                        }
+
+                        onRejected: {
+                            console.log("File selection cancelled")
+                        }
+                    }
+
+                    AIOButton {
+                        text: "Load Model"
+
+                        Layout.fillWidth: true
+
+                        onClicked: {
+                            console.log("Button was clicked!")
+                            finetuneModelDialog.open();;;;;;;;;
+                        }
+                    }
+
+                Text {
+                    text: " enablething"
+                    color: "white"
+                }
 
             }
         }

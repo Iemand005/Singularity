@@ -1,69 +1,16 @@
 {
   "version": "1.0",
   "project": {
-    "totalFocusTime": 2074394,
-    "totalActiveTime": 63594
+    "totalFocusTime": 38924
   },
   "files": {
-    "AIOneQTCore/QSDModel.hpp": {
-      "pending": 16657,
-      "focus": 247686
-    },
-    ".editorconfig": {
+    "AIOne/src/Model.hpp": {
       "pending": 0,
-      "focus": 5167
-    },
-    ".clang-format": {
-      "pending": 0,
-      "focus": 8657
-    },
-    "AIOne/src/Finetune.hpp": {
-      "pending": 0,
-      "focus": 4613
-    },
-    "AIOne/src/SDModel.cpp": {
-      "pending": 8259,
-      "focus": 111106
-    },
-    "AIOneQTCore/QModelFactory.hpp": {
-      "pending": 6310,
-      "focus": 134011
-    },
-    "AIOne/src/Callbacks.h": {
-      "pending": 0,
-      "focus": 42410
-    },
-    "AIOne/src/ChatManager.hpp": {
-      "pending": 5297,
-      "focus": 101690
-    },
-    "AIOneQTCore/QTextGenOptions.h": {
-      "pending": 13558,
-      "focus": 145502
-    },
-    "AIOneQTWidgets/mainwindow.cpp": {
-      "pending": 2742,
-      "focus": 382351
-    },
-    "AIOne/src/TextGenOptions.hpp": {
-      "pending": 1199,
-      "focus": 57493
-    },
-    "AIOne/external/stable-diffusion.cpp/README.md": {
-      "pending": 0,
-      "focus": 9298
-    },
-    "AIOne/src/SDModel.hpp": {
-      "pending": 0,
-      "focus": 5486
-    },
-    "AIOButton.ui.qml": {
-      "pending": 0,
-      "focus": 1080
+      "focus": 13221
     },
     "Main.qml": {
-      "pending": 9572,
-      "focus": 115343
+      "pending": 0,
+      "focus": 25364
     }
   }
 }
