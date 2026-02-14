@@ -22,7 +22,7 @@ class QModelManager {
     auto syncOptions = dynamic_cast<LLModelOptions&>(options);
     factory->loadLLMAsync(path, syncOptions, [this, options](QLLModelPtr model) {
       llm = std::move(model);
-      chatManager = std::make_unique<QChatManager>(llm);
+      chatManager = llm->createChatManager();
       options.done();
     });
   }

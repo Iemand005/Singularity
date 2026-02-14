@@ -20,7 +20,7 @@ public:
     }
 
     QChatManagerPtr createChatManager(const QString systemPrompt = "") {
-        return std::make_unique<QChatManager>(this, systemPrompt);
+        return std::move(std::make_unique<QChatManager>(this, systemPrompt));
     }
 
 };
