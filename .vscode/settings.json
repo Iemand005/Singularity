@@ -20,5 +20,6 @@
     "statusBar.debuggingForeground": "#FEFBFB",
     "statusBar.noFolderBackground": "#511C1C",
     "statusBar.noFolderForeground": "#FEFBFB"
-  }
+  },
+  "output.smartScroll.enabled": false
 }
