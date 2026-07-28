@@ -15,7 +15,7 @@
         "CMAKE_CXX_COMPILER": "cl"
       },
       "environment": {
-        "PATH": "C:/Qt/6.10.1/msvc2022_64/bin;$penv{PATH}"
+        "PATH": "C:/Qt/6.11.1/msvc2022_64/bin;$penv{PATH}"
       }
     },
     {
@@ -33,7 +33,7 @@
         "AIONE_VULKAN": true
       },
       "environment": {
-        "PATH": "C:/Qt/6.10.1/msvc2022_64/bin;$penv{PATH}"
+        "PATH": "C:/Qt/6.11.1/msvc2022_64/bin;$penv{PATH}"
       }
     },
     {
