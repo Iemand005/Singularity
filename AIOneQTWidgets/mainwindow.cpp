@@ -193,6 +193,10 @@ MainWindow::MainWindow(QWidget *parent)
             QMetaObject::invokeMethod(bar, &ProgressBar::hide);
         });
     });
+
+    // Uh OpenAI API stuff
+
+    connect(ui->)
 }
 
 ProgressCallback MainWindow::progressFor(ProgressBar *bar) {

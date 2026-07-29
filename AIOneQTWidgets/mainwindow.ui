@@ -833,7 +833,7 @@
        <attribute name="title">
         <string>OpenAI API</string>
        </attribute>
-       <widget class="QLineEdit" name="lineEdit">
+       <widget class="QLineEdit" name="openAIKey">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -866,7 +866,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QPushButton" name="pushButton">
+       <widget class="QPushButton" name="openAIButton">
         <property name="geometry">
          <rect>
           <x>90</x>
