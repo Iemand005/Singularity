@@ -7,7 +7,7 @@
 #include <ModelFactory.hpp>
 
 #include "../AIOneQTCore/QModelFactory.hpp"
-#include "../AIOne/src/OpenAIClient.hpp"
+#include "../AIOne/src/Providers/OpenAIProvider.hpp"
 
 #include "progressbar.h"
 
@@ -29,6 +29,7 @@ public:
     QLLModelPtr llm = nullptr;
     QSDModelPtr sdm = nullptr;
     QChatManagerPtr chatManager = nullptr;
+    std::unique_ptr<AIOne::OpenAIProvider> openAIProvider;
 
     void send();
 
@@ -58,7 +59,9 @@ private:
     // }
     void updateSeed();
 
-    QString lastPath = QDir::homePath(); // TOOD:: load dis from a file or somthng yaya
+    QString lastPath = QDir::homePath();
     QString openFileDialog(const QString &title, QString fileTypes = tr("SafeTensors files (*.safetensors);"));
+
+    void setupCloudChatManager(const QString &modelId, const QString &apiKey);
 };
 #endif // MAINWINDOW_H

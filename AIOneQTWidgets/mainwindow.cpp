@@ -3,6 +3,8 @@
 
 #include <QFileDialog>
 #include <QGraphicsPixmapItem>
+#include <QStringListModel>
+#include <QThread>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -194,14 +196,38 @@ MainWindow::MainWindow(QWidget *parent)
         });
     });
 
-    // Uh OpenAI API stuff
+    // OpenAI Provider
 
-    connect(ui->openAIButton, &QPushButton::clicked, [&]() {
-      std::string uhUrl = "api.groq.com/openai";
-      std::string apiKey = ui->openAIKey->text().toStdString();
-      static OpenAIClient client(uhUrl, apiKey);
+    connect(ui->openAIButton, &QPushButton::clicked, [this]() {
+        QString apiKey = ui->openAIKey->text();
+        if (apiKey.isEmpty()) return;
 
-      auto models = client.getModels();
+        ui->openAIButton->setEnabled(false);
+        ui->openAIButton->setText("Fetching...");
+
+        static const std::string baseUrl = "api.groq.com/openai";
+        openAIProvider = std::make_unique<AIOne::OpenAIProvider>(baseUrl, apiKey.toStdString());
+
+        std::thread([this]() {
+            auto models = openAIProvider->getModels();
+            QMetaObject::invokeMethod(this, [this, models]() {
+                QStringList modelNames;
+                for (const auto& m : models)
+                    modelNames << QString::fromStdString(m.id);
+
+                auto *listModel = new QStringListModel(modelNames, this);
+                ui->listView->setModel(listModel);
+                ui->listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+                disconnect(ui->listView, &QListView::clicked, nullptr, nullptr);
+                connect(ui->listView, &QListView::clicked, this, [this](const QModelIndex& index) {
+                    setupCloudChatManager(index.data().toString(), ui->openAIKey->text());
+                });
+
+                ui->openAIButton->setText("Switch Model");
+                ui->openAIButton->setEnabled(true);
+            });
+        }).detach();
     });
 }
 
@@ -219,6 +245,26 @@ QString MainWindow::openFileDialog(const QString &title, QString fileTypes) {
 
 void MainWindow::updateSeed() {
     if (ui->randomizeSeedBox->isChecked()) ui->seedInput->setValue(sdm->newSeed());
+}
+
+void MainWindow::setupCloudChatManager(const QString &modelId, const QString &apiKey) {
+    if (!openAIProvider) {
+        openAIProvider = std::make_unique<AIOne::OpenAIProvider>(
+            "api.groq.com/openai", apiKey.toStdString());
+    }
+
+    auto newChat = std::make_unique<QChatManager>(openAIProvider.get());
+    newChat->setModel(modelId.toStdString());
+    newChat->setSystemPrompt(ui->systemPromptInput->toPlainText());
+
+    chatManager = std::move(newChat);
+
+    disconnect(ui->systemPromptInput, &QPlainTextEdit::textChanged, nullptr, nullptr);
+    connect(ui->systemPromptInput, &QPlainTextEdit::textChanged, this, [this]() {
+        if (chatManager) chatManager->setSystemPrompt(ui->systemPromptInput->toPlainText());
+    });
+
+    ui->statusbar->showMessage("Using OpenAI model: " + modelId);
 }
 
 void MainWindow::send() {

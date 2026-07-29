@@ -6,6 +6,7 @@
 #include "QTextGenOptions.h"
 
 class QLLModel;
+namespace AIOne { class ILLMProvider; }
 
 
 
@@ -17,6 +18,7 @@ class QChatManager : public QObject, public ChatManager {
 public:
 
     QChatManager(QLLModel *model, const QString systemPrompt = "");
+    QChatManager(AIOne::ILLMProvider *provider, const QString systemPrompt = "");
 
     void sendAsync(QString message, QAsyncTextGenOptions options) {
         AsyncTextGenOptions newOptions {{(TextGenOptionsBase)options}};
