@@ -4,7 +4,8 @@
     "ms-vscode.cmake-tools",
     "ms-vscode.cpptools",
     // "twxs.cmake",
-    "eamodio.gitlens"
+    "eamodio.gitlens",
+	"EditorConfig.EditorConfig"
   ],
   "unwantedRecommendations": [
     "ms-edgedevtools.vscode-edge-devtools"
