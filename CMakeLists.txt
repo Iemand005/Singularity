@@ -104,6 +104,9 @@ endif()
 
 target_include_directories(AIOneQT PRIVATE
     ${AIONE_DIR}/src
+    ${AIONE_DIR}/external/cpp-httplib
+    ${AIONE_DIR}/external/wolfssl
+    ${AIONE_DIR}/external/wolfssl/IDE/WIN
     ${AIONE_DIR}/external/llama.cpp/src
     ${AIONE_DIR}/external/llama.cpp/include
     ${AIONE_DIR}/external/llama.cpp/ggml/include
