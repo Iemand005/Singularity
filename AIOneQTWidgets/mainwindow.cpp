@@ -197,12 +197,12 @@ MainWindow::MainWindow(QWidget *parent)
     // Uh OpenAI API stuff
 
     connect(ui->openAIButton, &QPushButton::clicked, [&]() {
-      std::string uhUrl = "https://api.groq.com/openai/v1";
+      std::string uhUrl = "https://api.groq.com/openai";
       std::string apiKey = ui->openAIKey->text().toStdString();
       static OpenAIClient client(uhUrl, apiKey);
 
       auto models = client.getModels();
-    })
+    });
 }
 
 ProgressCallback MainWindow::progressFor(ProgressBar *bar) {
