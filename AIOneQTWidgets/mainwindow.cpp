@@ -197,7 +197,7 @@ MainWindow::MainWindow(QWidget *parent)
     // Uh OpenAI API stuff
 
     connect(ui->openAIButton, &QPushButton::clicked, [&]() {
-      std::string uhUrl = "https://api.groq.com/openai";
+      std::string uhUrl = "api.groq.com/openai";
       std::string apiKey = ui->openAIKey->text().toStdString();
       static OpenAIClient client(uhUrl, apiKey);
 
