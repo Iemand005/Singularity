@@ -7,6 +7,7 @@
 #include <ModelFactory.hpp>
 
 #include "../AIOneQTCore/QModelFactory.hpp"
+#include "../AIOne/src/OpenAIClient.hpp"
 
 #include "progressbar.h"
 
