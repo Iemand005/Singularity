@@ -52,7 +52,7 @@ void MessageWidget::processBuffer()
     int idx;
     while (!m_pending.isEmpty()) {
         if (m_isThinking) {
-            idx = m_pending");
+            idx = m_pending.indexOf("</think>");
             if (idx < 0) {
                 ensureThinkSegment();
                 m_thinkContent->setText(m_thinkContent->text() + m_pending);
