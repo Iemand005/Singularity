@@ -132,8 +132,14 @@ MainWindow::MainWindow(QWidget *parent)
     ui->messageInput->installEventFilter(this);
 
     connect(ui->maxTokensInput, &QSpinBox::valueChanged, [this]() {
-        if (chatManager)
+        if (chatManager && !m_loadingChat && ui->maxTokensCheck->isChecked())
             chatManager->currentChatOptions()->maxTokens = ui->maxTokensInput->value();
+    });
+
+    connect(ui->maxTokensCheck, &QCheckBox::toggled, [this](bool checked) {
+        ui->maxTokensInput->setEnabled(checked);
+        if (chatManager && !m_loadingChat)
+            chatManager->currentChatOptions()->maxTokens = checked ? ui->maxTokensInput->value() : 0;
     });
 
     // ---- Stable Diffusion ----
@@ -413,7 +419,9 @@ void MainWindow::onChatSelected(int row) {
 
     // Restore UI state
     ui->systemPromptInput->setPlainText(QString::fromStdString(meta.systemPrompt));
-    ui->maxTokensInput->setValue(meta.params.maxTokens);
+    bool tokensEnabled = meta.params.maxTokens > 0;
+    ui->maxTokensCheck->setChecked(tokensEnabled);
+    ui->maxTokensInput->setValue(tokensEnabled ? meta.params.maxTokens : 500);
 
     // Reload messages into listWidget
     ui->listWidget->clear();
@@ -451,7 +459,7 @@ void MainWindow::onNewChat() {
     // Get current system prompt and params from UI
     std::string systemPrompt = ui->systemPromptInput->toPlainText().toStdString();
     TextGenOptionsBase params;
-    params.maxTokens = ui->maxTokensInput->value();
+    params.maxTokens = ui->maxTokensCheck->isChecked() ? ui->maxTokensInput->value() : 0;
 
     chatManager->createNewChat("Untitled", m_currentModelName.toStdString(),
                                 systemPrompt, params);
@@ -565,6 +573,7 @@ void MainWindow::send() {
     });
 
     QAsyncTextGenOptions options;
+    options.maxTokens = ui->maxTokensCheck->isChecked() ? ui->maxTokensInput->value() : 0;
 
     options.onThinkStateChange = [this](bool thinking) {
         QMetaObject::invokeMethod(m_generatingWidget, [this, thinking]() {
