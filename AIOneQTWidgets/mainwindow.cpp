@@ -573,20 +573,21 @@ void MainWindow::rebuildConversationDisplay() {
         uint64_t slotParentId = msg.parentId;
 
         w->setContent(QString::fromStdString(msg.content));
-        w->finish();
+        w->setParentId(slotParentId);
 
-        if (useFallback) {
-            // In fallback mode, all siblings = just this message
-            w->setVersionInfo(0, 1);
-            w->setParentId(slotParentId);
-        } else {
-            auto siblings = chat->getSiblings(slotParentId);
-            size_t idx = chat->getCurrentVersionIndex(slotParentId);
-            if (idx >= siblings.size()) idx = 0;
-            w->setContent(QString::fromStdString(siblings[idx].content));
-            w->setVersionInfo(idx, siblings.size());
-            w->setParentId(slotParentId);
+        if (msg.role == "assistant") {
+            if (useFallback) {
+                w->setVersionInfo(0, 1);
+            } else {
+                auto siblings = chat->getSiblings(slotParentId);
+                size_t idx = chat->getCurrentVersionIndex(slotParentId);
+                if (idx >= siblings.size()) idx = 0;
+                w->setContent(QString::fromStdString(siblings[idx].content));
+                w->setVersionInfo(idx, siblings.size());
+            }
         }
+
+        w->finish();
 
         connect(w, &MessageWidget::prevRequested, this, [this, slotParentId]() {
             onVersionPrev(slotParentId);
@@ -839,6 +840,7 @@ void MainWindow::send() {
             if (m_generatingWidget) {
                 auto content = QString::fromStdString(output.output.content);
                 m_generatingWidget->setContent(content);
+                m_generatingWidget->setVersionInfo(0, 1);
                 m_generatingWidget->finish();
                 if (m_generatingItem)
                     m_generatingItem->setSizeHint(m_generatingWidget->minimumSizeHint());
