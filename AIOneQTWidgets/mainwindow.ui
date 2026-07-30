@@ -201,9 +201,9 @@
                  <property name="maximum">
                   <number>1000000000</number>
                  </property>
-                 <property name="value">
-                  <number>500</number>
-                 </property>
+                  <property name="value">
+                   <number>50000</number>
+                  </property>
                 </widget>
                </item>
               </layout>

@@ -11,6 +11,7 @@
 #include <QTimer>
 #include <QMessageBox>
 #include <QKeyEvent>
+#include <QScopeGuard>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -399,43 +400,50 @@ void MainWindow::onChatSelected(int row) {
     QString folder = item->data(Qt::UserRole).toString();
     if (folder.isEmpty()) return;
 
+    // Force-reset any in-flight generation
+    forceStopGeneration();
+
     // Save current chat before switching
     if (chatManager) {
         chatManager->saveCurrentChatMetadata();
     }
 
     m_loadingChat = true;
+    // Ensure m_loadingChat is reset even if something throws
+    auto resetLoading = qScopeGuard([this]() { m_loadingChat = false; });
 
     // Load the selected chat
     auto meta = ChatStorage::loadMetadata(folder.toStdString());
 
     if (!chatManager) {
-        // No model loaded, create a dummy chat manager for browsing history
-        auto dummyChat = std::make_unique<QChatManager>(
-            std::make_unique<AIOne::OpenAIProvider>("api.groq.com/openai", "").get());
-        chatManager = std::move(dummyChat);
+        chatManager = std::make_unique<QChatManager>(
+            new AIOne::OpenAIProvider("api.groq.com/openai", ""));
     }
 
     chatManager->loadChat(folder.toStdString());
     m_currentModelName = QString::fromStdString(meta.model);
 
-    // Restore UI state
-    ui->systemPromptInput->setPlainText(QString::fromStdString(meta.systemPrompt));
+    // Restore UI state - read system prompt from loaded chat messages, not metadata
+    auto* loadedChat = chatManager->getCurrentChat();
+    std::string actualSystemPrompt;
+    if (loadedChat) {
+        auto loadMsgs = loadedChat->getMessages();
+        if (!loadMsgs.empty() && loadMsgs[0].role == "system")
+            actualSystemPrompt = loadMsgs[0].content;
+    }
+    ui->systemPromptInput->setPlainText(QString::fromStdString(actualSystemPrompt));
+
     bool tokensEnabled = meta.params.maxTokens > 0;
     ui->maxTokensCheck->setChecked(tokensEnabled);
-    ui->maxTokensInput->setValue(tokensEnabled ? meta.params.maxTokens : 500);
+    ui->maxTokensInput->setValue(tokensEnabled ? meta.params.maxTokens : 50000);
 
     rebuildConversationDisplay();
 
     ui->llmInputFrame->setEnabled(true);
-
-    // Ensure first version of each slot is selected
-    m_loadingChat = false;
 }
 
 void MainWindow::onNewChat() {
     if (!chatManager) {
-        // Need at least a chat manager - create a stub provider-based one if nothing loaded
         ui->statusbar->showMessage("Load a model first");
         return;
     }
@@ -443,7 +451,11 @@ void MainWindow::onNewChat() {
     if (!chatManager->getCurrentChat())
         return;
 
+    // Force-reset any in-flight generation
+    forceStopGeneration();
+
     m_loadingChat = true;
+    auto resetLoading = qScopeGuard([this]() { m_loadingChat = false; });
 
     // Save current chat first
     chatManager->saveCurrentChatMetadata();
@@ -460,8 +472,6 @@ void MainWindow::onNewChat() {
     m_slotItems.clear();
     ui->listWidget->clear();
     ui->llmInputFrame->setEnabled(true);
-
-    m_loadingChat = false;
 
     // Refresh sidebar
     refreshChatList();
@@ -519,29 +529,65 @@ void MainWindow::onSendDone() {
     rebuildConversationDisplay();
 }
 
+void MainWindow::forceStopGeneration() {
+    if (m_generating || m_stopRequested) {
+        m_stopRequested = true;
+        m_generating = false;
+        m_generatingWidget = nullptr;
+        m_generatingItem = nullptr;
+        ui->sendButton->setText("Send");
+        ui->messageInput->setEnabled(true);
+        ui->inputEvalProgressBar->setIndeterminate(false);
+        ui->inputEvalProgressBar->hide();
+    }
+}
+
 void MainWindow::rebuildConversationDisplay() {
     if (!chatManager || !chatManager->getCurrentChat()) return;
 
     auto* chat = chatManager->getCurrentChat();
     auto activePath = chat->getActivePath();
 
+    // Hard fallback: if activePath is empty or has only system messages,
+    // display all non-system messages in order.
+    auto allMsgs = chat->getMessages();
+    size_t nonSystem = 0;
+    for (auto& m : allMsgs)
+        if (m.role != "system") ++nonSystem;
+
+    bool useFallback = false;
+    size_t shownInPath = 0;
+    for (auto& m : activePath)
+        if (m.role != "system") ++shownInPath;
+    if (shownInPath == 0 && nonSystem > 0) useFallback = true;
+
     m_slotItems.clear();
     ui->listWidget->clear();
 
-    for (const auto& msg : activePath) {
+    const auto& displayMsgs = useFallback ? allMsgs : activePath;
+
+    for (const auto& msg : displayMsgs) {
         if (msg.role == "system") continue;
 
         auto *item = new QListWidgetItem(ui->listWidget);
         auto *w = new MessageWidget(ui->listWidget);
         uint64_t slotParentId = msg.parentId;
-        auto siblings = chat->getSiblings(slotParentId);
-        size_t idx = chat->getCurrentVersionIndex(slotParentId);
-        if (idx >= siblings.size()) idx = 0;
 
-        w->setContent(QString::fromStdString(siblings[idx].content));
+        w->setContent(QString::fromStdString(msg.content));
         w->finish();
-        w->setVersionInfo(idx, siblings.size());
-        w->setParentId(slotParentId);
+
+        if (useFallback) {
+            // In fallback mode, all siblings = just this message
+            w->setVersionInfo(0, 1);
+            w->setParentId(slotParentId);
+        } else {
+            auto siblings = chat->getSiblings(slotParentId);
+            size_t idx = chat->getCurrentVersionIndex(slotParentId);
+            if (idx >= siblings.size()) idx = 0;
+            w->setContent(QString::fromStdString(siblings[idx].content));
+            w->setVersionInfo(idx, siblings.size());
+            w->setParentId(slotParentId);
+        }
 
         connect(w, &MessageWidget::prevRequested, this, [this, slotParentId]() {
             onVersionPrev(slotParentId);
@@ -734,6 +780,7 @@ void MainWindow::onRegenerateRequested(uint64_t parentId) {
 void MainWindow::send() {
     if (m_generating) {
         m_stopRequested = true;
+        forceStopGeneration();
         return;
     }
 

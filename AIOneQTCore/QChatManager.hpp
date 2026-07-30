@@ -43,6 +43,7 @@ public:
             if (options.onToken) options.onToken(QString(token.c_str()));
         };
         newOptions.onInputEval = options.onInputEval;
+        newOptions.onDone = options.onDone;
         newOptions.onThinkStateChange = [options](bool thinking) {
             if (options.onThinkStateChange) options.onThinkStateChange(thinking);
         };

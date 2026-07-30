@@ -98,6 +98,9 @@ private:
     void loadLastChat();
     void onSendDone();
 
+    // Generation helpers
+    void forceStopGeneration();
+
     // Version/branching
     void rebuildConversationDisplay();
     void onVersionPrev(uint64_t parentId);
