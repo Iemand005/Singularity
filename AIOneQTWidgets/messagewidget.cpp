@@ -10,23 +10,56 @@ MessageWidget::MessageWidget(QWidget *parent)
 
 void MessageWidget::appendToken(const QString &token)
 {
-    if (m_isThinking) {
-        if (!m_thinkContent)
-            startThinkSegment();
-        m_thinkContent->setText(m_thinkContent->text() + token);
-        if (m_thinkScroll->maximumHeight() > 0)
-            recalculateThinkHeight();
-    } else {
-        if (!m_textLabel)
+    m_pending += token;
+    processBuffer();
+    emit sizeChanged();
+}
+
+void MessageWidget::processBuffer()
+{
+    if (m_pending.isEmpty()) return;
+
+    int idx;
+    while (!m_pending.isEmpty()) {
+        if (m_isThinking) {
+            idx = m_pending.indexOf("</think>");
+            if (idx < 0) {
+                ensureThinkSegment();
+                m_thinkContent->setText(m_thinkContent->text() + m_pending);
+                m_pending.clear();
+                break;
+            }
+            ensureThinkSegment();
+            if (idx > 0)
+                m_thinkContent->setText(m_thinkContent->text() + m_pending.left(idx));
+            m_everHadContent = true;
+            m_isThinking = false;
+            m_pending = m_pending.mid(idx + 8);
             startTextSegment();
-        m_textLabel->setText(m_textLabel->text() + token);
+        } else {
+            idx = m_pending.indexOf("<think>");
+            if (idx < 0) {
+                ensureTextSegment();
+                m_textLabel->setText(m_textLabel->text() + m_pending);
+                m_pending.clear();
+                break;
+            }
+            ensureTextSegment();
+            if (idx > 0)
+                m_textLabel->setText(m_textLabel->text() + m_pending.left(idx));
+            m_everHadContent = true;
+            m_isThinking = true;
+            m_pending = m_pending.mid(idx + 7);
+            startThinkSegment();
+        }
     }
 }
 
 void MessageWidget::setThinking(bool thinking)
 {
-    if (m_isThinking == thinking)
-        return;
+    if (m_isThinking == thinking) return;
+
+    processBuffer();
 
     m_textLabel = nullptr;
     m_thinkContainer = nullptr;
@@ -47,8 +80,7 @@ void MessageWidget::setThinking(bool thinking)
 
 void MessageWidget::finish()
 {
-    if (m_thinkScroll && m_thinkScroll->maximumHeight() > 0)
-        recalculateThinkHeight();
+    processBuffer();
     m_textLabel = nullptr;
     m_thinkContainer = nullptr;
     m_thinkToggle = nullptr;
@@ -56,6 +88,26 @@ void MessageWidget::finish()
     m_thinkContent = nullptr;
     m_thinkAnim = nullptr;
     emit sizeChanged();
+}
+
+void MessageWidget::setContent(const QString &text)
+{
+    if (m_everHadContent) return;
+    m_pending = text;
+    processBuffer();
+    emit sizeChanged();
+}
+
+void MessageWidget::ensureTextSegment()
+{
+    if (!m_textLabel)
+        startTextSegment();
+}
+
+void MessageWidget::ensureThinkSegment()
+{
+    if (!m_thinkContent)
+        startThinkSegment();
 }
 
 void MessageWidget::startTextSegment()
@@ -134,21 +186,4 @@ void MessageWidget::startThinkSegment()
     m_thinkScroll = scroll;
     m_thinkContent = content;
     m_thinkAnim = anim;
-}
-
-void MessageWidget::recalculateThinkHeight()
-{
-    if (!m_thinkScroll || !m_thinkContent)
-        return;
-    int prev = m_thinkScroll->maximumHeight();
-    m_thinkScroll->setMaximumHeight(QWIDGETSIZE_MAX);
-    m_thinkScroll->adjustSize();
-    int target = qMin(m_thinkScroll->minimumSizeHint().height(), 600);
-    target = qMax(target, 50);
-    if (target > prev) {
-        m_thinkScroll->setMaximumHeight(target);
-        emit sizeChanged();
-    } else {
-        m_thinkScroll->setMaximumHeight(prev);
-    }
 }

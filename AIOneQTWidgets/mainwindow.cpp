@@ -310,6 +310,8 @@ void MainWindow::send() {
 
     options.onDone = [this, lastItem, widget](const TextGenResult &output) {
         QMetaObject::invokeMethod(this, [this, lastItem, widget, output]() {
+            auto content = QString::fromStdString(output.output.content);
+            widget->setContent(content);
             widget->finish();
             lastItem->setSizeHint(widget->minimumSizeHint());
 

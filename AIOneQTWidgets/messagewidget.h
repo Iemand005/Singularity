@@ -18,16 +18,21 @@ public:
     void setThinking(bool thinking);
     void finish();
 
+    void setContent(const QString &text);
+
 signals:
     void sizeChanged();
 
 private:
     void startTextSegment();
+    void ensureTextSegment();
     void startThinkSegment();
-    void recalculateThinkHeight();
+    void processBuffer();
 
     QVBoxLayout *m_layout;
     bool m_isThinking = false;
+    bool m_everHadContent = false;
+    QString m_pending;
 
     QLabel *m_textLabel = nullptr;
     QWidget *m_thinkContainer = nullptr;
