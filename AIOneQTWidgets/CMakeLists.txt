@@ -51,6 +51,7 @@ qt_add_executable(AIOneQTWidgets
     ../AIOneQTCore/QTextGenOptions.h
     ${AIONE_DIR}/src/Chat.hpp ${AIONE_DIR}/src/ChatManager.hpp ${AIONE_DIR}/src/ContextInvalidError.hpp ${AIONE_DIR}/src/LlamaUtil.hpp ${AIONE_DIR}/src/LLModel.cpp ${AIONE_DIR}/src/LLModel.hpp ${AIONE_DIR}/src/LLModelOptions.hpp ${AIONE_DIR}/src/Message.hpp ${AIONE_DIR}/src/Model.cpp ${AIONE_DIR}/src/Model.hpp ${AIONE_DIR}/src/ModelFactory.cpp ${AIONE_DIR}/src/ModelFactory.hpp ${AIONE_DIR}/src/PreferredDevice.h ${AIONE_DIR}/src/Role.h ${AIONE_DIR}/src/SDImageOptions.h ${AIONE_DIR}/src/SDModel.cpp ${AIONE_DIR}/src/SDModel.hpp ${AIONE_DIR}/src/SDModelOptions.hpp ${AIONE_DIR}/src/TextContext.cpp ${AIONE_DIR}/src/TextContext.hpp ${AIONE_DIR}/src/TextContextOptions.h ${AIONE_DIR}/src/TextGenOptions.hpp ${AIONE_DIR}/src/TextGenResult.hpp ${AIONE_DIR}/src/Timeable.hpp
     ${AIONE_DIR}/src/ModelOptions.h
+    messagewidget.h messagewidget.cpp
     imagepreview.h imagepreview.cpp
     progressbar.h progressbar.cpp
     checkbox.h checkbox.cpp

@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "messagewidget.h"
 
 #include <QFileDialog>
 #include <QGraphicsPixmapItem>
@@ -282,7 +283,17 @@ void MainWindow::send() {
     QAsyncTextGenOptions options;
 
     options.onDone = [this, lastItem](const TextGenResult &output) {
-        lastItem->setText(output.output.content.c_str());
+        auto content = QString::fromStdString(output.output.content);
+
+        auto *widget = new MessageWidget(content, ui->listWidget);
+        ui->listWidget->setItemWidget(lastItem, widget);
+        lastItem->setSizeHint(widget->minimumSizeHint());
+
+        connect(widget, &MessageWidget::toggleChanged, this, [this, lastItem, widget]() {
+            lastItem->setSizeHint(widget->minimumSizeHint());
+            ui->listWidget->doItemsLayout();
+        });
+
         ui->tokensCachedDisplay->display((int)output.tokensCached);
         ui->tokensGeneratedDisplay->display((int)output.tokensGenerated);
         ui->tokensEvaluatedDisplay->display((int)output.tokensEvaluated);
