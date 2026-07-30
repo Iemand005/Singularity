@@ -74,7 +74,7 @@ target_link_libraries(AIOneQTWidgets
 )
 
 
-if(NOT AIONEQT_USE_QT_WIDGETS)
+if(NOT TARGET AIOne::Core)
     add_subdirectory("${AIONE_DIR}" ${CMAKE_BINARY_DIR}/AIOneCore_build)
 endif()
 

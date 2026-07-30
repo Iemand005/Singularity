@@ -259,6 +259,9 @@ void MainWindow::setupCloudChatManager(const QString &modelId, const QString &ap
 
     chatManager = std::move(newChat);
 
+    ui->llmLoadProgressBar->hide();
+    ui->llmInputFrame->setEnabled(true);
+
     disconnect(ui->systemPromptInput, &QPlainTextEdit::textChanged, nullptr, nullptr);
     connect(ui->systemPromptInput, &QPlainTextEdit::textChanged, this, [this]() {
         if (chatManager) chatManager->setSystemPrompt(ui->systemPromptInput->toPlainText());
