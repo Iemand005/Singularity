@@ -605,8 +605,8 @@ void MainWindow::send() {
 
             ui->sendButton->setText("Send");
             ui->messageInput->setEnabled(true);
-            ui->inputEvalProgressBar->setRange(0, 100);
-            ui->inputEvalProgressBar->setValue(100);
+            ui->inputEvalProgressBar->setIndeterminate(false);
+            ui->inputEvalProgressBar->hide();
 
             onSendDone();
         });
