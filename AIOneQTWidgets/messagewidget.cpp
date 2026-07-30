@@ -45,14 +45,19 @@ MessageWidget::MessageWidget(QWidget *parent)
 
 void MessageWidget::setVersionInfo(size_t current, size_t total)
 {
-    if (total < 2) {
+    if (total < 1) {
         m_versionBar->setVisible(false);
         return;
     }
     m_versionBar->setVisible(true);
+    bool multi = total > 1;
+    m_prevBtn->setVisible(multi);
+    m_nextBtn->setVisible(multi);
+    m_versionLabel->setVisible(multi);
     m_versionLabel->setText(QString("%1/%2").arg(current + 1).arg(total));
     m_prevBtn->setEnabled(current > 0);
     m_nextBtn->setEnabled(current + 1 < total);
+    m_regenerateBtn->setEnabled(true);
 }
 
 void MessageWidget::appendToken(const QString &token)
