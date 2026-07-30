@@ -2,6 +2,8 @@
 #define MESSAGEWIDGET_H
 
 #include <QWidget>
+#include <QScrollArea>
+#include <QPropertyAnimation>
 
 namespace Ui {
 class MessageWidget;
