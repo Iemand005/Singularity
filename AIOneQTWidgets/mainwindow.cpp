@@ -752,6 +752,29 @@ void MainWindow::onRegenerateRequested(uint64_t parentId) {
 
             m_generating = false;
             m_stopRequested = false;
+
+            auto it = m_slotItems.find(parentId);
+            if (it != m_slotItems.end()) {
+                auto* item = it->second;
+                ui->listWidget->setItemWidget(item, m_generatingWidget);
+                item->setSizeHint(m_generatingWidget->minimumSizeHint());
+
+                connect(m_generatingWidget, &MessageWidget::prevRequested, this, [this, parentId]() {
+                    onVersionPrev(parentId);
+                });
+                connect(m_generatingWidget, &MessageWidget::nextRequested, this, [this, parentId]() {
+                    onVersionNext(parentId);
+                });
+                connect(m_generatingWidget, &MessageWidget::regenerateRequested, this, [this, parentId]() {
+                    onRegenerateRequested(parentId);
+                });
+                connect(m_generatingWidget, &MessageWidget::sizeChanged, this, [this, item]() {
+                    if (item && m_generatingWidget) {
+                        item->setSizeHint(m_generatingWidget->minimumSizeHint());
+                        ui->listWidget->doItemsLayout();
+                    }
+                });
+            }
             m_generatingWidget = nullptr;
 
             ui->sendButton->setText("Send");
@@ -835,13 +858,35 @@ void MainWindow::send() {
 
     options.onDone = [this](const TextGenResult &output) {
         QMetaObject::invokeMethod(this, [this, output]() {
-            if (m_generatingWidget) {
+            if (m_generatingWidget && m_generatingItem) {
                 auto content = QString::fromStdString(output.output.content);
                 m_generatingWidget->setContent(content);
                 m_generatingWidget->setVersionInfo(0, 1);
                 m_generatingWidget->finish();
-                if (m_generatingItem)
-                    m_generatingItem->setSizeHint(m_generatingWidget->minimumSizeHint());
+
+                auto* chat = chatManager->getCurrentChat();
+                uint64_t parentId = m_generatingWidget->parentId();
+                if (parentId == 0 && chat) {
+                    auto allMsgs = chat->getMessages();
+                    if (allMsgs.size() >= 2) {
+                        parentId = allMsgs[allMsgs.size() - 2].id;
+                        m_generatingWidget->setParentId(parentId);
+                    }
+                }
+                if (parentId != 0) {
+                    m_slotItems[parentId] = m_generatingItem;
+
+                    connect(m_generatingWidget, &MessageWidget::prevRequested, this, [this, parentId]() {
+                        onVersionPrev(parentId);
+                    });
+                    connect(m_generatingWidget, &MessageWidget::nextRequested, this, [this, parentId]() {
+                        onVersionNext(parentId);
+                    });
+                    connect(m_generatingWidget, &MessageWidget::regenerateRequested, this, [this, parentId]() {
+                        onRegenerateRequested(parentId);
+                    });
+                }
+                m_generatingItem->setSizeHint(m_generatingWidget->minimumSizeHint());
             }
 
             ui->tokensCachedDisplay->display((int)output.tokensCached);

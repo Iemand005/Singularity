@@ -46,64 +46,35 @@ void MessageWidget::setVersionInfo(size_t current, size_t total)
 void MessageWidget::appendToken(const QString &token)
 {
     m_hasStreamedContent = true;
-    m_pending += token;
-    processBuffer();
-    emit sizeChanged();
-}
-
-void MessageWidget::processBuffer()
-{
-    if (m_pending.isEmpty()) return;
-
-    int idx;
-    while (!m_pending.isEmpty()) {
-        if (m_isThinking) {
-            idx = m_pending");
-            if (idx < 0) {
-                ui->thinkContent->setText(ui->thinkContent->text() + m_pending);
-                m_pending.clear();
-                break;
-            }
-            if (idx > 0)
-                ui->thinkContent->setText(ui->thinkContent->text() + m_pending.left(idx));
-            m_everHadContent = true;
-            m_isThinking = false;
-            m_pending = m_pending.mid(idx + 8);
-        } else {
-            idx = m_pending.indexOf(" 생각은 ");
-            if (idx < 0) {
-                ui->textLabel->setText(ui->textLabel->text() + m_pending);
-                m_pending.clear();
-                break;
-            }
-            if (idx > 0)
-                ui->textLabel->setText(ui->textLabel->text() + m_pending.left(idx));
-            m_everHadContent = true;
-            m_isThinking = true;
-            m_pending = m_pending.mid(idx + 7);
-        }
+    if (m_isThinking) {
+        ui->thinkContent->setText(ui->thinkContent->text() + token);
+        ui->thinkContainer->setVisible(true);
+    } else {
+        ui->textLabel->setText(ui->textLabel->text() + token);
     }
+    emit sizeChanged();
 }
 
 void MessageWidget::setThinking(bool thinking)
 {
     if (m_isThinking == thinking) return;
-
-    processBuffer();
     m_isThinking = thinking;
+    if (thinking) {
+        ui->thinkContainer->setVisible(true);
+    }
     emit sizeChanged();
 }
 
 void MessageWidget::finish()
 {
-    processBuffer();
+    m_everHadContent = true;
     emit sizeChanged();
 }
 
 void MessageWidget::setContent(const QString &text)
 {
     if (m_everHadContent || m_hasStreamedContent) return;
-    m_pending = text;
-    processBuffer();
+    ui->textLabel->setText(text);
+    m_everHadContent = true;
     emit sizeChanged();
 }

@@ -30,14 +30,10 @@ signals:
     void regenerateRequested();
 
 private:
-    void processBuffer();
-
     Ui::MessageWidget *ui;
     bool m_isThinking = false;
     bool m_everHadContent = false;
     bool m_hasStreamedContent = false;
-    QString m_pending;
-
     uint64_t m_parentId = 0;
 };
 
