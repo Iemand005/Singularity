@@ -283,20 +283,22 @@ void MainWindow::send() {
     QAsyncTextGenOptions options;
 
     options.onDone = [this, lastItem](const TextGenResult &output) {
-        auto content = QString::fromStdString(output.output.content);
+        QMetaObject::invokeMethod(this, [this, lastItem, output]() {
+            auto content = QString::fromStdString(output.output.content);
 
-        auto *widget = new MessageWidget(content, ui->listWidget);
-        ui->listWidget->setItemWidget(lastItem, widget);
-        lastItem->setSizeHint(widget->minimumSizeHint());
-
-        connect(widget, &MessageWidget::toggleChanged, this, [this, lastItem, widget]() {
+            auto *widget = new MessageWidget(content, ui->listWidget);
+            ui->listWidget->setItemWidget(lastItem, widget);
             lastItem->setSizeHint(widget->minimumSizeHint());
-            ui->listWidget->doItemsLayout();
-        });
 
-        ui->tokensCachedDisplay->display((int)output.tokensCached);
-        ui->tokensGeneratedDisplay->display((int)output.tokensGenerated);
-        ui->tokensEvaluatedDisplay->display((int)output.tokensEvaluated);
+            connect(widget, &MessageWidget::toggleChanged, this, [this, lastItem, widget]() {
+                lastItem->setSizeHint(widget->minimumSizeHint());
+                ui->listWidget->doItemsLayout();
+            });
+
+            ui->tokensCachedDisplay->display((int)output.tokensCached);
+            ui->tokensGeneratedDisplay->display((int)output.tokensGenerated);
+            ui->tokensEvaluatedDisplay->display((int)output.tokensEvaluated);
+        });
     };
 
     options.onToken = [this, lastItem](const QString &token) {
