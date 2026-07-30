@@ -143,7 +143,8 @@ void MessageWidget::startThinkSegment()
     scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     scroll->setFrameShape(QFrame::NoFrame);
-    scroll->setMaximumHeight(0);
+    scroll->setVisible(false);
+    scroll->setMaximumHeight(QWIDGETSIZE_MAX);
 
     auto *content = new QLabel();
     content->setWordWrap(true);
@@ -151,29 +152,9 @@ void MessageWidget::startThinkSegment()
     content->setContentsMargins(20, 2, 0, 2);
     scroll->setWidget(content);
 
-    auto *anim = new QPropertyAnimation(scroll, "maximumHeight", this);
-    anim->setDuration(250);
-    anim->setEasingCurve(QEasingCurve::InOutQuad);
-
-    connect(toggle, &QToolButton::toggled, this, [this, toggle, scroll, content, anim](bool checked) {
-        anim->stop();
-        if (checked) {
-            int prev = scroll->maximumHeight();
-            scroll->setMaximumHeight(QWIDGETSIZE_MAX);
-            scroll->adjustSize();
-            int target = qMin(scroll->minimumSizeHint().height(), 600);
-            scroll->setMaximumHeight(prev);
-            anim->setStartValue(0);
-            anim->setEndValue(qMax(target, 50));
-        } else {
-            anim->setStartValue(scroll->maximumHeight());
-            anim->setEndValue(0);
-        }
+    connect(toggle, &QToolButton::toggled, this, [this, toggle, scroll](bool checked) {
+        scroll->setVisible(checked);
         toggle->setText(checked ? QStringLiteral("\u25BC Hide thinking") : QStringLiteral("\u25B6 Show thinking"));
-        anim->start();
-    });
-
-    connect(anim, &QPropertyAnimation::valueChanged, this, [this]() {
         emit sizeChanged();
     });
 

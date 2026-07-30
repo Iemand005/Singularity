@@ -258,7 +258,7 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     connect(ui->openAIButton, &QPushButton::clicked, [this]() {
-        QString apiKey = ui->openAIKey->text();
+        QString apiKey = ui->openAIKey->text().trimmed();
         if (apiKey.isEmpty()) return;
 
         // Save API key
@@ -295,7 +295,7 @@ MainWindow::MainWindow(QWidget *parent)
                         QString model = ui->modelBox->currentText();
                         m_settings.lastAIModel = model.toStdString();
                         saveSettings();
-                        setupCloudChatManager(model, ui->openAIKey->text());
+                        setupCloudChatManager(model, ui->openAIKey->text().trimmed());
                     }
                 });
 
