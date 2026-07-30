@@ -66,7 +66,6 @@ void MessageWidget::setThinking(bool thinking)
     m_thinkToggle = nullptr;
     m_thinkScroll = nullptr;
     m_thinkContent = nullptr;
-    m_thinkAnim = nullptr;
 
     m_isThinking = thinking;
 
@@ -86,7 +85,6 @@ void MessageWidget::finish()
     m_thinkToggle = nullptr;
     m_thinkScroll = nullptr;
     m_thinkContent = nullptr;
-    m_thinkAnim = nullptr;
     emit sizeChanged();
 }
 
@@ -166,5 +164,4 @@ void MessageWidget::startThinkSegment()
     m_thinkToggle = toggle;
     m_thinkScroll = scroll;
     m_thinkContent = content;
-    m_thinkAnim = anim;
 }
