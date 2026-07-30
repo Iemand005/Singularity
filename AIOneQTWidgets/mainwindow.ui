@@ -42,12 +42,18 @@
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
          <widget class="QTabWidget" name="tabWidget_2">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tab_2">
            <attribute name="title">
-            <string>Chat</string>
+            <string>Local</string>
            </attribute>
            <layout class="QVBoxLayout" name="verticalLayout_12">
             <item>
@@ -57,11 +63,18 @@
               </property>
              </widget>
             </item>
+            <item>
+             <widget class="ProgressBar" name="llmLoadProgressBar">
+              <property name="value">
+               <number>0</number>
+              </property>
+             </widget>
+            </item>
            </layout>
           </widget>
           <widget class="QWidget" name="tab_3">
            <attribute name="title">
-            <string>Chat Settings</string>
+            <string>OpenAI API</string>
            </attribute>
            <layout class="QVBoxLayout" name="verticalLayout_13">
             <item>
@@ -86,13 +99,6 @@
             </item>
            </layout>
           </widget>
-         </widget>
-        </item>
-        <item>
-         <widget class="ProgressBar" name="llmLoadProgressBar">
-          <property name="value">
-           <number>0</number>
-          </property>
          </widget>
         </item>
         <item>
@@ -869,11 +875,6 @@
          </layout>
         </item>
        </layout>
-      </widget>
-      <widget class="QWidget" name="tab">
-       <attribute name="title">
-        <string>OpenAI API</string>
-       </attribute>
       </widget>
      </widget>
     </item>
