@@ -5,6 +5,10 @@
 #include <QFileDialog>
 #include <QGraphicsPixmapItem>
 #include <QThread>
+#include <QVBoxLayout>
+#include <QTimer>
+#include <QMessageBox>
+#include <QKeyEvent>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -12,49 +16,104 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    // LLM
+    // ---- Chat Storage Init ----
+    ChatStorage::init();
+    m_chatsRoot = QString::fromStdString(ChatStorage::rootPath());
+
+    loadSettings();
+
+    // ---- Sidebar ----
+    m_sidebar = new QWidget(this);
+    auto *sbLayout = new QVBoxLayout(m_sidebar);
+    sbLayout->setContentsMargins(4, 4, 4, 4);
+    sbLayout->setSpacing(4);
+
+    m_newChatBtn = new QPushButton("New Chat", m_sidebar);
+    m_chatList = new QListWidget(m_sidebar);
+    m_chatList->setFrameShape(QFrame::NoFrame);
+    sbLayout->addWidget(m_newChatBtn);
+    sbLayout->addWidget(m_chatList);
+
+    m_sidebar->setMinimumWidth(0);
+    m_sidebar->setMaximumWidth(300);
+
+    // Wrap existing llmTab content in a container for the splitter
+    auto *llmTab = ui->llmTab;
+    auto *llmLayout = qobject_cast<QVBoxLayout*>(llmTab->layout());
+    auto *rightContainer = new QWidget();
+    rightContainer->setLayout(llmLayout); // reparents layout
+
+    m_chatSplitter = new QSplitter(Qt::Horizontal, llmTab);
+    m_chatSplitter->addWidget(m_sidebar);
+    m_chatSplitter->addWidget(rightContainer);
+    m_chatSplitter->setStretchFactor(0, 0);
+    m_chatSplitter->setStretchFactor(1, 1);
+    m_chatSplitter->setSizes({200, 800});
+
+    // Replace the llmTab's layout with one containing only the splitter
+    auto *outerLayout = new QVBoxLayout(llmTab);
+    outerLayout->setContentsMargins(0, 0, 0, 0);
+    outerLayout->addWidget(m_chatSplitter);
+
+    // Restore sidebar width from settings (default 200)
+    int sidebarWidth = 200;
+    m_chatSplitter->setSizes({sidebarWidth, llmTab->width() - sidebarWidth});
+
+    connect(m_newChatBtn, &QPushButton::clicked, this, &MainWindow::onNewChat);
+    connect(m_chatList, &QListWidget::currentRowChanged, this, &MainWindow::onChatSelected);
+
+    // ---- LLM ----
 
     ui->llmLoadProgressBar->hide();
     connect(ui->loadLLMButton, &QPushButton::clicked, [this]() {
         qDebug() << "I need that!";
 
         QString fileName = QFileDialog::getOpenFileName(
-            this,                    // Parent widget
-            tr("Open GGUF file"),         // Dialog title
-            nullptr,        // Starting directory
+            this,
+            tr("Open GGUF file"),
+            nullptr,
             tr("GGUF files (*.gguf);")
             );
         qDebug() << "and this is the file" << fileName;
 
         ui->llmLoadProgressBar->showIntermediate();
 
-        llm = nullptr; // Unload the old before reload TODO: check if the path is valid (exists) before unloading!
+        llm = nullptr;
 
         LLModelOptions options;
-
         options.onProgress = progressFor(ui->llmLoadProgressBar);
 
-        factory->loadLLMAsync(fileName, options, [this](QLLModelPtr model) {
+        factory->loadLLMAsync(fileName, options, [this, fileName](QLLModelPtr model) {
             if (!model) {
                 qDebug() << "Umm this isn't normal ain't normal the model is empty bruh bro?!?!?!";
                 return;
             }
             this->llm = std::move(model);
             this->chatManager = llm->createChatManager();
+            m_currentModelName = fileName;
 
             qDebug() << "Loaded LLM";
 
             QMetaObject::invokeMethod(ui->llmInputFrame, [this]() {
-                connect(ui->systemPromptInput, &QPlainTextEdit::textChanged, [this]() {
-                    this->chatManager->setSystemPrompt(ui->systemPromptInput->toPlainText());
+                disconnect(ui->systemPromptInput, &QPlainTextEdit::textChanged, nullptr, nullptr);
+                connect(ui->systemPromptInput, &QPlainTextEdit::textChanged, this, [this]() {
+                    if (chatManager && !m_loadingChat) {
+                        chatManager->setSystemPrompt(ui->systemPromptInput->toPlainText());
+                        saveChatMetaDelayed();
+                    }
                 });
                 ui->llmLoadProgressBar->hide();
                 ui->llmInputFrame->setEnabled(true);
+
+                // Create a new chat for this model
+                if (!m_loadingChat) {
+                    onNewChat();
+                }
             });
         });
     });
 
-    connect(ui->sendButton, &QPushButton::clicked, [this](){send();});
+    connect(ui->sendButton, &QPushButton::clicked, this, &MainWindow::send);
 
     connect(ui->continueButton, &QPushButton::clicked, [this]() {
         QString message = ui->messageInput->toPlainText();
@@ -73,11 +132,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->messageInput->installEventFilter(this);
 
     connect(ui->maxTokensInput, &QSpinBox::valueChanged, [this]() {
-        chatManager->currentChatOptions()->maxTokens = ui->maxTokensInput->value();
+        if (chatManager)
+            chatManager->currentChatOptions()->maxTokens = ui->maxTokensInput->value();
     });
 
-
-    // Stable Diffusion
+    // ---- Stable Diffusion ----
 
     ui->sdmLoadProgressBar->hide();
     ui->generationProgressBar->hide();
@@ -86,9 +145,6 @@ MainWindow::MainWindow(QWidget *parent)
         qDebug() << "I need that als too!";
 
         QString fileName = openFileDialog(tr("Open Stable Diffusion model file"), tr("Stable Diffusion models (*.safetensors *.gguf);;All Files (*)"));
-
-        // ui->loadSDButton->
-        // TODO: disable lod button
 
         ui->sdmLoadProgressBar->showIntermediate();
         ui->statusbar->showMessage("Loading model...");
@@ -112,7 +168,6 @@ MainWindow::MainWindow(QWidget *parent)
 
             QMetaObject::invokeMethod(ui->sdmLoadProgressBar, [this]() {
                 ui->sdmLoadProgressBar->hide();
-
                 ui->statusbar->showMessage("Done!");
             });
         });
@@ -139,7 +194,6 @@ MainWindow::MainWindow(QWidget *parent)
 
         ui->statusbar->showMessage("Generating...");
 
-        // SDImageOptions options;
         auto options = sdImageOptions;
         options.cfgScale = ui->cfgInput->value();
         options.width = ui->widthBox->value();
@@ -175,7 +229,7 @@ MainWindow::MainWindow(QWidget *parent)
         qDebug() << "Loaded Stable Diffusion model.";
     });
 
-    // SD Quantization o tpions
+    // SD Quantization options
 
     connect(ui->selectQuantSourceButton, &QPushButton::clicked, [this]() {
         qDebug() << "Selecting model...";
@@ -196,11 +250,20 @@ MainWindow::MainWindow(QWidget *parent)
         });
     });
 
-    // OpenAI Provider
+    // ---- OpenAI Provider ----
+
+    // Restore API key from settings
+    if (!m_settings.apiKey.empty()) {
+        ui->openAIKey->setText(QString::fromStdString(m_settings.apiKey));
+    }
 
     connect(ui->openAIButton, &QPushButton::clicked, [this]() {
         QString apiKey = ui->openAIKey->text();
         if (apiKey.isEmpty()) return;
+
+        // Save API key
+        m_settings.apiKey = apiKey.toStdString();
+        saveSettings();
 
         ui->openAIButton->setEnabled(false);
         ui->openAIButton->setText("Fetching...");
@@ -218,17 +281,38 @@ MainWindow::MainWindow(QWidget *parent)
                 ui->modelBox->clear();
                 ui->modelBox->addItems(modelNames);
 
+                // Restore previously selected model
+                if (!m_settings.lastAIModel.empty()) {
+                    int idx = ui->modelBox->findText(QString::fromStdString(m_settings.lastAIModel));
+                    if (idx >= 0) {
+                        ui->modelBox->setCurrentIndex(idx);
+                    }
+                }
+
                 disconnect(ui->modelBox, &QComboBox::currentIndexChanged, nullptr, nullptr);
                 connect(ui->modelBox, &QComboBox::currentIndexChanged, this, [this](int index) {
-                    if (index >= 0)
-                        setupCloudChatManager(ui->modelBox->currentText(), ui->openAIKey->text());
+                    if (index >= 0) {
+                        QString model = ui->modelBox->currentText();
+                        m_settings.lastAIModel = model.toStdString();
+                        saveSettings();
+                        setupCloudChatManager(model, ui->openAIKey->text());
+                    }
                 });
 
                 ui->openAIButton->setText("Switch Model");
                 ui->openAIButton->setEnabled(true);
+
+                // Auto-select if there's a saved model
+                if (ui->modelBox->count() > 0 && ui->modelBox->currentIndex() < 0) {
+                    ui->modelBox->setCurrentIndex(0);
+                }
             });
         }).detach();
     });
+
+    // ---- Finish initialization ----
+    refreshChatList();
+    loadLastChat();
 }
 
 ProgressCallback MainWindow::progressFor(ProgressBar *bar) {
@@ -258,20 +342,199 @@ void MainWindow::setupCloudChatManager(const QString &modelId, const QString &ap
     newChat->setSystemPrompt(ui->systemPromptInput->toPlainText());
 
     chatManager = std::move(newChat);
+    m_currentModelName = modelId;
 
     ui->llmLoadProgressBar->hide();
     ui->llmInputFrame->setEnabled(true);
 
     disconnect(ui->systemPromptInput, &QPlainTextEdit::textChanged, nullptr, nullptr);
     connect(ui->systemPromptInput, &QPlainTextEdit::textChanged, this, [this]() {
-        if (chatManager) chatManager->setSystemPrompt(ui->systemPromptInput->toPlainText());
+        if (chatManager && !m_loadingChat) {
+chatManager->setSystemPrompt(ui->systemPromptInput->toPlainText());
+        saveChatMetaDelayed();
+        }
     });
 
     ui->statusbar->showMessage("Using OpenAI model: " + modelId);
+
+    if (!m_loadingChat) {
+        onNewChat();
+    }
+}
+
+void MainWindow::initChatStorage() {
+    ChatStorage::init();
+}
+
+void MainWindow::refreshChatList() {
+    m_chatList->blockSignals(true);
+    m_chatList->clear();
+
+    auto chats = ChatStorage::scan();
+    for (const auto& c : chats) {
+        auto *item = new QListWidgetItem(QString::fromStdString(c.title));
+        item->setData(Qt::UserRole, QString::fromStdString(c.folder));
+
+        // Show timestamp
+        QDateTime dt = QDateTime::fromMSecsSinceEpoch(c.updated);
+        item->setToolTip(dt.toString("yyyy-MM-dd hh:mm"));
+
+        m_chatList->addItem(item);
+    }
+
+    m_chatList->blockSignals(false);
+}
+
+void MainWindow::onChatSelected(int row) {
+    if (row < 0 || m_loadingChat) return;
+
+    auto *item = m_chatList->item(row);
+    if (!item) return;
+
+    QString folder = item->data(Qt::UserRole).toString();
+    if (folder.isEmpty()) return;
+
+    // Save current chat before switching
+    if (chatManager) {
+        chatManager->saveCurrentChatMetadata();
+    }
+
+    m_loadingChat = true;
+
+    // Load the selected chat
+    auto meta = ChatStorage::loadMetadata(folder.toStdString());
+
+    if (!chatManager) {
+        // No model loaded, create a dummy chat manager for browsing history
+        auto dummyChat = std::make_unique<QChatManager>(
+            std::make_unique<AIOne::OpenAIProvider>("api.groq.com/openai", "").get());
+        chatManager = std::move(dummyChat);
+    }
+
+    chatManager->loadChat(folder.toStdString());
+    m_currentModelName = QString::fromStdString(meta.model);
+
+    // Restore UI state
+    ui->systemPromptInput->setPlainText(QString::fromStdString(meta.systemPrompt));
+    ui->maxTokensInput->setValue(meta.params.maxTokens);
+
+    // Reload messages into listWidget
+    ui->listWidget->clear();
+    auto msgs = chatManager->getCurrentChat()->getMessages();
+    for (const auto& msg : msgs) {
+        if (msg.role == "system") continue;
+        auto *listItem = new QListWidgetItem(ui->listWidget);
+        auto *w = new MessageWidget(ui->listWidget);
+        w->setContent(QString::fromStdString(msg.content));
+        w->finish();
+        ui->listWidget->setItemWidget(listItem, w);
+        listItem->setSizeHint(w->minimumSizeHint());
+    }
+
+    ui->llmInputFrame->setEnabled(true);
+
+    m_loadingChat = false;
+}
+
+void MainWindow::onNewChat() {
+    if (!chatManager) {
+        // Need at least a chat manager - create a stub provider-based one if nothing loaded
+        ui->statusbar->showMessage("Load a model first");
+        return;
+    }
+
+    if (!chatManager->getCurrentChat())
+        return;
+
+    m_loadingChat = true;
+
+    // Save current chat first
+    chatManager->saveCurrentChatMetadata();
+
+    // Get current system prompt and params from UI
+    std::string systemPrompt = ui->systemPromptInput->toPlainText().toStdString();
+    TextGenOptionsBase params;
+    params.maxTokens = ui->maxTokensInput->value();
+
+    chatManager->createNewChat("Untitled", m_currentModelName.toStdString(),
+                                systemPrompt, params);
+
+    // Clear message display
+    ui->listWidget->clear();
+    ui->llmInputFrame->setEnabled(true);
+
+    m_loadingChat = false;
+
+    // Refresh sidebar
+    refreshChatList();
+    // Select the new chat (last item)
+    m_chatList->setCurrentRow(m_chatList->count() - 1);
+}
+
+void MainWindow::syncChatToUI() {
+    if (!chatManager || !chatManager->getCurrentChat()) return;
+
+    ui->listWidget->clear();
+    auto msgs = chatManager->getCurrentChat()->getMessages();
+    for (const auto& msg : msgs) {
+        if (msg.role == "system") continue;
+        auto *item = new QListWidgetItem(ui->listWidget);
+        auto *w = new MessageWidget(ui->listWidget);
+        w->setContent(QString::fromStdString(msg.content));
+        w->finish();
+        ui->listWidget->setItemWidget(item, w);
+        item->setSizeHint(w->minimumSizeHint());
+    }
+}
+
+void MainWindow::saveChatMetaDelayed() {
+    static QTimer *debounce = nullptr;
+    if (!debounce) {
+        debounce = new QTimer(this);
+        debounce->setSingleShot(true);
+        connect(debounce, &QTimer::timeout, this, [this]() {
+            if (chatManager) chatManager->saveCurrentChatMetadata();
+        });
+    }
+    debounce->start(2000);
+}
+
+void MainWindow::loadSettings() {
+    m_settings = ChatStorage::loadSettings();
+}
+
+void MainWindow::saveSettings() {
+    ChatStorage::saveSettings(m_settings);
+}
+
+void MainWindow::loadLastChat() {
+    if (!m_settings.lastChatFolder.empty()) {
+        // Find the chat in the list
+        for (int i = 0; i < m_chatList->count(); ++i) {
+            auto *item = m_chatList->item(i);
+            if (item->data(Qt::UserRole).toString() == QString::fromStdString(m_settings.lastChatFolder)) {
+                m_chatList->setCurrentRow(i);
+                return;
+            }
+        }
+    }
+    // If no last chat or not found, select the most recent
+    if (m_chatList->count() > 0) {
+        m_chatList->setCurrentRow(0);
+    }
+}
+
+void MainWindow::onSendDone() {
+    if (chatManager) {
+        chatManager->saveCurrentChatMetadata();
+        // Update sidebar - the title may have changed
+        refreshChatList();
+    }
 }
 
 void MainWindow::send() {
     QString message = ui->messageInput->toPlainText();
+    if (message.isEmpty() || !chatManager) return;
 
     ui->messageInput->setPlainText("");
     ui->listWidget->addItem(message);
@@ -300,9 +563,7 @@ void MainWindow::send() {
     options.onToken = [this, lastItem, widget](const QString &token) {
         QMetaObject::invokeMethod(ui->listWidget, [this, lastItem, widget, token]() {
             widget->appendToken(token);
-
             ui->listWidget->scrollToBottom();
-
             auto display = ui->tokensGeneratedDisplay;
             display->display(display->intValue() + 1);
         });
@@ -318,6 +579,8 @@ void MainWindow::send() {
             ui->tokensCachedDisplay->display((int)output.tokensCached);
             ui->tokensGeneratedDisplay->display((int)output.tokensGenerated);
             ui->tokensEvaluatedDisplay->display((int)output.tokensEvaluated);
+
+            onSendDone();
         });
     };
 
@@ -354,5 +617,19 @@ void MainWindow::onPreviewGenerated(int step, const QImage& preview, bool isNois
 
 MainWindow::~MainWindow()
 {
+    // Save before closing
+    if (chatManager) {
+        chatManager->saveCurrentChatMetadata();
+    }
+    m_settings.lastChatFolder = "";
+    if (chatManager && chatManager->getCurrentChat()) {
+        std::string folder = chatManager->getCurrentChat()->folder();
+        auto pos = folder.rfind('/');
+        if (pos != std::string::npos) folder = folder.substr(pos + 1);
+        pos = folder.rfind('\\');
+        if (pos != std::string::npos) folder = folder.substr(pos + 1);
+        m_settings.lastChatFolder = folder;
+    }
+    saveSettings();
     delete ui;
 }

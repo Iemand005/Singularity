@@ -3,11 +3,15 @@
 
 #include <QMainWindow>
 #include <QDir>
+#include <QSplitter>
+#include <QListWidget>
+#include <QPushButton>
 
 #include <ModelFactory.hpp>
 
 #include "../AIOneQTCore/QModelFactory.hpp"
 #include "../AIOne/src/Providers/OpenAIProvider.hpp"
+#include "../AIOne/src/ChatStorage.hpp"
 
 #include "progressbar.h"
 
@@ -42,6 +46,20 @@ protected:
 private:
     Ui::MainWindow *ui;
 
+    // Sidebar
+    QSplitter *m_chatSplitter = nullptr;
+    QWidget *m_sidebar = nullptr;
+    QListWidget *m_chatList = nullptr;
+    QPushButton *m_newChatBtn = nullptr;
+
+    // Storage
+    QString m_chatsRoot;
+    AppSettings m_settings;
+    bool m_loadingChat = false;
+
+    // Current model tracking
+    QString m_currentModelName;
+
     QString vaePath = "";
     QString taePath = "";
 
@@ -51,17 +69,25 @@ private:
     QString quantModelPath = "";
 
     ProgressCallback progressFor(ProgressBar *bar);
-
     void showImage(QImage image, bool smooth = false);
-
-    // void reloadSeed() {
-    //     if (ui->randomizeSeedBox->isChecked()) ui->seedInput->setValue(sdm->newSeed());
-    // }
     void updateSeed();
 
     QString lastPath = QDir::homePath();
     QString openFileDialog(const QString &title, QString fileTypes = tr("SafeTensors files (*.safetensors);"));
 
     void setupCloudChatManager(const QString &modelId, const QString &apiKey);
+
+    // Chat storage
+    void initChatStorage();
+    void refreshChatList();
+    void onChatSelected(int row);
+    void onNewChat();
+    void syncChatToUI();
+    void saveChatMetaDelayed();
+    void loadSettings();
+    void saveSettings();
+    void loadLastChat();
+    void onSendDone();
 };
+
 #endif // MAINWINDOW_H

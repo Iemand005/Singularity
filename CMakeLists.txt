@@ -11,7 +11,7 @@ option(AIONEQT_USE_QT_WIDGETS "Use QT Widgets" ON)
 
 # Better Qt detection - don't hardcode paths
 if(MSVC)
-    set(Qt6_ROOT_DIR "/Qt/6.10.1/msvc2022_64")
+    set(Qt6_ROOT_DIR "C:/Qt/6.11.1/msvc2022_64")
 else()
     set(Qt6_ROOT_DIR "/Qt/6.10.2/mingw_64")
 endif()
@@ -20,7 +20,7 @@ set(Qt6_DIR "${Qt6_ROOT_DIR}/lib/cmake/Qt6")
 
 # Add CMAKE_PREFIX_PATH for Qt (this is what find_package actually uses)
 if(MSVC)
-    if(EXISTS "C:/Qt/6.10.1/msvc2022_64/lib/cmake/Qt6")
+    if(EXISTS "C:/Qt/6.11.1/msvc2022_64/lib/cmake/Qt6")
         list(APPEND CMAKE_PREFIX_PATH "C:/Qt/6.10.1/msvc2022_64")
     endif()
 else()

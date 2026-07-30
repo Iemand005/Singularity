@@ -27,6 +27,7 @@ private:
     void startTextSegment();
     void ensureTextSegment();
     void startThinkSegment();
+    void ensureThinkSegment();
     void processBuffer();
 
     QVBoxLayout *m_layout;
