@@ -33,6 +33,7 @@ private:
     QVBoxLayout *m_layout;
     bool m_isThinking = false;
     bool m_everHadContent = false;
+    bool m_hasStreamedContent = false;
     QString m_pending;
 
     QLabel *m_textLabel = nullptr;

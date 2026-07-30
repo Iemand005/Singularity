@@ -10,6 +10,7 @@ MessageWidget::MessageWidget(QWidget *parent)
 
 void MessageWidget::appendToken(const QString &token)
 {
+    m_hasStreamedContent = true;
     m_pending += token;
     processBuffer();
     emit sizeChanged();
@@ -90,7 +91,7 @@ void MessageWidget::finish()
 
 void MessageWidget::setContent(const QString &text)
 {
-    if (m_everHadContent) return;
+    if (m_everHadContent || m_hasStreamedContent) return;
     m_pending = text;
     processBuffer();
     emit sizeChanged();
