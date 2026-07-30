@@ -523,10 +523,9 @@ void MainWindow::loadLastChat() {
 void MainWindow::onSendDone() {
     if (chatManager) {
         chatManager->saveCurrentChatMetadata();
-        // Update sidebar - the title may have changed
         refreshChatList();
     }
-    rebuildConversationDisplay();
+    // streaming widget is already in place with final content — no rebuild needed
 }
 
 void MainWindow::forceStopGeneration() {
@@ -746,6 +745,9 @@ void MainWindow::onRegenerateRequested(uint64_t parentId) {
             if (m_generatingWidget) {
                 auto content = QString::fromStdString(output.output.content);
                 m_generatingWidget->setContent(content);
+                auto siblings = chat->getSiblings(parentId);
+                size_t idx = siblings.empty() ? 0 : siblings.size() - 1;
+                m_generatingWidget->setVersionInfo(idx, std::max(siblings.size(), (size_t)1));
                 m_generatingWidget->finish();
             }
 
@@ -762,8 +764,6 @@ void MainWindow::onRegenerateRequested(uint64_t parentId) {
             auto siblings = chat->getSiblings(parentId);
             if (!siblings.empty())
                 chat->setCurrentVersionIndex(parentId, siblings.size() - 1);
-
-            rebuildConversationDisplay();
 
             if (chatManager) {
                 chatManager->saveCurrentChatMetadata();
