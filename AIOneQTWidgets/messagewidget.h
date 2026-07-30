@@ -10,17 +10,26 @@ class MessageWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit MessageWidget(const QString &text, QWidget *parent = nullptr);
+    explicit MessageWidget(QWidget *parent = nullptr);
+
+    void appendToken(const QString &token);
+    void setThinking(bool thinking);
+    void finish();
 
 signals:
-    void toggleChanged();
+    void sizeChanged();
 
 private:
-    void parseAndBuild(const QString &text);
-    QWidget* createTextSection(const QString &text);
-    QWidget* createThinkSection(const QString &content);
+    void startTextSegment();
+    void startThinkSegment();
 
     QVBoxLayout *m_layout;
+    bool m_isThinking = false;
+
+    QLabel *m_textLabel = nullptr;
+    QWidget *m_thinkContainer = nullptr;
+    QToolButton *m_thinkToggle = nullptr;
+    QLabel *m_thinkContent = nullptr;
 };
 
 #endif // MESSAGEWIDGET_H

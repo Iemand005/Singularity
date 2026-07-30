@@ -27,6 +27,9 @@ public:
         };
         newOptions.onInputEval = options.onInputEval;
         newOptions.onDone = options.onDone;
+        newOptions.onThinkStateChange = [options](bool thinking) {
+            if (options.onThinkStateChange) options.onThinkStateChange(thinking);
+        };
         super()->sendAsync(message.toStdString(), newOptions);
     }
 

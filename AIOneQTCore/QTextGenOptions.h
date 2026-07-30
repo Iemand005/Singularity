@@ -10,6 +10,7 @@ struct QTextGenOptions : TextGenOptionsBase
 {
     QTokenCallback onToken = nullptr;
     ProgressCallback onInputEval = nullptr;
+    ThinkStateChangedCallback onThinkStateChange = nullptr;
 };
 
 struct QAsyncTextGenOptions : QTextGenOptions {

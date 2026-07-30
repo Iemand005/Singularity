@@ -280,39 +280,43 @@ void MainWindow::send() {
     auto lastItem = ui->listWidget->item(ui->listWidget->count() - 1);
     ui->tokensGeneratedDisplay->display(0);
 
+    auto *widget = new MessageWidget(ui->listWidget);
+    ui->listWidget->setItemWidget(lastItem, widget);
+    lastItem->setSizeHint(widget->minimumSizeHint());
+
+    connect(widget, &MessageWidget::sizeChanged, this, [this, lastItem, widget]() {
+        lastItem->setSizeHint(widget->minimumSizeHint());
+        ui->listWidget->doItemsLayout();
+    });
+
     QAsyncTextGenOptions options;
 
-    options.onDone = [this, lastItem](const TextGenResult &output) {
-        QMetaObject::invokeMethod(this, [this, lastItem, output]() {
-            auto content = QString::fromStdString(output.output.content);
-
-            auto *widget = new MessageWidget(content, ui->listWidget);
-            ui->listWidget->setItemWidget(lastItem, widget);
-            lastItem->setSizeHint(widget->minimumSizeHint());
-
-            connect(widget, &MessageWidget::toggleChanged, this, [this, lastItem, widget]() {
-                lastItem->setSizeHint(widget->minimumSizeHint());
-                ui->listWidget->doItemsLayout();
-            });
-
-            ui->tokensCachedDisplay->display((int)output.tokensCached);
-            ui->tokensGeneratedDisplay->display((int)output.tokensGenerated);
-            ui->tokensEvaluatedDisplay->display((int)output.tokensEvaluated);
+    options.onThinkStateChange = [widget](bool thinking) {
+        QMetaObject::invokeMethod(widget, [widget, thinking]() {
+            widget->setThinking(thinking);
         });
     };
 
-    options.onToken = [this, lastItem](const QString &token) {
-
-        QMetaObject::invokeMethod(ui->listWidget, [this, lastItem, token]() {
-
-            lastItem->setText(lastItem->text() + token);
+    options.onToken = [this, lastItem, widget](const QString &token) {
+        QMetaObject::invokeMethod(ui->listWidget, [this, lastItem, widget, token]() {
+            widget->appendToken(token);
 
             ui->listWidget->scrollToBottom();
 
             auto display = ui->tokensGeneratedDisplay;
             display->display(display->intValue() + 1);
         });
+    };
 
+    options.onDone = [this, lastItem, widget](const TextGenResult &output) {
+        QMetaObject::invokeMethod(this, [this, lastItem, widget, output]() {
+            widget->finish();
+            lastItem->setSizeHint(widget->minimumSizeHint());
+
+            ui->tokensCachedDisplay->display((int)output.tokensCached);
+            ui->tokensGeneratedDisplay->display((int)output.tokensGenerated);
+            ui->tokensEvaluatedDisplay->display((int)output.tokensEvaluated);
+        });
     };
 
     options.onInputEval = progressFor(ui->inputEvalProgressBar);

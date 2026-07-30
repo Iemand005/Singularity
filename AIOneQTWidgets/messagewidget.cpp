@@ -1,42 +1,66 @@
 #include "messagewidget.h"
-#include <QRegularExpression>
 
-MessageWidget::MessageWidget(const QString &text, QWidget *parent)
+MessageWidget::MessageWidget(QWidget *parent)
     : QWidget(parent)
     , m_layout(new QVBoxLayout(this))
 {
     m_layout->setContentsMargins(0, 2, 0, 2);
     m_layout->setSpacing(2);
-    parseAndBuild(text);
 }
 
-void MessageWidget::parseAndBuild(const QString &text)
+void MessageWidget::appendToken(const QString &token)
 {
-    QRegularExpression thinkRegex(R"(<think>([\s\S]*?)</think>)");
-
-    int lastEnd = 0;
-    auto it = thinkRegex.globalMatch(text);
-    while (it.hasNext()) {
-        auto match = it.next();
-        if (match.capturedStart() > lastEnd)
-            m_layout->addWidget(createTextSection(text.mid(lastEnd, match.capturedStart() - lastEnd)));
-        m_layout->addWidget(createThinkSection(match.captured(1)));
-        lastEnd = match.capturedEnd();
+    if (m_isThinking) {
+        if (!m_thinkContent)
+            startThinkSegment();
+        m_thinkContent->setText(m_thinkContent->text() + token);
+    } else {
+        if (!m_textLabel)
+            startTextSegment();
+        m_textLabel->setText(m_textLabel->text() + token);
     }
-    if (lastEnd < text.length())
-        m_layout->addWidget(createTextSection(text.mid(lastEnd)));
 }
 
-QWidget* MessageWidget::createTextSection(const QString &text)
+void MessageWidget::setThinking(bool thinking)
 {
-    auto *label = new QLabel(text, this);
+    if (m_isThinking == thinking)
+        return;
+
+    m_textLabel = nullptr;
+    m_thinkContainer = nullptr;
+    m_thinkToggle = nullptr;
+    m_thinkContent = nullptr;
+
+    m_isThinking = thinking;
+
+    if (thinking)
+        startThinkSegment();
+    else
+        startTextSegment();
+
+    emit sizeChanged();
+}
+
+void MessageWidget::finish()
+{
+    m_textLabel = nullptr;
+    m_thinkContainer = nullptr;
+    m_thinkToggle = nullptr;
+    m_thinkContent = nullptr;
+    emit sizeChanged();
+}
+
+void MessageWidget::startTextSegment()
+{
+    auto *label = new QLabel(this);
     label->setWordWrap(true);
     label->setTextInteractionFlags(Qt::TextSelectableByMouse);
     label->setContentsMargins(0, 0, 0, 0);
-    return label;
+    m_layout->addWidget(label);
+    m_textLabel = label;
 }
 
-QWidget* MessageWidget::createThinkSection(const QString &content)
+void MessageWidget::startThinkSegment()
 {
     auto *container = new QWidget(this);
     auto *layout = new QVBoxLayout(container);
@@ -54,19 +78,23 @@ QWidget* MessageWidget::createThinkSection(const QString &content)
     toggle->setCursor(Qt::PointingHandCursor);
     toggle->setToolButtonStyle(Qt::ToolButtonTextOnly);
 
-    auto *contentLabel = new QLabel(content, container);
-    contentLabel->setWordWrap(true);
-    contentLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
-    contentLabel->setContentsMargins(20, 2, 0, 2);
-    contentLabel->hide();
+    auto *content = new QLabel(container);
+    content->setWordWrap(true);
+    content->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    content->setContentsMargins(20, 2, 0, 2);
+    content->hide();
 
-    connect(toggle, &QToolButton::toggled, this, [this, toggle, contentLabel](bool checked) {
-        contentLabel->setVisible(checked);
+    connect(toggle, &QToolButton::toggled, this, [this, toggle, content](bool checked) {
+        content->setVisible(checked);
         toggle->setText(checked ? QStringLiteral("\u25BC Hide thinking") : QStringLiteral("\u25B6 Show thinking"));
-        emit toggleChanged();
+        emit sizeChanged();
     });
 
     layout->addWidget(toggle);
-    layout->addWidget(contentLabel);
-    return container;
+    layout->addWidget(content);
+    m_layout->addWidget(container);
+
+    m_thinkContainer = container;
+    m_thinkToggle = toggle;
+    m_thinkContent = content;
 }
