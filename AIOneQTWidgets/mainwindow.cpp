@@ -454,9 +454,6 @@ void MainWindow::onNewChat() {
     // Force-reset any in-flight generation
     forceStopGeneration();
 
-    m_loadingChat = true;
-    auto resetLoading = qScopeGuard([this]() { m_loadingChat = false; });
-
     // Save current chat first
     chatManager->saveCurrentChatMetadata();
 
@@ -465,6 +462,7 @@ void MainWindow::onNewChat() {
     TextGenOptionsBase params;
     params.maxTokens = ui->maxTokensCheck->isChecked() ? ui->maxTokensInput->value() : 0;
 
+    // Create new chat with "Untitled" - title will be auto-generated from first user message
     chatManager->createNewChat("Untitled", m_currentModelName.toStdString(),
                                 systemPrompt, params);
 
@@ -475,7 +473,7 @@ void MainWindow::onNewChat() {
 
     // Refresh sidebar
     refreshChatList();
-    // Select the new chat (last item)
+    // Select the new chat (last item) - m_loadingChat is false now so onChatSelected will load it
     m_chatList->setCurrentRow(m_chatList->count() - 1);
 }
 

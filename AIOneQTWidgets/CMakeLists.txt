@@ -46,6 +46,7 @@ qt_add_executable(AIOneQTWidgets
     mainwindow.cpp
     mainwindow.h
     mainwindow.ui
+    messagewidget.ui
     README.md
     ../AIOneQTCore/QModelFactory.hpp ../AIOneQTCore/QLLModel.hpp ../AIOneQTCore/QSDModel.hpp ../AIOneQTCore/QChatManager.cpp ../AIOneQTCore/QChatManager.hpp
     ../AIOneQTCore/QTextGenOptions.h

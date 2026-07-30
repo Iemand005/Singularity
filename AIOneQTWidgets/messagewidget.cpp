@@ -1,63 +1,39 @@
 #include "messagewidget.h"
+#include "ui_messagewidget.h"
 
 MessageWidget::MessageWidget(QWidget *parent)
     : QWidget(parent)
-    , m_layout(new QVBoxLayout(this))
+    , ui(new Ui::MessageWidget)
 {
-    m_layout->setContentsMargins(0, 2, 0, 2);
-    m_layout->setSpacing(2);
+    ui->setupUi(this);
 
-    m_versionBar = new QWidget(this);
-    auto *hb = new QHBoxLayout(m_versionBar);
-    hb->setContentsMargins(0, 2, 0, 2);
-    hb->setSpacing(4);
+    connect(ui->prevBtn, &QPushButton::clicked, this, &MessageWidget::prevRequested);
+    connect(ui->nextBtn, &QPushButton::clicked, this, &MessageWidget::nextRequested);
+    connect(ui->regenerateBtn, &QPushButton::clicked, this, &MessageWidget::regenerateRequested);
 
-    m_prevBtn = new QPushButton(QStringLiteral("\u25C0"), m_versionBar);
-    m_prevBtn->setFixedWidth(24);
-    m_prevBtn->setToolTip("Previous version");
-    m_prevBtn->setEnabled(false);
+    ui->versionBar->setVisible(false);
+}
 
-    m_versionLabel = new QLabel("1/1", m_versionBar);
-    m_versionLabel->setAlignment(Qt::AlignCenter);
-
-    m_nextBtn = new QPushButton(QStringLiteral("\u25B6"), m_versionBar);
-    m_nextBtn->setFixedWidth(24);
-    m_nextBtn->setToolTip("Next version");
-    m_nextBtn->setEnabled(false);
-
-    m_regenerateBtn = new QPushButton("Regenerate", m_versionBar);
-    m_regenerateBtn->setToolTip("Generate a new response with the same context");
-
-    hb->addStretch();
-    hb->addWidget(m_prevBtn);
-    hb->addWidget(m_versionLabel);
-    hb->addWidget(m_nextBtn);
-    hb->addWidget(m_regenerateBtn);
-    hb->addStretch();
-
-    m_versionBar->setVisible(false);
-    m_layout->addWidget(m_versionBar);
-
-    connect(m_prevBtn, &QPushButton::clicked, this, &MessageWidget::prevRequested);
-    connect(m_nextBtn, &QPushButton::clicked, this, &MessageWidget::nextRequested);
-    connect(m_regenerateBtn, &QPushButton::clicked, this, &MessageWidget::regenerateRequested);
+MessageWidget::~MessageWidget()
+{
+    delete ui;
 }
 
 void MessageWidget::setVersionInfo(size_t current, size_t total)
 {
     if (total < 1) {
-        m_versionBar->setVisible(false);
+        ui->versionBar->setVisible(false);
         return;
     }
-    m_versionBar->setVisible(true);
+    ui->versionBar->setVisible(true);
     bool multi = total > 1;
-    m_prevBtn->setVisible(multi);
-    m_nextBtn->setVisible(multi);
-    m_versionLabel->setVisible(multi);
-    m_versionLabel->setText(QString("%1/%2").arg(current + 1).arg(total));
-    m_prevBtn->setEnabled(current > 0);
-    m_nextBtn->setEnabled(current + 1 < total);
-    m_regenerateBtn->setEnabled(true);
+    ui->prevBtn->setVisible(multi);
+    ui->nextBtn->setVisible(multi);
+    ui->versionLabel->setVisible(multi);
+    ui->versionLabel->setText(QString("%1/%2").arg(current + 1).arg(total));
+    ui->prevBtn->setEnabled(current > 0);
+    ui->nextBtn->setEnabled(current + 1 < total);
+    ui->regenerateBtn->setEnabled(true);
 }
 
 void MessageWidget::appendToken(const QString &token)
@@ -75,7 +51,7 @@ void MessageWidget::processBuffer()
     int idx;
     while (!m_pending.isEmpty()) {
         if (m_isThinking) {
-            idx = m_pending.indexOf("</think>");
+            idx = m_pending");
             if (idx < 0) {
                 ensureThinkSegment();
                 m_thinkContent->setText(m_thinkContent->text() + m_pending);
@@ -90,7 +66,7 @@ void MessageWidget::processBuffer()
             m_pending = m_pending.mid(idx + 8);
             startTextSegment();
         } else {
-            idx = m_pending.indexOf("<think>");
+            idx = m_pending.indexOf(" 생각은 ");
             if (idx < 0) {
                 ensureTextSegment();
                 m_textLabel->setText(m_textLabel->text() + m_pending);
@@ -119,6 +95,7 @@ void MessageWidget::setThinking(bool thinking)
     m_thinkToggle = nullptr;
     m_thinkScroll = nullptr;
     m_thinkContent = nullptr;
+    m_thinkAnim = nullptr;
 
     m_isThinking = thinking;
 
@@ -138,6 +115,7 @@ void MessageWidget::finish()
     m_thinkToggle = nullptr;
     m_thinkScroll = nullptr;
     m_thinkContent = nullptr;
+    m_thinkAnim = nullptr;
     emit sizeChanged();
 }
 
@@ -167,7 +145,7 @@ void MessageWidget::startTextSegment()
     label->setWordWrap(true);
     label->setTextInteractionFlags(Qt::TextSelectableByMouse);
     label->setContentsMargins(0, 0, 0, 0);
-    m_layout->addWidget(label);
+    ui->verticalLayout->addWidget(label);
     m_textLabel = label;
 }
 
@@ -243,7 +221,7 @@ void MessageWidget::startThinkSegment()
 
     layout->addWidget(toggle);
     layout->addWidget(scroll);
-    m_layout->addWidget(container);
+    ui->verticalLayout->addWidget(container);
 
     m_thinkContainer = container;
     m_thinkToggle = toggle;
