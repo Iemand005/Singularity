@@ -2,6 +2,8 @@
 #include "ui_mainwindow.h"
 #include "messagewidget.h"
 
+#include "../AIOne/src/Message.hpp"
+
 #include <QFileDialog>
 #include <QGraphicsPixmapItem>
 #include <QThread>
@@ -423,21 +425,11 @@ void MainWindow::onChatSelected(int row) {
     ui->maxTokensCheck->setChecked(tokensEnabled);
     ui->maxTokensInput->setValue(tokensEnabled ? meta.params.maxTokens : 500);
 
-    // Reload messages into listWidget
-    ui->listWidget->clear();
-    auto msgs = chatManager->getCurrentChat()->getMessages();
-    for (const auto& msg : msgs) {
-        if (msg.role == "system") continue;
-        auto *listItem = new QListWidgetItem(ui->listWidget);
-        auto *w = new MessageWidget(ui->listWidget);
-        w->setContent(QString::fromStdString(msg.content));
-        w->finish();
-        ui->listWidget->setItemWidget(listItem, w);
-        listItem->setSizeHint(w->minimumSizeHint());
-    }
+    rebuildConversationDisplay();
 
     ui->llmInputFrame->setEnabled(true);
 
+    // Ensure first version of each slot is selected
     m_loadingChat = false;
 }
 
@@ -465,6 +457,7 @@ void MainWindow::onNewChat() {
                                 systemPrompt, params);
 
     // Clear message display
+    m_slotItems.clear();
     ui->listWidget->clear();
     ui->llmInputFrame->setEnabled(true);
 
@@ -477,19 +470,7 @@ void MainWindow::onNewChat() {
 }
 
 void MainWindow::syncChatToUI() {
-    if (!chatManager || !chatManager->getCurrentChat()) return;
-
-    ui->listWidget->clear();
-    auto msgs = chatManager->getCurrentChat()->getMessages();
-    for (const auto& msg : msgs) {
-        if (msg.role == "system") continue;
-        auto *item = new QListWidgetItem(ui->listWidget);
-        auto *w = new MessageWidget(ui->listWidget);
-        w->setContent(QString::fromStdString(msg.content));
-        w->finish();
-        ui->listWidget->setItemWidget(item, w);
-        item->setSizeHint(w->minimumSizeHint());
-    }
+    rebuildConversationDisplay();
 }
 
 void MainWindow::saveChatMetaDelayed() {
@@ -535,6 +516,219 @@ void MainWindow::onSendDone() {
         // Update sidebar - the title may have changed
         refreshChatList();
     }
+    rebuildConversationDisplay();
+}
+
+void MainWindow::rebuildConversationDisplay() {
+    if (!chatManager || !chatManager->getCurrentChat()) return;
+
+    auto* chat = chatManager->getCurrentChat();
+    auto activePath = chat->getActivePath();
+
+    m_slotItems.clear();
+    ui->listWidget->clear();
+
+    for (const auto& msg : activePath) {
+        if (msg.role == "system") continue;
+
+        auto *item = new QListWidgetItem(ui->listWidget);
+        auto *w = new MessageWidget(ui->listWidget);
+        uint64_t slotParentId = msg.parentId;
+        auto siblings = chat->getSiblings(slotParentId);
+        size_t idx = chat->getCurrentVersionIndex(slotParentId);
+        if (idx >= siblings.size()) idx = 0;
+
+        w->setContent(QString::fromStdString(siblings[idx].content));
+        w->finish();
+        w->setVersionInfo(idx, siblings.size());
+        w->setParentId(slotParentId);
+
+        connect(w, &MessageWidget::prevRequested, this, [this, slotParentId]() {
+            onVersionPrev(slotParentId);
+        });
+        connect(w, &MessageWidget::nextRequested, this, [this, slotParentId]() {
+            onVersionNext(slotParentId);
+        });
+        connect(w, &MessageWidget::regenerateRequested, this, [this, slotParentId]() {
+            onRegenerateRequested(slotParentId);
+        });
+        connect(w, &MessageWidget::sizeChanged, this, [this, item, w]() {
+            if (item && w) {
+                item->setSizeHint(w->minimumSizeHint());
+                ui->listWidget->doItemsLayout();
+            }
+        });
+
+        ui->listWidget->setItemWidget(item, w);
+        item->setSizeHint(w->minimumSizeHint());
+        m_slotItems[slotParentId] = item;
+    }
+}
+
+void MainWindow::onVersionPrev(uint64_t parentId) {
+    auto* chat = chatManager->getCurrentChat();
+    size_t idx = chat->getCurrentVersionIndex(parentId);
+    if (idx == 0) return;
+    chat->setCurrentVersionIndex(parentId, idx - 1);
+
+    auto it = m_slotItems.find(parentId);
+    if (it == m_slotItems.end()) return;
+
+    auto *item = it->second;
+    auto siblings = chat->getSiblings(parentId);
+    size_t newIdx = chat->getCurrentVersionIndex(parentId);
+    if (newIdx >= siblings.size()) return;
+
+    auto *w = new MessageWidget(ui->listWidget);
+    w->setContent(QString::fromStdString(siblings[newIdx].content));
+    w->finish();
+    w->setVersionInfo(newIdx, siblings.size());
+    w->setParentId(parentId);
+
+    connect(w, &MessageWidget::prevRequested, this, [this, parentId]() {
+        onVersionPrev(parentId);
+    });
+    connect(w, &MessageWidget::nextRequested, this, [this, parentId]() {
+        onVersionNext(parentId);
+    });
+    connect(w, &MessageWidget::regenerateRequested, this, [this, parentId]() {
+        onRegenerateRequested(parentId);
+    });
+    connect(w, &MessageWidget::sizeChanged, this, [this, item, w]() {
+        if (item && w) {
+            item->setSizeHint(w->minimumSizeHint());
+            ui->listWidget->doItemsLayout();
+        }
+    });
+
+    ui->listWidget->setItemWidget(item, w);
+    item->setSizeHint(w->minimumSizeHint());
+}
+
+void MainWindow::onVersionNext(uint64_t parentId) {
+    auto* chat = chatManager->getCurrentChat();
+    auto siblings = chat->getSiblings(parentId);
+    size_t idx = chat->getCurrentVersionIndex(parentId);
+    if (idx + 1 >= siblings.size()) return;
+    chat->setCurrentVersionIndex(parentId, idx + 1);
+
+    auto it = m_slotItems.find(parentId);
+    if (it == m_slotItems.end()) return;
+
+    auto *item = it->second;
+    size_t newIdx = chat->getCurrentVersionIndex(parentId);
+    if (newIdx >= siblings.size()) return;
+
+    auto *w = new MessageWidget(ui->listWidget);
+    w->setContent(QString::fromStdString(siblings[newIdx].content));
+    w->finish();
+    w->setVersionInfo(newIdx, siblings.size());
+    w->setParentId(parentId);
+
+    connect(w, &MessageWidget::prevRequested, this, [this, parentId]() {
+        onVersionPrev(parentId);
+    });
+    connect(w, &MessageWidget::nextRequested, this, [this, parentId]() {
+        onVersionNext(parentId);
+    });
+    connect(w, &MessageWidget::regenerateRequested, this, [this, parentId]() {
+        onRegenerateRequested(parentId);
+    });
+    connect(w, &MessageWidget::sizeChanged, this, [this, item, w]() {
+        if (item && w) {
+            item->setSizeHint(w->minimumSizeHint());
+            ui->listWidget->doItemsLayout();
+        }
+    });
+
+    ui->listWidget->setItemWidget(item, w);
+    item->setSizeHint(w->minimumSizeHint());
+}
+
+void MainWindow::onRegenerateRequested(uint64_t parentId) {
+    if (m_generating) return;
+
+    m_stopRequested = false;
+    m_generating = true;
+
+    ui->sendButton->setText("Stop");
+    ui->messageInput->setEnabled(false);
+    ui->inputEvalProgressBar->setRange(0, 0);
+    ui->inputEvalProgressBar->show();
+
+    auto it = m_slotItems.find(parentId);
+    if (it == m_slotItems.end()) return;
+    auto *item = it->second;
+
+    m_generatingWidget = new MessageWidget(ui->listWidget);
+    m_generatingWidget->setParentId(parentId);
+    ui->listWidget->setItemWidget(item, m_generatingWidget);
+    item->setSizeHint(m_generatingWidget->minimumSizeHint());
+
+    connect(m_generatingWidget, &MessageWidget::sizeChanged, this, [this, item]() {
+        if (item && m_generatingWidget) {
+            item->setSizeHint(m_generatingWidget->minimumSizeHint());
+            ui->listWidget->doItemsLayout();
+        }
+    });
+
+    QAsyncTextGenOptions options;
+    options.maxTokens = ui->maxTokensCheck->isChecked() ? ui->maxTokensInput->value() : 0;
+
+    options.onThinkStateChange = [this](bool thinking) {
+        QMetaObject::invokeMethod(m_generatingWidget, [this, thinking]() {
+            if (m_generatingWidget)
+                m_generatingWidget->setThinking(thinking);
+        });
+    };
+
+    options.onToken = [this](const QString &token) {
+        if (m_stopRequested) return;
+        QMetaObject::invokeMethod(ui->listWidget, [this, token]() {
+            if (!m_generatingWidget || m_stopRequested) return;
+            m_generatingWidget->appendToken(token);
+            ui->listWidget->scrollToBottom();
+            auto display = ui->tokensGeneratedDisplay;
+            display->display(display->intValue() + 1);
+        });
+    };
+
+    options.onDone = [this, parentId](const TextGenResult &output) {
+        QMetaObject::invokeMethod(this, [this, parentId, output]() {
+            auto* chat = chatManager->getCurrentChat();
+
+            if (m_generatingWidget) {
+                auto content = QString::fromStdString(output.output.content);
+                m_generatingWidget->setContent(content);
+                m_generatingWidget->finish();
+            }
+
+            m_generating = false;
+            m_stopRequested = false;
+            m_generatingWidget = nullptr;
+
+            ui->sendButton->setText("Send");
+            ui->messageInput->setEnabled(true);
+            ui->inputEvalProgressBar->setIndeterminate(false);
+            ui->inputEvalProgressBar->hide();
+
+            // Update version tracking: set to the last version
+            auto siblings = chat->getSiblings(parentId);
+            if (!siblings.empty())
+                chat->setCurrentVersionIndex(parentId, siblings.size() - 1);
+
+            rebuildConversationDisplay();
+
+            if (chatManager) {
+                chatManager->saveCurrentChatMetadata();
+                refreshChatList();
+            }
+        });
+    };
+
+    options.onInputEval = progressFor(ui->inputEvalProgressBar);
+
+    chatManager->regenerateAsync(parentId, options);
 }
 
 void MainWindow::send() {

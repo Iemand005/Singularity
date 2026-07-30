@@ -6,6 +6,53 @@ MessageWidget::MessageWidget(QWidget *parent)
 {
     m_layout->setContentsMargins(0, 2, 0, 2);
     m_layout->setSpacing(2);
+
+    m_versionBar = new QWidget(this);
+    auto *hb = new QHBoxLayout(m_versionBar);
+    hb->setContentsMargins(0, 2, 0, 2);
+    hb->setSpacing(4);
+
+    m_prevBtn = new QPushButton(QStringLiteral("\u25C0"), m_versionBar);
+    m_prevBtn->setFixedWidth(24);
+    m_prevBtn->setToolTip("Previous version");
+    m_prevBtn->setEnabled(false);
+
+    m_versionLabel = new QLabel("1/1", m_versionBar);
+    m_versionLabel->setAlignment(Qt::AlignCenter);
+
+    m_nextBtn = new QPushButton(QStringLiteral("\u25B6"), m_versionBar);
+    m_nextBtn->setFixedWidth(24);
+    m_nextBtn->setToolTip("Next version");
+    m_nextBtn->setEnabled(false);
+
+    m_regenerateBtn = new QPushButton("Regenerate", m_versionBar);
+    m_regenerateBtn->setToolTip("Generate a new response with the same context");
+
+    hb->addStretch();
+    hb->addWidget(m_prevBtn);
+    hb->addWidget(m_versionLabel);
+    hb->addWidget(m_nextBtn);
+    hb->addWidget(m_regenerateBtn);
+    hb->addStretch();
+
+    m_versionBar->setVisible(false);
+    m_layout->addWidget(m_versionBar);
+
+    connect(m_prevBtn, &QPushButton::clicked, this, &MessageWidget::prevRequested);
+    connect(m_nextBtn, &QPushButton::clicked, this, &MessageWidget::nextRequested);
+    connect(m_regenerateBtn, &QPushButton::clicked, this, &MessageWidget::regenerateRequested);
+}
+
+void MessageWidget::setVersionInfo(size_t current, size_t total)
+{
+    if (total < 2) {
+        m_versionBar->setVisible(false);
+        return;
+    }
+    m_versionBar->setVisible(true);
+    m_versionLabel->setText(QString("%1/%2").arg(current + 1).arg(total));
+    m_prevBtn->setEnabled(current > 0);
+    m_nextBtn->setEnabled(current + 1 < total);
 }
 
 void MessageWidget::appendToken(const QString &token)

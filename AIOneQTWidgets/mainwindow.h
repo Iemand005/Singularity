@@ -3,9 +3,10 @@
 
 #include <QMainWindow>
 #include <QDir>
-#include <QSplitter>
 #include <QListWidget>
 #include <QPushButton>
+#include <QSplitter>
+#include <map>
 
 #include <ModelFactory.hpp>
 
@@ -96,6 +97,14 @@ private:
     void saveSettings();
     void loadLastChat();
     void onSendDone();
+
+    // Version/branching
+    void rebuildConversationDisplay();
+    void onVersionPrev(uint64_t parentId);
+    void onVersionNext(uint64_t parentId);
+    void onRegenerateRequested(uint64_t parentId);
+
+    std::map<uint64_t, QListWidgetItem*> m_slotItems;
 };
 
 #endif // MAINWINDOW_H

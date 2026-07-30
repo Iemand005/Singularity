@@ -37,6 +37,24 @@ public:
         super()->setSystemPrompt(prompt.toStdString());
     };
 
+    void regenerateAsync(uint64_t parentId, QAsyncTextGenOptions options) {
+        AsyncTextGenOptions newOptions {{(TextGenOptionsBase)options}};
+        newOptions.onToken = [options](std::string token) {
+            if (options.onToken) options.onToken(QString(token.c_str()));
+        };
+        newOptions.onInputEval = options.onInputEval;
+        newOptions.onDone = [this, options, parentId](const TextGenResult& output) {
+            Message msg = output.output;
+            msg.parentId = parentId;
+            currentChat->addMessage(msg);
+            if (options.onDone) options.onDone(output);
+        };
+        newOptions.onThinkStateChange = [options](bool thinking) {
+            if (options.onThinkStateChange) options.onThinkStateChange(thinking);
+        };
+        super()->regenerateAsync(parentId, newOptions);
+    }
+
 };
 
 using QChatManagerPtr = std::unique_ptr<QChatManager>;
