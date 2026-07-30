@@ -281,14 +281,6 @@ MainWindow::MainWindow(QWidget *parent)
                 ui->modelBox->clear();
                 ui->modelBox->addItems(modelNames);
 
-                // Restore previously selected model
-                if (!m_settings.lastAIModel.empty()) {
-                    int idx = ui->modelBox->findText(QString::fromStdString(m_settings.lastAIModel));
-                    if (idx >= 0) {
-                        ui->modelBox->setCurrentIndex(idx);
-                    }
-                }
-
                 disconnect(ui->modelBox, &QComboBox::currentIndexChanged, nullptr, nullptr);
                 connect(ui->modelBox, &QComboBox::currentIndexChanged, this, [this](int index) {
                     if (index >= 0) {
@@ -299,13 +291,18 @@ MainWindow::MainWindow(QWidget *parent)
                     }
                 });
 
+                // Restore previously selected model (fires the handler above)
+                int selectIdx = -1;
+                if (!m_settings.lastAIModel.empty()) {
+                    selectIdx = ui->modelBox->findText(QString::fromStdString(m_settings.lastAIModel));
+                }
+                if (selectIdx < 0 && ui->modelBox->count() > 0)
+                    selectIdx = 0;
+                if (selectIdx >= 0)
+                    ui->modelBox->setCurrentIndex(selectIdx);
+
                 ui->openAIButton->setText("Switch Model");
                 ui->openAIButton->setEnabled(true);
-
-                // Auto-select if there's a saved model
-                if (ui->modelBox->count() > 0 && ui->modelBox->currentIndex() < 0) {
-                    ui->modelBox->setCurrentIndex(0);
-                }
             });
         }).detach();
     });
@@ -533,52 +530,83 @@ void MainWindow::onSendDone() {
 }
 
 void MainWindow::send() {
+    if (m_generating) {
+        m_stopRequested = true;
+        return;
+    }
+
     QString message = ui->messageInput->toPlainText();
     if (message.isEmpty() || !chatManager) return;
+
+    m_stopRequested = false;
+    m_generating = true;
+
+    ui->sendButton->setText("Stop");
+    ui->messageInput->setEnabled(false);
+    ui->inputEvalProgressBar->setRange(0, 0);
+    ui->inputEvalProgressBar->show();
 
     ui->messageInput->setPlainText("");
     ui->listWidget->addItem(message);
 
     ui->listWidget->addItem("");
-    auto lastItem = ui->listWidget->item(ui->listWidget->count() - 1);
+    m_generatingItem = ui->listWidget->item(ui->listWidget->count() - 1);
     ui->tokensGeneratedDisplay->display(0);
 
-    auto *widget = new MessageWidget(ui->listWidget);
-    ui->listWidget->setItemWidget(lastItem, widget);
-    lastItem->setSizeHint(widget->minimumSizeHint());
+    m_generatingWidget = new MessageWidget(ui->listWidget);
+    ui->listWidget->setItemWidget(m_generatingItem, m_generatingWidget);
+    m_generatingItem->setSizeHint(m_generatingWidget->minimumSizeHint());
 
-    connect(widget, &MessageWidget::sizeChanged, this, [this, lastItem, widget]() {
-        lastItem->setSizeHint(widget->minimumSizeHint());
-        ui->listWidget->doItemsLayout();
+    connect(m_generatingWidget, &MessageWidget::sizeChanged, this, [this]() {
+        if (m_generatingItem && m_generatingWidget) {
+            m_generatingItem->setSizeHint(m_generatingWidget->minimumSizeHint());
+            ui->listWidget->doItemsLayout();
+        }
     });
 
     QAsyncTextGenOptions options;
 
-    options.onThinkStateChange = [widget](bool thinking) {
-        QMetaObject::invokeMethod(widget, [widget, thinking]() {
-            widget->setThinking(thinking);
+    options.onThinkStateChange = [this](bool thinking) {
+        QMetaObject::invokeMethod(m_generatingWidget, [this, thinking]() {
+            if (m_generatingWidget)
+                m_generatingWidget->setThinking(thinking);
         });
     };
 
-    options.onToken = [this, lastItem, widget](const QString &token) {
-        QMetaObject::invokeMethod(ui->listWidget, [this, lastItem, widget, token]() {
-            widget->appendToken(token);
+    options.onToken = [this](const QString &token) {
+        if (m_stopRequested) return;
+        QMetaObject::invokeMethod(ui->listWidget, [this, token]() {
+            if (!m_generatingWidget || m_stopRequested) return;
+            m_generatingWidget->appendToken(token);
             ui->listWidget->scrollToBottom();
             auto display = ui->tokensGeneratedDisplay;
             display->display(display->intValue() + 1);
         });
     };
 
-    options.onDone = [this, lastItem, widget](const TextGenResult &output) {
-        QMetaObject::invokeMethod(this, [this, lastItem, widget, output]() {
-            auto content = QString::fromStdString(output.output.content);
-            widget->setContent(content);
-            widget->finish();
-            lastItem->setSizeHint(widget->minimumSizeHint());
+    options.onDone = [this](const TextGenResult &output) {
+        QMetaObject::invokeMethod(this, [this, output]() {
+            if (m_generatingWidget) {
+                auto content = QString::fromStdString(output.output.content);
+                m_generatingWidget->setContent(content);
+                m_generatingWidget->finish();
+                if (m_generatingItem)
+                    m_generatingItem->setSizeHint(m_generatingWidget->minimumSizeHint());
+            }
 
             ui->tokensCachedDisplay->display((int)output.tokensCached);
             ui->tokensGeneratedDisplay->display((int)output.tokensGenerated);
             ui->tokensEvaluatedDisplay->display((int)output.tokensEvaluated);
+
+            m_generating = false;
+            m_stopRequested = false;
+            m_generatingItem = nullptr;
+            m_generatingWidget = nullptr;
+
+            ui->sendButton->setText("Send");
+            ui->messageInput->setEnabled(true);
+            ui->inputEvalProgressBar->setRange(0, 100);
+            ui->inputEvalProgressBar->setValue(100);
 
             onSendDone();
         });
@@ -592,7 +620,7 @@ void MainWindow::send() {
 bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
     if (obj == ui->messageInput && event->type() == QEvent::KeyPress) {
         QKeyEvent *keyEvent = (QKeyEvent*)event;
-        if (keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter) {
+        if ((keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter) && !m_generating) {
             send();
             return true;
         }
