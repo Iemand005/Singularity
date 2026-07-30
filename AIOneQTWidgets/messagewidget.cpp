@@ -141,8 +141,6 @@ void MessageWidget::startThinkSegment()
     scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     scroll->setFrameShape(QFrame::NoFrame);
-    scroll->setVisible(false);
-    scroll->setMaximumHeight(QWIDGETSIZE_MAX);
 
     auto *content = new QLabel();
     content->setWordWrap(true);
@@ -150,10 +148,40 @@ void MessageWidget::startThinkSegment()
     content->setContentsMargins(20, 2, 0, 2);
     scroll->setWidget(content);
 
-    connect(toggle, &QToolButton::toggled, this, [this, toggle, scroll](bool checked) {
-        scroll->setVisible(checked);
-        toggle->setText(checked ? QStringLiteral("\u25BC Hide thinking") : QStringLiteral("\u25B6 Show thinking"));
+    auto *anim = new QPropertyAnimation(container, "maximumHeight", this);
+    anim->setDuration(200);
+    anim->setEasingCurve(QEasingCurve::InOutQuad);
+
+    int collapsedHeight = toggle->sizeHint().height() + layout->contentsMargins().top() + layout->contentsMargins().bottom();
+
+    container->setMaximumHeight(collapsedHeight);
+
+    connect(anim, &QPropertyAnimation::valueChanged, this, [this]() {
         emit sizeChanged();
+    });
+
+    connect(toggle, &QToolButton::toggled, this, [this, toggle, scroll, container, anim, collapsedHeight](bool checked) {
+        anim->stop();
+        if (checked) {
+            scroll->setVisible(true);
+            container->setMaximumHeight(QWIDGETSIZE_MAX);
+            int target = container->minimumSizeHint().height();
+            container->setMaximumHeight(collapsedHeight);
+            anim->setStartValue(collapsedHeight);
+            anim->setEndValue(target);
+        } else {
+            anim->setStartValue(container->maximumHeight());
+            anim->setEndValue(collapsedHeight);
+        }
+        toggle->setText(checked ? QStringLiteral("\u25BC Hide thinking") : QStringLiteral("\u25B6 Show thinking"));
+        anim->start();
+    });
+
+    connect(anim, &QPropertyAnimation::finished, this, [scroll, anim]() {
+        if (anim->endValue().toInt() == 0 || anim->endValue().toInt() == anim->startValue().toInt()) {
+            if (anim->endValue().toInt() == 0)
+                scroll->setVisible(false);
+        }
     });
 
     layout->addWidget(toggle);
@@ -164,4 +192,6 @@ void MessageWidget::startThinkSegment()
     m_thinkToggle = toggle;
     m_thinkScroll = scroll;
     m_thinkContent = content;
+    m_thinkAnim = anim;
+    m_thinkCollapsedHeight = collapsedHeight;
 }

@@ -6,6 +6,7 @@
 #include <QToolButton>
 #include <QVBoxLayout>
 #include <QScrollArea>
+#include <QPropertyAnimation>
 
 class MessageWidget : public QWidget
 {
@@ -39,6 +40,8 @@ private:
     QToolButton *m_thinkToggle = nullptr;
     QScrollArea *m_thinkScroll = nullptr;
     QLabel *m_thinkContent = nullptr;
+    QPropertyAnimation *m_thinkAnim = nullptr;
+    int m_thinkCollapsedHeight = 0;
 };
 
 #endif // MESSAGEWIDGET_H

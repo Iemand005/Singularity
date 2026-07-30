@@ -60,6 +60,12 @@ private:
     // Current model tracking
     QString m_currentModelName;
 
+    // Generation state
+    bool m_generating = false;
+    bool m_stopRequested = false;
+    QListWidgetItem *m_generatingItem = nullptr;
+    MessageWidget *m_generatingWidget = nullptr;
+
     QString vaePath = "";
     QString taePath = "";
 
