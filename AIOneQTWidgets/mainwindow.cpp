@@ -3,7 +3,6 @@
 
 #include <QFileDialog>
 #include <QGraphicsPixmapItem>
-#include <QStringListModel>
 #include <QThread>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -215,13 +214,13 @@ MainWindow::MainWindow(QWidget *parent)
                 for (const auto& m : models)
                     modelNames << QString::fromStdString(m.id);
 
-                auto *listModel = new QStringListModel(modelNames, this);
-                ui->listView->setModel(listModel);
-                ui->listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+                ui->modelBox->clear();
+                ui->modelBox->addItems(modelNames);
 
-                disconnect(ui->listView, &QListView::clicked, nullptr, nullptr);
-                connect(ui->listView, &QListView::clicked, this, [this](const QModelIndex& index) {
-                    setupCloudChatManager(index.data().toString(), ui->openAIKey->text());
+                disconnect(ui->modelBox, &QComboBox::currentIndexChanged, nullptr, nullptr);
+                connect(ui->modelBox, &QComboBox::currentIndexChanged, this, [this](int index) {
+                    if (index >= 0)
+                        setupCloudChatManager(ui->modelBox->currentText(), ui->openAIKey->text());
                 });
 
                 ui->openAIButton->setText("Switch Model");
