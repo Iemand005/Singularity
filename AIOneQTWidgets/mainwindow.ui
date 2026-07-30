@@ -45,13 +45,13 @@
           <item>
            <widget class="QTabWidget" name="tabWidget_2">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
             <property name="currentIndex">
-             <number>0</number>
+             <number>1</number>
             </property>
             <widget class="QWidget" name="tab_2">
              <attribute name="title">
