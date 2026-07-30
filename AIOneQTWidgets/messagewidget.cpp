@@ -12,6 +12,7 @@ MessageWidget::MessageWidget(QWidget *parent)
     connect(ui->regenerateBtn, &QPushButton::clicked, this, &MessageWidget::regenerateRequested);
 
     ui->versionBar->setVisible(false);
+    ui->thinkContainer->setVisible(false);
 }
 
 MessageWidget::~MessageWidget()
