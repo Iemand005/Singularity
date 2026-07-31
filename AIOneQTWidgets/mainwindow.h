@@ -85,6 +85,7 @@ private:
     QString openFileDialog(const QString &title, QString fileTypes = tr("SafeTensors files (*.safetensors);"));
 
     void setupCloudChatManager(const QString &modelId, const QString &apiKey);
+    void connectOpenAI(const QString &apiKey);
 
     // Chat storage
     void initChatStorage();

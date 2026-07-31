@@ -264,56 +264,18 @@ MainWindow::MainWindow(QWidget *parent)
     // Restore API key from settings
     if (!m_settings.apiKey.empty()) {
         ui->openAIKey->setText(QString::fromStdString(m_settings.apiKey));
+
+        // Auto-connect to the provider on launch if a key is already saved
+        QTimer::singleShot(0, this, [this]() {
+            if (!m_settings.apiKey.empty())
+                connectOpenAI(QString::fromStdString(m_settings.apiKey));
+        });
     }
 
     connect(ui->openAIButton, &QPushButton::clicked, [this]() {
         QString apiKey = ui->openAIKey->text().trimmed();
         if (apiKey.isEmpty()) return;
-
-        // Save API key
-        m_settings.apiKey = apiKey.toStdString();
-        saveSettings();
-
-        ui->openAIButton->setEnabled(false);
-        ui->openAIButton->setText("Fetching...");
-
-        static const std::string baseUrl = "api.groq.com/openai";
-        openAIProvider = std::make_unique<AIOne::OpenAIProvider>(baseUrl, apiKey.toStdString());
-
-        std::thread([this]() {
-            auto models = openAIProvider->getModels();
-            QMetaObject::invokeMethod(this, [this, models]() {
-                QStringList modelNames;
-                for (const auto& m : models)
-                    modelNames << QString::fromStdString(m.id);
-
-                ui->modelBox->clear();
-                ui->modelBox->addItems(modelNames);
-
-                disconnect(ui->modelBox, &QComboBox::currentIndexChanged, nullptr, nullptr);
-                connect(ui->modelBox, &QComboBox::currentIndexChanged, this, [this](int index) {
-                    if (index >= 0) {
-                        QString model = ui->modelBox->currentText();
-                        m_settings.lastAIModel = model.toStdString();
-                        saveSettings();
-                        setupCloudChatManager(model, ui->openAIKey->text().trimmed());
-                    }
-                });
-
-                // Restore previously selected model (fires the handler above)
-                int selectIdx = -1;
-                if (!m_settings.lastAIModel.empty()) {
-                    selectIdx = ui->modelBox->findText(QString::fromStdString(m_settings.lastAIModel));
-                }
-                if (selectIdx < 0 && ui->modelBox->count() > 0)
-                    selectIdx = 0;
-                if (selectIdx >= 0)
-                    ui->modelBox->setCurrentIndex(selectIdx);
-
-                ui->openAIButton->setText("Switch Model");
-                ui->openAIButton->setEnabled(true);
-            });
-        }).detach();
+        connectOpenAI(apiKey);
     });
 
     // ---- Finish initialization ----
@@ -335,6 +297,55 @@ QString MainWindow::openFileDialog(const QString &title, QString fileTypes) {
 
 void MainWindow::updateSeed() {
     if (ui->randomizeSeedBox->isChecked()) ui->seedInput->setValue(sdm->newSeed());
+}
+
+void MainWindow::connectOpenAI(const QString &apiKey) {
+    if (apiKey.isEmpty()) return;
+
+    // Save API key
+    m_settings.apiKey = apiKey.toStdString();
+    saveSettings();
+
+    ui->openAIButton->setEnabled(false);
+    ui->openAIButton->setText("Fetching...");
+
+    static const std::string baseUrl = "api.groq.com/openai";
+    openAIProvider = std::make_unique<AIOne::OpenAIProvider>(baseUrl, apiKey.toStdString());
+
+    std::thread([this]() {
+        auto models = openAIProvider->getModels();
+        QMetaObject::invokeMethod(this, [this, models]() {
+            QStringList modelNames;
+            for (const auto& m : models)
+                modelNames << QString::fromStdString(m.id);
+
+            ui->modelBox->clear();
+            ui->modelBox->addItems(modelNames);
+
+            disconnect(ui->modelBox, &QComboBox::currentIndexChanged, nullptr, nullptr);
+            connect(ui->modelBox, &QComboBox::currentIndexChanged, this, [this](int index) {
+                if (index >= 0) {
+                    QString model = ui->modelBox->currentText();
+                    m_settings.lastAIModel = model.toStdString();
+                    saveSettings();
+                    setupCloudChatManager(model, ui->openAIKey->text().trimmed());
+                }
+            });
+
+            // Restore previously selected model (fires the handler above)
+            int selectIdx = -1;
+            if (!m_settings.lastAIModel.empty()) {
+                selectIdx = ui->modelBox->findText(QString::fromStdString(m_settings.lastAIModel));
+            }
+            if (selectIdx < 0 && ui->modelBox->count() > 0)
+                selectIdx = 0;
+            if (selectIdx >= 0)
+                ui->modelBox->setCurrentIndex(selectIdx);
+
+            ui->openAIButton->setText("Switch Model");
+            ui->openAIButton->setEnabled(true);
+        });
+    }).detach();
 }
 
 void MainWindow::setupCloudChatManager(const QString &modelId, const QString &apiKey) {
