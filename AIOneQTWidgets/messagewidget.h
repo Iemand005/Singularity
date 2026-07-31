@@ -30,6 +30,8 @@ public:
     uint64_t parentId() const { return m_parentId; }
 
 protected:
+    QSize sizeHint() const override;
+    QSize minimumSizeHint() const override;
     bool eventFilter(QObject *watched, QEvent *event) override;
 
 signals:
@@ -49,13 +51,15 @@ private:
     void animateThinking(bool expand);
     void stopThinkAnimation();
     int thinkTargetHeight() const;
+    QSize contentSize() const;
+    int contentHeightForWidth(int width) const;
 
     Ui::MessageWidget *ui;
     QToolButton *m_thinkToggle = nullptr;
     QScrollArea *m_thinkScroll = nullptr;
     QLabel *m_thinkContent = nullptr;
     QPropertyAnimation *m_thinkAnimMax = nullptr;
-    QPropertyAnimation *m_thinkAnimMin = nullptr;
+    QObject *m_eventWatchParent = nullptr;
     bool m_isThinking = false;
     bool m_thinkExpanded = false;
     bool m_everHadContent = false;

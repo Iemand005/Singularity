@@ -33,8 +33,10 @@ MessageWidget::MessageWidget(QWidget *parent)
         animateThinking(checked);
     });
 
-    if (parentWidget())
-        parentWidget()->installEventFilter(this);
+    if (parentWidget()) {
+        m_eventWatchParent = parentWidget();
+        m_eventWatchParent->installEventFilter(this);
+    }
 }
 
 MessageWidget::~MessageWidget()
@@ -45,13 +47,23 @@ MessageWidget::~MessageWidget()
 
 bool MessageWidget::eventFilter(QObject *watched, QEvent *event)
 {
-    if (watched == parentWidget() && event->type() == QEvent::Resize && m_thinkExpanded && ui->thinkScroll) {
+    if (watched == m_eventWatchParent && event->type() == QEvent::Resize && m_thinkExpanded && ui->thinkScroll) {
         int target = thinkTargetHeight();
         ui->thinkScroll->setMaximumHeight(target);
         ui->thinkScroll->setMinimumHeight(target);
         emit sizeChanged();
     }
     return QWidget::eventFilter(watched, event);
+}
+
+QSize MessageWidget::sizeHint() const
+{
+    return contentSize();
+}
+
+QSize MessageWidget::minimumSizeHint() const
+{
+    return contentSize();
 }
 
 void MessageWidget::hideThinking()
@@ -85,23 +97,16 @@ void MessageWidget::animateThinking(bool expand)
     m_thinkAnimMax->setStartValue(ui->thinkScroll->maximumHeight());
     m_thinkAnimMax->setEndValue(target);
 
-    m_thinkAnimMin = new QPropertyAnimation(ui->thinkScroll, "minimumHeight", this);
-    m_thinkAnimMin->setDuration(250);
-    m_thinkAnimMin->setEasingCurve(QEasingCurve::InOutCubic);
-    m_thinkAnimMin->setStartValue(ui->thinkScroll->minimumHeight());
-    m_thinkAnimMin->setEndValue(target);
-
-    connect(m_thinkAnimMax, &QPropertyAnimation::finished, this, [this]() {
-        stopThinkAnimation();
+    connect(m_thinkAnimMax, &QPropertyAnimation::valueChanged, this, [this](const QVariant &v) {
+        ui->thinkScroll->setMinimumHeight(v.toInt());
         emit sizeChanged();
     });
-    connect(m_thinkAnimMin, &QPropertyAnimation::finished, this, [this]() {
+    connect(m_thinkAnimMax, &QPropertyAnimation::finished, this, [this]() {
         stopThinkAnimation();
         emit sizeChanged();
     });
 
     m_thinkAnimMax->start();
-    m_thinkAnimMin->start();
     emit sizeChanged();
 }
 
@@ -112,17 +117,43 @@ void MessageWidget::stopThinkAnimation()
         m_thinkAnimMax->deleteLater();
         m_thinkAnimMax = nullptr;
     }
-    if (m_thinkAnimMin) {
-        m_thinkAnimMin->stop();
-        m_thinkAnimMin->deleteLater();
-        m_thinkAnimMin = nullptr;
-    }
 }
 
 int MessageWidget::thinkTargetHeight() const
 {
     int parentH = parentWidget() ? parentWidget()->height() : 400;
     return qMax(80, parentH / 2);
+}
+
+QSize MessageWidget::contentSize() const
+{
+    QWidget *parent = parentWidget();
+    int width = parent ? parent->width() : 400;
+    return QSize(width, contentHeightForWidth(width));
+}
+
+int MessageWidget::contentHeightForWidth(int width) const
+{
+    int labelWidth = qMax(10, width - 16);
+
+    int thinkH = 0;
+    if (ui->thinkToggle && ui->thinkToggle->isVisible())
+        thinkH += ui->thinkToggle->sizeHint().height();
+    if (ui->thinkScroll && ui->thinkScroll->isVisible())
+        thinkH += ui->thinkScroll->maximumHeight();
+
+    int textH = 0;
+    if (ui->textLabel && ui->textLabel->isVisible()) {
+        textH = ui->textLabel->heightForWidth(labelWidth);
+        if (textH <= 0) textH = ui->textLabel->sizeHint().height();
+    }
+
+    int versionH = ui->regenerateBtn ? ui->regenerateBtn->sizeHint().height() : 30;
+
+    int visibleRows = (thinkH > 0 ? 1 : 0) + 1 + 1;
+    int spacing = (visibleRows - 1) * 4;
+
+    return qMax(40, 16 + spacing + thinkH + textH + versionH);
 }
 
 void MessageWidget::hideVersionBar()
