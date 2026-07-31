@@ -5,6 +5,8 @@
 #include <QToolButton>
 #include <QScrollArea>
 #include <QLabel>
+#include <QPropertyAnimation>
+#include <QEvent>
 
 namespace Ui {
 class MessageWidget;
@@ -27,6 +29,9 @@ public:
     void setParentId(uint64_t id) { m_parentId = id; }
     uint64_t parentId() const { return m_parentId; }
 
+protected:
+    bool eventFilter(QObject *watched, QEvent *event) override;
+
 signals:
     void sizeChanged();
     void prevRequested();
@@ -41,12 +46,18 @@ private:
     void appendToThinking(const QString &token);
     void processToken(const QString &token);
     void routeText(const QString &text);
+    void animateThinking(bool expand);
+    void stopThinkAnimation();
+    int thinkTargetHeight() const;
 
     Ui::MessageWidget *ui;
     QToolButton *m_thinkToggle = nullptr;
     QScrollArea *m_thinkScroll = nullptr;
     QLabel *m_thinkContent = nullptr;
+    QPropertyAnimation *m_thinkAnimMax = nullptr;
+    QPropertyAnimation *m_thinkAnimMin = nullptr;
     bool m_isThinking = false;
+    bool m_thinkExpanded = false;
     bool m_everHadContent = false;
     bool m_hasStreamedContent = false;
     uint64_t m_parentId = 0;
