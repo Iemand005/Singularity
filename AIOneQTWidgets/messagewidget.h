@@ -2,6 +2,9 @@
 #define MESSAGEWIDGET_H
 
 #include <QWidget>
+#include <QToolButton>
+#include <QScrollArea>
+#include <QLabel>
 
 namespace Ui {
 class MessageWidget;
@@ -31,7 +34,16 @@ signals:
     void regenerateRequested();
 
 private:
+    void hideThinking();
+    void showThinking();
+    void hideVersionBar();
+    void showVersionBar();
+    void appendToThinking(const QString &token);
+
     Ui::MessageWidget *ui;
+    QToolButton *m_thinkToggle = nullptr;
+    QScrollArea *m_thinkScroll = nullptr;
+    QLabel *m_thinkContent = nullptr;
     bool m_isThinking = false;
     bool m_everHadContent = false;
     bool m_hasStreamedContent = false;
