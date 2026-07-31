@@ -89,7 +89,7 @@ void MessageWidget::appendToken(const QString &token)
     m_hasStreamedContent = true;
     // Strip thinking tags from streamed output
     QString cleanToken = token;
-    cleanToken.remove(QRegularExpression(QStringLiteral("</?thinking\\b[^>]*>\\s*")));
+    cleanToken.remove(QRegularExpression(QStringLiteral("</?think\\b[^>]*>\\s*")));
     if (m_isThinking) {
         appendToThinking(cleanToken);
     } else {
@@ -115,7 +115,7 @@ void MessageWidget::appendToThinking(const QString &token)
 {
     if (m_thinkContent) {
         QString cleanToken = token;
-        cleanToken.remove(QRegularExpression(QStringLiteral("</?thinking\\b[^>]*>\\s*")));
+        cleanToken.remove(QRegularExpression(QStringLiteral("</?think\\b[^>]*>\\s*")));
         m_thinkContent->setText(m_thinkContent->text() + cleanToken);
     }
     showThinking();
@@ -146,8 +146,8 @@ void MessageWidget::setContent(const QString &text)
     QString thinkingContent;
 
     // Pattern: thinking markers  text...
-    QRegularExpression re(QStringLiteral("</?thinking\\b[^>]*>\\s*(.*?)(?:<\\s*/\\s*thinking\\s*>|$)"), QRegularExpression::DotMatchesEverythingOption);
-    QRegularExpression thinkTagRe(QStringLiteral("</?thinking\\b[^>]*>"));
+    QRegularExpression re(QStringLiteral("</?think\\b[^>]*>\\s*(.*?)(?:<\\s*/\\s*think\\s*>|$)"), QRegularExpression::DotMatchesEverythingOption);
+    QRegularExpression thinkTagRe(QStringLiteral("</?think\\b[^>]*>"));
     remaining.remove(thinkTagRe);
 
     int pos = 0;
