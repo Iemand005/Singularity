@@ -463,7 +463,7 @@ void MainWindow::onNewChat() {
     params.maxTokens = ui->maxTokensCheck->isChecked() ? ui->maxTokensInput->value() : 0;
 
     // Create new chat with "Untitled" - title will be auto-generated from first user message
-    chatManager->createNewChat("Untitled", m_currentModelName.toStdString(),
+    std::string newFolder = chatManager->createNewChat("Untitled", m_currentModelName.toStdString(),
                                 systemPrompt, params);
 
     // Clear message display
@@ -473,8 +473,16 @@ void MainWindow::onNewChat() {
 
     // Refresh sidebar
     refreshChatList();
-    // Select the new chat (last item) - m_loadingChat is false now so onChatSelected will load it
-    m_chatList->setCurrentRow(m_chatList->count() - 1);
+    // Select the newly created chat (it sorts to the top by updated date)
+    int newRow = 0;
+    QString newFolderStr = QString::fromStdString(newFolder);
+    for (int i = 0; i < m_chatList->count(); ++i) {
+        if (m_chatList->item(i)->data(Qt::UserRole).toString() == newFolderStr) {
+            newRow = i;
+            break;
+        }
+    }
+    m_chatList->setCurrentRow(newRow);
 }
 
 void MainWindow::syncChatToUI() {
