@@ -726,6 +726,17 @@ void MainWindow::onRegenerateRequested(uint64_t parentId) {
         });
     };
 
+    options.onToken = [this](const QString &token) {
+        if (m_stopRequested) return;
+        QMetaObject::invokeMethod(ui->listWidget, [this, token]() {
+            if (!m_generatingWidget || m_stopRequested) return;
+            m_generatingWidget->appendToken(token);
+            ui->listWidget->scrollToBottom();
+            auto display = ui->tokensGeneratedDisplay;
+            display->display(display->intValue() + 1);
+        });
+    };
+
     options.onTokenReasoning = [this](const QString &token, bool thinking) {
         if (m_stopRequested) return;
         QMetaObject::invokeMethod(ui->listWidget, [this, token, thinking]() {
@@ -842,6 +853,17 @@ void MainWindow::send() {
         QMetaObject::invokeMethod(m_generatingWidget, [this, thinking]() {
             if (m_generatingWidget)
                 m_generatingWidget->setThinking(thinking);
+        });
+    };
+
+    options.onToken = [this](const QString &token) {
+        if (m_stopRequested) return;
+        QMetaObject::invokeMethod(ui->listWidget, [this, token]() {
+            if (!m_generatingWidget || m_stopRequested) return;
+            m_generatingWidget->appendToken(token);
+            ui->listWidget->scrollToBottom();
+            auto display = ui->tokensGeneratedDisplay;
+            display->display(display->intValue() + 1);
         });
     };
 
