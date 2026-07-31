@@ -15,6 +15,7 @@ public:
     ~MessageWidget();
 
     void appendToken(const QString &token);
+    void appendTokenReasoning(const QString &token, bool thinking);
     void setThinking(bool thinking);
     void finish();
 

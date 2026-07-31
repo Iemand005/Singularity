@@ -55,6 +55,18 @@ void MessageWidget::appendToken(const QString &token)
     emit sizeChanged();
 }
 
+void MessageWidget::appendTokenReasoning(const QString &token, bool thinking)
+{
+    m_hasStreamedContent = true;
+    if (thinking) {
+        ui->thinkContent->setText(ui->thinkContent->text() + token);
+        ui->thinkContainer->setVisible(true);
+    } else {
+        ui->textLabel->setText(ui->textLabel->text() + token);
+    }
+    emit sizeChanged();
+}
+
 void MessageWidget::setThinking(bool thinking)
 {
     if (m_isThinking == thinking) return;
