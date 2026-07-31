@@ -29,9 +29,10 @@ public:
     void setParentId(uint64_t id) { m_parentId = id; }
     uint64_t parentId() const { return m_parentId; }
 
-protected:
     QSize sizeHint() const override;
     QSize minimumSizeHint() const override;
+
+protected:
     bool eventFilter(QObject *watched, QEvent *event) override;
 
 signals:
