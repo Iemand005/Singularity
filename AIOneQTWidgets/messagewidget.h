@@ -39,6 +39,8 @@ private:
     void hideVersionBar();
     void showVersionBar();
     void appendToThinking(const QString &token);
+    void processToken(const QString &token);
+    void routeText(const QString &text);
 
     Ui::MessageWidget *ui;
     QToolButton *m_thinkToggle = nullptr;
@@ -48,6 +50,7 @@ private:
     bool m_everHadContent = false;
     bool m_hasStreamedContent = false;
     uint64_t m_parentId = 0;
+    QString m_tagBuffer;
 };
 
 #endif // MESSAGEWIDGET_H

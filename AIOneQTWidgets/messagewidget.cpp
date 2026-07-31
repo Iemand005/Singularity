@@ -43,7 +43,10 @@ void MessageWidget::hideThinking()
 
 void MessageWidget::showThinking()
 {
-    if (ui->thinkToggle) ui->thinkToggle->setVisible(true);
+    if (ui->thinkToggle) {
+        ui->thinkToggle->setVisible(true);
+        ui->thinkToggle->setChecked(true);
+    }
     if (ui->thinkScroll) ui->thinkScroll->setVisible(true);
 }
 
@@ -87,38 +90,70 @@ void MessageWidget::setVersionInfo(size_t current, size_t total)
 void MessageWidget::appendToken(const QString &token)
 {
     m_hasStreamedContent = true;
-    // Strip thinking tags from streamed output
-    QString cleanToken = token;
-    cleanToken.remove(QRegularExpression(QStringLiteral("</?think\\b[^>]*>\\s*")));
-    if (m_isThinking) {
-        appendToThinking(cleanToken);
-    } else {
-        if (ui->textLabel)
-            ui->textLabel->setText(ui->textLabel->text() + cleanToken);
-    }
+    processToken(token);
     emit sizeChanged();
 }
 
-void MessageWidget::appendTokenReasoning(const QString &token, bool thinking)
+void MessageWidget::appendTokenReasoning(const QString &token, bool)
 {
     m_hasStreamedContent = true;
-    if (thinking) {
-        appendToThinking(token);
-    } else {
-        if (ui->textLabel)
-            ui->textLabel->setText(ui->textLabel->text() + token);
-    }
+    processToken(token);
     emit sizeChanged();
 }
 
 void MessageWidget::appendToThinking(const QString &token)
 {
     if (m_thinkContent) {
-        QString cleanToken = token;
-        cleanToken.remove(QRegularExpression(QStringLiteral("</?think\\b[^>]*>\\s*")));
-        m_thinkContent->setText(m_thinkContent->text() + cleanToken);
+        m_thinkContent->setText(m_thinkContent->text() + token);
     }
     showThinking();
+}
+
+void MessageWidget::processToken(const QString &token)
+{
+    m_tagBuffer += token;
+
+    int pos = 0;
+    while (pos < m_tagBuffer.size()) {
+        int openTag = m_tagBuffer.indexOf("<think", pos);
+        int closeTag = m_tagBuffer.indexOf("</think", pos);
+
+        int nextTag;
+        bool isOpen;
+        if (openTag != -1 && (closeTag == -1 || openTag < closeTag)) {
+            nextTag = openTag;
+            isOpen = true;
+        } else if (closeTag != -1) {
+            nextTag = closeTag;
+            isOpen = false;
+        } else {
+            routeText(m_tagBuffer.mid(pos));
+            m_tagBuffer.clear();
+            break;
+        }
+
+        routeText(m_tagBuffer.mid(pos, nextTag - pos));
+
+        int tagEnd = m_tagBuffer.indexOf('>', nextTag);
+        if (tagEnd == -1) {
+            m_tagBuffer = m_tagBuffer.mid(nextTag);
+            break;
+        }
+
+        setThinking(isOpen);
+        m_tagBuffer.remove(0, tagEnd + 1);
+        pos = 0;
+    }
+}
+
+void MessageWidget::routeText(const QString &text)
+{
+    if (text.isEmpty()) return;
+    if (m_isThinking) {
+        appendToThinking(text);
+    } else if (ui->textLabel) {
+        ui->textLabel->setText(ui->textLabel->text() + text);
+    }
 }
 
 void MessageWidget::setThinking(bool thinking)
@@ -139,31 +174,35 @@ void MessageWidget::finish()
 
 void MessageWidget::setContent(const QString &text)
 {
-    if (m_everHadContent || m_hasStreamedContent) return;
-
-    // Parse thinking blocks from stored content
     QString remaining = text;
     QString thinkingContent;
 
-    // Pattern: thinking markers  text...
-    QRegularExpression re(QStringLiteral("</?think\\b[^>]*>\\s*(.*?)(?:<\\s*/\\s*think\\s*>|$)"), QRegularExpression::DotMatchesEverythingOption);
-    QRegularExpression thinkTagRe(QStringLiteral("</?think\\b[^>]*>"));
-    remaining.remove(thinkTagRe);
-
     int pos = 0;
     while (pos < remaining.size()) {
-        QRegularExpressionMatch match = re.match(remaining, pos);
-        if (!match.hasMatch()) break;
+        int openIdx = remaining.indexOf("<think", pos);
+        if (openIdx == -1) break;
+        int openEnd = remaining.indexOf('>', openIdx);
+        if (openEnd == -1) break;
 
-        int start = match.capturedStart();
-        int end = match.capturedEnd();
-        QString thinking = match.captured(1).trimmed();
-        if (!thinking.isEmpty()) {
-            thinkingContent += thinking + "\n\n";
+        int closeIdx = remaining.indexOf("</think", openEnd);
+        if (closeIdx != -1) {
+            int closeEnd = remaining.indexOf('>', closeIdx);
+            if (closeEnd == -1) break;
+
+            QString think = remaining.mid(openEnd + 1, closeIdx - openEnd - 1).trimmed();
+            if (!think.isEmpty())
+                thinkingContent += think + "\n\n";
+
+            remaining.remove(openIdx, closeEnd + 1 - openIdx);
+            pos = openIdx;
+        } else {
+            QString think = remaining.mid(openEnd + 1).trimmed();
+            if (!think.isEmpty())
+                thinkingContent += think;
+
+            remaining.remove(openIdx, remaining.size() - openIdx);
+            break;
         }
-
-        remaining.remove(start, end - start);
-        pos = start;
     }
 
     if (!thinkingContent.isEmpty()) {
@@ -173,5 +212,6 @@ void MessageWidget::setContent(const QString &text)
     if (ui->textLabel)
         ui->textLabel->setText(remaining.trimmed());
     m_everHadContent = true;
+    m_tagBuffer.clear();
     emit sizeChanged();
 }

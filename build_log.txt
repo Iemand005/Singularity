@@ -1,0 +1,427 @@
+MSBuild version 18.8.2+ce25c0108 for .NET Framework
+
+  1>
+  mocs_compilation_Debug.cpp
+  build-info.cpp
+  build_info.vcxproj -> J:\AIOneQT\build\llama.cpp_build\common\build_info.dir\Debug\build_info.lib
+  1>
+  mocs_compilation_Debug.cpp
+  ggml-backend.cpp
+  ggml-opt.cpp
+  ggml-threading.cpp
+  gguf.cpp
+  ggml.c
+  ggml.cpp
+  ggml-alloc.c
+  ggml-quants.c
+  ggml-base.vcxproj -> J:\AIOneQT\build\lib\Debug\ggml-base.lib
+  1>
+  mocs_compilation_Debug.cpp
+  hbm.cpp
+  traits.cpp
+  amx.cpp
+  mmq.cpp
+  binary-ops.cpp
+  unary-ops.cpp
+  vec.cpp
+  ops.cpp
+  ggml-cpu.c
+  ggml-cpu.cpp
+  repack.cpp
+  quants.c
+  quants.c
+  repack.cpp
+  ggml-cpu.vcxproj -> J:\AIOneQT\build\lib\Debug\ggml-cpu.lib
+  1>
+  mocs_compilation_Debug.cpp
+  ggml-backend-dl.cpp
+  ggml-backend-reg.cpp
+  ggml.vcxproj -> J:\AIOneQT\build\lib\Debug\ggml.lib
+  1>
+  mocs_compilation_Debug.cpp
+  llama-adapter.cpp
+  llama-arch.cpp
+  llama-batch.cpp
+  llama-chat.cpp
+  llama-context.cpp
+  llama-cparams.cpp
+  llama-grammar.cpp
+  llama-graph.cpp
+  llama-hparams.cpp
+  llama-impl.cpp
+  llama-io.cpp
+  llama-kv-cache.cpp
+  llama-kv-cache-iswa.cpp
+  llama-memory.cpp
+  llama-memory-hybrid.cpp
+  llama-memory-hybrid-iswa.cpp
+  llama-memory-recurrent.cpp
+  llama-mmap.cpp
+  llama-model-loader.cpp
+  llama-model-saver.cpp
+  llama-model.cpp
+  llama-quant.cpp
+  llama-sampler.cpp
+  llama-vocab.cpp
+J:\AIOneQT\AIOne\external\llama.cpp\src\llama-context.cpp(879,37): warning C4101: 'err': unreferenced local variable [J:\AIOneQT\build\llama.cpp_build\src\llama.vcxproj]
+  unicode-data.cpp
+  unicode.cpp
+  afmoe.cpp
+  apertus.cpp
+  arcee.cpp
+  arctic.cpp
+  arwkv7.cpp
+J:\AIOneQT\AIOne\external\llama.cpp\src\llama-model.cpp(2112,38): warning C4305: '=': truncation from 'double' to 'float' [J:\AIOneQT\build\llama.cpp_build\src\llama.vcxproj]
+  baichuan.cpp
+  bailingmoe.cpp
+J:\AIOneQT\AIOne\external\llama.cpp\src\llama-model.cpp(2712,48): warning C4101: 'e': unreferenced local variable [J:\AIOneQT\build\llama.cpp_build\src\llama.vcxproj]
+  bailingmoe2.cpp
+  bert.cpp
+  bitnet.cpp
+J:\AIOneQT\AIOne\external\llama.cpp\src\llama-model.cpp(5928,54): warning C4101: 'e': unreferenced local variable [J:\AIOneQT\build\llama.cpp_build\src\llama.vcxproj]
+  bloom.cpp
+  chameleon.cpp
+  chatglm.cpp
+  codeshell.cpp
+  cogvlm.cpp
+  cohere2-iswa.cpp
+  command-r.cpp
+  dbrx.cpp
+  deci.cpp
+  deepseek.cpp
+  deepseek2.cpp
+  dots1.cpp
+  dream.cpp
+  ernie4-5-moe.cpp
+  ernie4-5.cpp
+  exaone.cpp
+  exaone4.cpp
+  exaone-moe.cpp
+  falcon-h1.cpp
+  falcon.cpp
+  gemma-embedding.cpp
+  gemma.cpp
+  gemma2-iswa.cpp
+  gemma3.cpp
+  gemma3n-iswa.cpp
+  glm4-moe.cpp
+  glm4.cpp
+  gpt2.cpp
+  gptneox.cpp
+  granite-hybrid.cpp
+  granite.cpp
+  grok.cpp
+  grovemoe.cpp
+  hunyuan-dense.cpp
+  hunyuan-moe.cpp
+  internlm2.cpp
+  jais.cpp
+  jamba.cpp
+  kimi-linear.cpp
+  lfm2.cpp
+  llada-moe.cpp
+  llada.cpp
+  llama-iswa.cpp
+  maincoder.cpp
+  mamba.cpp
+  mimo2-iswa.cpp
+  minicpm3.cpp
+  minimax-m2.cpp
+  modern-bert.cpp
+  mpt.cpp
+  nemotron-h.cpp
+  nemotron.cpp
+  neo-bert.cpp
+  olmo.cpp
+  olmo2.cpp
+  olmoe.cpp
+  openai-moe-iswa.cpp
+  openelm.cpp
+  orion.cpp
+  pangu-embedded.cpp
+  phi2.cpp
+  phi3.cpp
+  plamo.cpp
+  plamo2.cpp
+  plamo3.cpp
+  plm.cpp
+  qwen.cpp
+  qwen2.cpp
+  qwen2moe.cpp
+  qwen2vl.cpp
+  qwen3.cpp
+  qwen3vl.cpp
+  qwen3vl-moe.cpp
+  qwen3moe.cpp
+  qwen3next.cpp
+  refact.cpp
+  rnd1.cpp
+  rwkv6-base.cpp
+  rwkv6.cpp
+  rwkv6qwen2.cpp
+  rwkv7-base.cpp
+  rwkv7.cpp
+  seed-oss.cpp
+  smallthinker.cpp
+  smollm3.cpp
+  stablelm.cpp
+  starcoder.cpp
+  starcoder2.cpp
+  step35-iswa.cpp
+  t5-dec.cpp
+  t5-enc.cpp
+  wavtokenizer-dec.cpp
+  xverse.cpp
+  mistral3.cpp
+  graph-context-mamba.cpp
+J:\AIOneQT\AIOne\external\llama.cpp\src\models\rwkv7-base.cpp(68,64): warning C4305: 'argument': truncation from 'double' to 'float' [J:\AIOneQT\build\llama.cpp_build\src\llama.vcxproj]
+J:\AIOneQT\AIOne\external\llama.cpp\src\models\rwkv7-base.cpp(92,47): warning C4305: 'argument': truncation from 'double' to 'float' [J:\AIOneQT\build\llama.cpp_build\src\llama.vcxproj]
+  llama.cpp
+J:\AIOneQT\AIOne\external\llama.cpp\src\llama.cpp(673,52): warning C4018: '>': signed/unsigned mismatch [J:\AIOneQT\build\llama.cpp_build\src\llama.vcxproj]
+  llama.cpp
+  llama.vcxproj -> J:\AIOneQT\build\lib\Debug\llama.lib
+  1>
+  mocs_compilation_Debug.cpp
+  arg.cpp
+  chat-parser.cpp
+  chat-parser-xml-toolcall.cpp
+  chat-peg-parser.cpp
+  chat.cpp
+  common.cpp
+  console.cpp
+  debug.cpp
+  download.cpp
+  json-partial.cpp
+  json-schema-to-grammar.cpp
+  llguidance.cpp
+  log.cpp
+  ngram-cache.cpp
+  ngram-map.cpp
+  ngram-mod.cpp
+  peg-parser.cpp
+  preset.cpp
+  regex-partial.cpp
+  sampling.cpp
+  speculative.cpp
+J:\AIOneQT\AIOne\external\llama.cpp\common\common.h(343,29): warning C4305: 'initializing': truncation from 'double' to 'float' [J:\AIOneQT\build\llama.cpp_build\common\common.vcxproj]
+  (compiling source file '../../../AIOne/external/llama.cpp/common/debug.cpp')
+  
+J:\AIOneQT\AIOne\external\llama.cpp\common\common.h(343,29): warning C4305: 'initializing': truncation from 'double' to 'float' [J:\AIOneQT\build\llama.cpp_build\common\common.vcxproj]
+  (compiling source file '../../../AIOne/external/llama.cpp/common/console.cpp')
+  
+J:\AIOneQT\AIOne\external\llama.cpp\common\common.h(343,29): warning C4305: 'initializing': truncation from 'double' to 'float' [J:\AIOneQT\build\llama.cpp_build\common\common.vcxproj]
+  (compiling source file '../../../AIOne/external/llama.cpp/common/download.cpp')
+  
+J:\AIOneQT\AIOne\external\llama.cpp\common\common.h(343,29): warning C4305: 'initializing': truncation from 'double' to 'float' [J:\AIOneQT\build\llama.cpp_build\common\common.vcxproj]
+  (compiling source file '../../../AIOne/external/llama.cpp/common/chat.cpp')
+  
+J:\AIOneQT\AIOne\external\llama.cpp\common\common.h(343,29): warning C4305: 'initializing': truncation from 'double' to 'float' [J:\AIOneQT\build\llama.cpp_build\common\common.vcxproj]
+  (compiling source file '../../../AIOne/external/llama.cpp/common/arg.cpp')
+  
+J:\AIOneQT\AIOne\external\llama.cpp\common\common.h(343,29): warning C4305: 'initializing': truncation from 'double' to 'float' [J:\AIOneQT\build\llama.cpp_build\common\common.vcxproj]
+  (compiling source file '../../../AIOne/external/llama.cpp/common/llguidance.cpp')
+  
+J:\AIOneQT\AIOne\external\llama.cpp\common\common.h(343,29): warning C4305: 'initializing': truncation from 'double' to 'float' [J:\AIOneQT\build\llama.cpp_build\common\common.vcxproj]
+  (compiling source file '../../../AIOne/external/llama.cpp/common/chat-parser.cpp')
+  
+J:\AIOneQT\AIOne\external\llama.cpp\common\common.h(343,29): warning C4305: 'initializing': truncation from 'double' to 'float' [J:\AIOneQT\build\llama.cpp_build\common\common.vcxproj]
+  (compiling source file '../../../AIOne/external/llama.cpp/common/common.cpp')
+  
+J:\AIOneQT\AIOne\external\llama.cpp\common\common.h(343,29): warning C4305: 'initializing': truncation from 'double' to 'float' [J:\AIOneQT\build\llama.cpp_build\common\common.vcxproj]
+  (compiling source file '../../../AIOne/external/llama.cpp/common/chat-parser-xml-toolcall.cpp')
+  
+J:\AIOneQT\AIOne\external\llama.cpp\common\common.h(343,29): warning C4305: 'initializing': truncation from 'double' to 'float' [J:\AIOneQT\build\llama.cpp_build\common\common.vcxproj]
+  (compiling source file '../../../AIOne/external/llama.cpp/common/ngram-map.cpp')
+  
+J:\AIOneQT\AIOne\external\llama.cpp\common\common.h(343,29): warning C4305: 'initializing': truncation from 'double' to 'float' [J:\AIOneQT\build\llama.cpp_build\common\common.vcxproj]
+  (compiling source file '../../../AIOne/external/llama.cpp/common/chat-peg-parser.cpp')
+  
+J:\AIOneQT\AIOne\external\llama.cpp\common\common.h(343,29): warning C4305: 'initializing': truncation from 'double' to 'float' [J:\AIOneQT\build\llama.cpp_build\common\common.vcxproj]
+  (compiling source file '../../../AIOne/external/llama.cpp/common/log.cpp')
+  
+J:\AIOneQT\AIOne\external\llama.cpp\common\common.h(343,29): warning C4305: 'initializing': truncation from 'double' to 'float' [J:\AIOneQT\build\llama.cpp_build\common\common.vcxproj]
+  (compiling source file '../../../AIOne/external/llama.cpp/common/peg-parser.cpp')
+  
+J:\AIOneQT\AIOne\external\llama.cpp\common\common.h(343,29): warning C4305: 'initializing': truncation from 'double' to 'float' [J:\AIOneQT\build\llama.cpp_build\common\common.vcxproj]
+  (compiling source file '../../../AIOne/external/llama.cpp/common/json-schema-to-grammar.cpp')
+  
+J:\AIOneQT\AIOne\external\llama.cpp\common\common.h(343,29): warning C4305: 'initializing': truncation from 'double' to 'float' [J:\AIOneQT\build\llama.cpp_build\common\common.vcxproj]
+  (compiling source file '../../../AIOne/external/llama.cpp/common/sampling.cpp')
+  
+J:\AIOneQT\AIOne\external\llama.cpp\common\common.h(343,29): warning C4305: 'initializing': truncation from 'double' to 'float' [J:\AIOneQT\build\llama.cpp_build\common\common.vcxproj]
+  (compiling source file '../../../AIOne/external/llama.cpp/common/preset.cpp')
+  
+J:\AIOneQT\AIOne\external\llama.cpp\common\common.h(343,29): warning C4305: 'initializing': truncation from 'double' to 'float' [J:\AIOneQT\build\llama.cpp_build\common\common.vcxproj]
+  (compiling source file '../../../AIOne/external/llama.cpp/common/ngram-cache.cpp')
+  
+J:\AIOneQT\AIOne\external\llama.cpp\common\common.h(343,29): warning C4305: 'initializing': truncation from 'double' to 'float' [J:\AIOneQT\build\llama.cpp_build\common\common.vcxproj]
+  (compiling source file '../../../AIOne/external/llama.cpp/common/regex-partial.cpp')
+  
+  unicode.cpp
+J:\AIOneQT\AIOne\external\llama.cpp\common\common.h(343,29): warning C4305: 'initializing': truncation from 'double' to 'float' [J:\AIOneQT\build\llama.cpp_build\common\common.vcxproj]
+  (compiling source file '../../../AIOne/external/llama.cpp/common/speculative.cpp')
+  
+  lexer.cpp
+  parser.cpp
+J:\AIOneQT\AIOne\external\llama.cpp\common\common.cpp(1006,26): warning C4996: 'isatty': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _isatty. See online help for details. [J:\AIOneQT\build\llama.cpp_build\common\common.vcxproj]
+J:\AIOneQT\AIOne\external\llama.cpp\common\common.cpp(1007,26): warning C4996: 'isatty': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _isatty. See online help for details. [J:\AIOneQT\build\llama.cpp_build\common\common.vcxproj]
+  runtime.cpp
+  value.cpp
+  string.cpp
+  caps.cpp
+J:\AIOneQT\AIOne\external\llama.cpp\common\json-schema-to-grammar.cpp(478,60): warning C4101: 'e': unreferenced local variable [J:\AIOneQT\build\llama.cpp_build\common\common.vcxproj]
+J:\AIOneQT\AIOne\external\llama.cpp\common\json-schema-to-grammar.cpp(789,72): warning C4101: 'e': unreferenced local variable [J:\AIOneQT\build\llama.cpp_build\common\common.vcxproj]
+  license.cpp
+J:\AIOneQT\AIOne\external\llama.cpp\common\arg.cpp(989,32): warning C4305: '=': truncation from 'double' to 'float' [J:\AIOneQT\build\llama.cpp_build\common\common.vcxproj]
+  common.vcxproj -> J:\AIOneQT\build\lib\Debug\common.lib
+  1>
+  mocs_compilation_Debug.cpp
+  zip.c
+  zip.vcxproj -> J:\AIOneQT\build\stable-diffusion.cpp_build\thirdparty\zip.dir\Debug\zip.lib
+  1>
+  mocs_compilation_Debug.cpp
+  model.cpp
+  name_conversion.cpp
+  stable-diffusion.cpp
+  tokenize_util.cpp
+  upscaler.cpp
+  util.cpp
+J:\AIOneQT\AIOne\external\stable-diffusion.cpp\util.cpp(85,9): warning C4005: 'NOMINMAX': macro redefinition [J:\AIOneQT\build\stable-diffusion.cpp_build\stable-diffusion.vcxproj]
+      J:\AIOneQT\AIOne\external\stable-diffusion.cpp\util.cpp(85,9):
+      'NOMINMAX' previously declared on the command line
+  
+  version.cpp
+  stable-diffusion.vcxproj -> J:\AIOneQT\build\lib\Debug\stable-diffusion.lib
+  1>
+  mocs_compilation_Debug.cpp
+  crl.c
+  dtls.c
+  dtls13.c
+  internal.c
+  keys.c
+  ocsp.c
+  quic.c
+  sniffer.c
+  ssl.c
+  tls.c
+  tls13.c
+  wolfio.c
+  aes.c
+  arc4.c
+  ascon.c
+  asm.c
+  asn.c
+  async.c
+  blake2b.c
+  blake2s.c
+  camellia.c
+  chacha.c
+  chacha20_poly1305.c
+  cmac.c
+  coding.c
+  compress.c
+  cpuid.c
+  cryptocb.c
+  curve25519.c
+  curve448.c
+  des3.c
+  dh.c
+  dsa.c
+  ecc.c
+  ecc_fp.c
+  eccsi.c
+  ed25519.c
+  ed448.c
+  error.c
+  falcon.c
+  fe_448.c
+  fe_low_mem.c
+  fe_operations.c
+  ge_448.c
+  ge_low_mem.c
+  ge_operations.c
+  hash.c
+  hmac.c
+  hpke.c
+  integer.c
+  kdf.c
+  logging.c
+  md2.c
+  md4.c
+  md5.c
+  memory.c
+  pkcs12.c
+  pkcs7.c
+  poly1305.c
+  puf.c
+  pwdbased.c
+  random.c
+  rc2.c
+  ripemd.c
+  rng_bank.c
+  rsa.c
+  sakke.c
+  sha.c
+  sha256.c
+  sha3.c
+  sha512.c
+  signature.c
+  siphash.c
+  sm2.c
+  sm3.c
+  sm4.c
+  sp_arm32.c
+  sp_arm64.c
+  sp_armthumb.c
+  sp_c32.c
+  sp_c64.c
+  sp_cortexm.c
+  sp_dsp32.c
+  sp_int.c
+  sp_sm2_arm32.c
+  sp_sm2_arm64.c
+  sp_sm2_armthumb.c
+  sp_sm2_c32.c
+  sp_sm2_c64.c
+  sp_sm2_cortexm.c
+  sp_sm2_x86_64.c
+  sp_x86_64.c
+  srp.c
+  tfm.c
+  tsp.c
+  wc_dsp.c
+  wc_encrypt.c
+  wc_frodokem.c
+  wc_frodokem_mat.c
+  wc_lms.c
+  wc_lms_impl.c
+  wc_mldsa.c
+  wc_mlkem.c
+  wc_mlkem_poly.c
+  wc_pkcs11.c
+  wc_port.c
+  wc_she.c
+  wc_slhdsa.c
+  wc_xmss.c
+  wc_xmss_impl.c
+  wolfentropy.c
+  wolfevent.c
+  wolfmath.c
+  wolfssl.vcxproj -> J:\AIOneQT\build\lib\Debug\wolfssl.lib
+  1>
+  mocs_compilation_Debug.cpp
+  Chat.cpp
+  ChatStorage.cpp
+  LLModel.cpp
+  Model.cpp
+  ModelFactory.cpp
+  OpenAIProvider.cpp
+  SDModel.cpp
+  TextContext.cpp
+J:\AIOneQT\AIOne\external\llama.cpp\common\common.h(343,29): warning C4305: 'initializing': truncation from 'double' to 'float' [J:\AIOneQT\build\AIOneCore_build\AIOneCore.vcxproj]
+  (compiling source file '../../AIOne/src/LLModel.cpp')
+  
+  AIOneCore.vcxproj -> J:\AIOneQT\build\lib\Debug\AIOneCore.lib
+  1>
+  mocs_compilation_Debug.cpp
+  main.cpp
