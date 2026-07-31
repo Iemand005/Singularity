@@ -11,6 +11,7 @@
 #include <QTimer>
 #include <QMessageBox>
 #include <QKeyEvent>
+#include <QScrollBar>
 #include <QScopeGuard>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -597,8 +598,13 @@ void MainWindow::rebuildConversationDisplay() {
                 w->setVersionInfo(0, 1);
             } else {
                 auto siblings = chat->getSiblings(slotParentId);
-                size_t idx = chat->getCurrentVersionIndex(slotParentId);
+                size_t idx = 0;
+                for (size_t i = 0; i < siblings.size(); ++i) {
+                    if (siblings[i].id == msg.id) { idx = i; break; }
+                }
                 if (idx >= siblings.size()) idx = 0;
+                // Keep the runtime version selection in sync with the active path
+                chat->setCurrentVersionIndex(slotParentId, idx);
                 w->setContent(QString::fromStdString(siblings[idx].content));
                 w->setVersionInfo(idx, siblings.size());
             }
@@ -749,8 +755,11 @@ void MainWindow::onRegenerateRequested(uint64_t parentId) {
         if (m_stopRequested) return;
         QMetaObject::invokeMethod(ui->listWidget, [this, token]() {
             if (!m_generatingWidget || m_stopRequested) return;
+            auto *vbar = ui->listWidget->verticalScrollBar();
+            bool nearBottom = vbar->value() >= vbar->maximum() - 50;
             m_generatingWidget->appendToken(token);
-            ui->listWidget->scrollToBottom();
+            if (nearBottom)
+                ui->listWidget->scrollToBottom();
             auto display = ui->tokensGeneratedDisplay;
             display->display(display->intValue() + 1);
         });
@@ -868,8 +877,11 @@ void MainWindow::send() {
         if (m_stopRequested) return;
         QMetaObject::invokeMethod(ui->listWidget, [this, token]() {
             if (!m_generatingWidget || m_stopRequested) return;
+            auto *vbar = ui->listWidget->verticalScrollBar();
+            bool nearBottom = vbar->value() >= vbar->maximum() - 50;
             m_generatingWidget->appendToken(token);
-            ui->listWidget->scrollToBottom();
+            if (nearBottom)
+                ui->listWidget->scrollToBottom();
             auto display = ui->tokensGeneratedDisplay;
             display->display(display->intValue() + 1);
         });
