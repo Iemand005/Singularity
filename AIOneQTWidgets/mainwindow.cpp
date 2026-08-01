@@ -377,7 +377,17 @@ void MainWindow::connectOpenAI(const QString &apiKey) {
 
     std::thread([this]() {
         auto models = openAIProvider->getModels();
-        QMetaObject::invokeMethod(this, [this, models]() {
+        std::string error = openAIProvider->getLastError();
+        QMetaObject::invokeMethod(this, [this, models, error]() {
+            if (models.empty() && !error.empty()) {
+                QMessageBox::warning(this, "Model fetch failed",
+                    QString("Could not fetch models from the provider.\n\n%1")
+                        .arg(QString::fromStdString(error)));
+                ui->openAIButton->setText("Switch Model");
+                ui->openAIButton->setEnabled(true);
+                return;
+            }
+
             QStringList modelNames;
             for (const auto& m : models)
                 modelNames << QString::fromStdString(m.id);
