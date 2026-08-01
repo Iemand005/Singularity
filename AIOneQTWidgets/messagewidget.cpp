@@ -218,7 +218,8 @@ void MessageWidget::appendToken(const QString &token)
 void MessageWidget::appendTokenReasoning(const QString &token, bool)
 {
     m_hasStreamedContent = true;
-    processToken(token);
+    m_isThinking = true;
+    appendToThinking(token);
     emit sizeChanged();
 }
 

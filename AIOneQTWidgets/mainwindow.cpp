@@ -877,6 +877,13 @@ void MainWindow::onRegenerateRequested(uint64_t parentId) {
         });
     };
 
+    options.onTokenReasoning = [this](const QString &token, bool thinking) {
+        QMetaObject::invokeMethod(m_generatingWidget, [this, token, thinking]() {
+            if (!m_generatingWidget) return;
+            m_generatingWidget->appendTokenReasoning(token, thinking);
+        });
+    };
+
     options.onThinkStateChange = [this](bool thinking) {
         QMetaObject::invokeMethod(m_generatingWidget, [this, thinking]() {
             if (m_generatingWidget)
@@ -1028,6 +1035,13 @@ void MainWindow::onContinueRequested(uint64_t parentId) {
         });
     };
 
+    options.onTokenReasoning = [this](const QString &token, bool thinking) {
+        QMetaObject::invokeMethod(m_generatingWidget, [this, token, thinking]() {
+            if (!m_generatingWidget) return;
+            m_generatingWidget->appendTokenReasoning(token, thinking);
+        });
+    };
+
     options.onThinkStateChange = [this](bool thinking) {
         QMetaObject::invokeMethod(m_generatingWidget, [this, thinking]() {
             if (m_generatingWidget)
@@ -1152,6 +1166,13 @@ void MainWindow::send() {
     options.onError = [this](const QString &err) {
         QMetaObject::invokeMethod(this, [this, err]() {
             QMessageBox::warning(this, "Request failed", err);
+        });
+    };
+
+    options.onTokenReasoning = [this](const QString &token, bool thinking) {
+        QMetaObject::invokeMethod(m_generatingWidget, [this, token, thinking]() {
+            if (!m_generatingWidget) return;
+            m_generatingWidget->appendTokenReasoning(token, thinking);
         });
     };
 
