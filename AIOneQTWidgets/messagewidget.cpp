@@ -12,6 +12,9 @@ MessageWidget::MessageWidget(QWidget *parent)
 {
     ui->setupUi(this);
 
+    ui->textLabel->setTextFormat(Qt::MarkdownText);
+    ui->thinkContent->setTextFormat(Qt::MarkdownText);
+
     m_thinkToggle = ui->thinkToggle;
     m_thinkScroll = ui->thinkScroll;
     m_thinkContent = ui->thinkContent;
