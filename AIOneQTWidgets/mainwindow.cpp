@@ -14,6 +14,24 @@
 #include <QScrollBar>
 #include <QScopeGuard>
 
+// Normalize a provider base URL so it ends with exactly one "/v1" segment.
+// Adds "https://" when a scheme is missing, strips trailing "/v1" repeats
+// (e.g. "/v1/v1") and adds "/v1" when missing.
+static QString normalizedApiBaseUrl(QString url) {
+    url = url.trimmed();
+    if (url.isEmpty())
+        return QStringLiteral("https://api.groq.com/openai/v1");
+    if (!url.contains("://"))
+        url = "https://" + url;
+    while (url.endsWith('/')) url.chop(1);
+    while (url.endsWith("/v1", Qt::CaseInsensitive)) {
+        url.chop(3);
+        while (url.endsWith('/')) url.chop(1);
+    }
+    url += "/v1";
+    return url;
+}
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -264,21 +282,19 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Base URL presets (selectable, editable for custom endpoints)
     ui->openAIBaseUrlBox->setEditable(true);
-    ui->openAIBaseUrlBox->addItem("Groq", QString("https://api.groq.com/openai"));
+    ui->openAIBaseUrlBox->addItem("Groq", QString("https://api.groq.com/openai/v1"));
     ui->openAIBaseUrlBox->addItem("OpenAI", QString("https://api.openai.com/v1"));
     ui->openAIBaseUrlBox->addItem("OpenRouter", QString("https://openrouter.ai/api/v1"));
     ui->openAIBaseUrlBox->addItem("Together AI", QString("https://api.together.xyz/v1"));
-    ui->openAIBaseUrlBox->addItem("DeepInfra", QString("https://api.deepinfra.com/v1/openai"));
+    ui->openAIBaseUrlBox->addItem("DeepInfra", QString("https://api.deepinfra.com/v1"));
     ui->openAIBaseUrlBox->addItem("Fireworks AI", QString("https://api.fireworks.ai/inference/v1"));
     ui->openAIBaseUrlBox->addItem("Mistral AI", QString("https://api.mistral.ai/v1"));
 
     // Restore previously selected base URL (adding it as a custom entry if needed)
+    // (normalized in loadSettings; this just fills in the default)
     QString savedUrl = QString::fromStdString(m_settings.apiBaseUrl);
     if (savedUrl.isEmpty())
-        savedUrl = QStringLiteral("https://api.groq.com/openai");
-    // Legacy settings may omit the scheme; normalize so it matches the presets
-    if (!savedUrl.contains("://"))
-        savedUrl = "https://" + savedUrl;
+        savedUrl = normalizedApiBaseUrl(QString());
     m_settings.apiBaseUrl = savedUrl.toStdString();
 
     int savedIdx = ui->openAIBaseUrlBox->findData(savedUrl);
@@ -296,8 +312,12 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->openAIBaseUrlBox, qOverload<const QString &>(&QComboBox::currentTextChanged), this, [this]() {
         QString url = currentApiBaseUrl();
         if (url.isEmpty()) return;
-        m_settings.apiBaseUrl = url.toStdString();
-        ui->openAIKey->setText(apiKeyForUrl(url));
+        QString normalized = normalizedApiBaseUrl(url);
+        // Keep the combo display in sync with the stored (normalized) URL
+        if (normalized != url)
+            ui->openAIBaseUrlBox->setEditText(normalized);
+        m_settings.apiBaseUrl = normalized.toStdString();
+        ui->openAIKey->setText(apiKeyForUrl(normalized));
         saveSettings();
     });
 
@@ -340,8 +360,8 @@ void MainWindow::updateSeed() {
 void MainWindow::connectOpenAI(const QString &apiKey) {
     if (apiKey.isEmpty()) return;
 
-    QString baseUrl = currentApiBaseUrl();
-    if (baseUrl.isEmpty())
+    QString baseUrl = normalizedApiBaseUrl(currentApiBaseUrl());
+    if (baseUrl == "/v1")
         baseUrl = QString::fromStdString(m_settings.apiBaseUrl);
 
     // Save API key, mapped to its base URL
@@ -563,6 +583,16 @@ void MainWindow::saveChatMetaDelayed() {
 
 void MainWindow::loadSettings() {
     m_settings = ChatStorage::loadSettings();
+
+    // Migrate stored per-URL API keys (and the current base URL) to normalized
+    // URLs so a key saved under e.g. "https://api.groq.com/openai" is still found
+    // after the base URL is normalized to ".../openai/v1".
+    std::map<std::string, std::string> normalized;
+    for (const auto& [url, key] : m_settings.apiKeys)
+        normalized[normalizedApiBaseUrl(QString::fromStdString(url)).toStdString()] = key;
+    m_settings.apiKeys = std::move(normalized);
+    m_settings.apiBaseUrl = normalizedApiBaseUrl(
+        QString::fromStdString(m_settings.apiBaseUrl)).toStdString();
 }
 
 void MainWindow::saveSettings() {
