@@ -30,6 +30,9 @@ public:
         newOptions.onThinkStateChange = [options](bool thinking) {
             if (options.onThinkStateChange) options.onThinkStateChange(thinking);
         };
+        newOptions.onError = [options](std::string err) {
+            if (options.onError) options.onError(QString(err.c_str()));
+        };
         super()->sendAsync(message.toStdString(), newOptions);
     }
 
@@ -47,6 +50,9 @@ public:
         newOptions.onThinkStateChange = [options](bool thinking) {
             if (options.onThinkStateChange) options.onThinkStateChange(thinking);
         };
+        newOptions.onError = [options](std::string err) {
+            if (options.onError) options.onError(QString(err.c_str()));
+        };
         super()->continueAsync(parentId, newOptions);
     }
 
@@ -59,6 +65,9 @@ public:
         newOptions.onDone = options.onDone;
         newOptions.onThinkStateChange = [options](bool thinking) {
             if (options.onThinkStateChange) options.onThinkStateChange(thinking);
+        };
+        newOptions.onError = [options](std::string err) {
+            if (options.onError) options.onError(QString(err.c_str()));
         };
         super()->regenerateAsync(parentId, newOptions);
     }

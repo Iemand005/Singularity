@@ -871,6 +871,12 @@ void MainWindow::onRegenerateRequested(uint64_t parentId) {
     QAsyncTextGenOptions options;
     options.maxTokens = ui->maxTokensCheck->isChecked() ? ui->maxTokensInput->value() : 0;
 
+    options.onError = [this](const QString &err) {
+        QMetaObject::invokeMethod(this, [this, err]() {
+            QMessageBox::warning(this, "Request failed", err);
+        });
+    };
+
     options.onThinkStateChange = [this](bool thinking) {
         QMetaObject::invokeMethod(m_generatingWidget, [this, thinking]() {
             if (m_generatingWidget)
@@ -1016,6 +1022,12 @@ void MainWindow::onContinueRequested(uint64_t parentId) {
     QAsyncTextGenOptions options;
     options.maxTokens = ui->maxTokensCheck->isChecked() ? ui->maxTokensInput->value() : 0;
 
+    options.onError = [this](const QString &err) {
+        QMetaObject::invokeMethod(this, [this, err]() {
+            QMessageBox::warning(this, "Request failed", err);
+        });
+    };
+
     options.onThinkStateChange = [this](bool thinking) {
         QMetaObject::invokeMethod(m_generatingWidget, [this, thinking]() {
             if (m_generatingWidget)
@@ -1136,6 +1148,12 @@ void MainWindow::send() {
 
     QAsyncTextGenOptions options;
     options.maxTokens = ui->maxTokensCheck->isChecked() ? ui->maxTokensInput->value() : 0;
+
+    options.onError = [this](const QString &err) {
+        QMetaObject::invokeMethod(this, [this, err]() {
+            QMessageBox::warning(this, "Request failed", err);
+        });
+    };
 
     options.onThinkStateChange = [this](bool thinking) {
         QMetaObject::invokeMethod(m_generatingWidget, [this, thinking]() {

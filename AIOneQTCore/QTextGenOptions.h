@@ -6,6 +6,7 @@
 
 typedef std::function<void(const QString &token)> QTokenCallback;
 typedef std::function<void(const QString &token, bool thinking)> QTokenReasoningCallback;
+typedef std::function<void(const QString &error)> QErrorCallback;
 
 struct QTextGenOptions : TextGenOptionsBase
 {
@@ -18,4 +19,5 @@ struct QTextGenOptions : TextGenOptionsBase
 struct QAsyncTextGenOptions : QTextGenOptions {
     // FinishedTCallback<const TextGenResult &> onDone = nullptr;
     TextFinishCallback onDone = nullptr;
+    QErrorCallback onError = nullptr;
 };
