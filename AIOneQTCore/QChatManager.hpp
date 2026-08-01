@@ -30,6 +30,9 @@ public:
         newOptions.onThinkStateChange = [options](bool thinking) {
             if (options.onThinkStateChange) options.onThinkStateChange(thinking);
         };
+        newOptions.onTokenReasoning = [options](std::string token, bool thinking) {
+            if (options.onTokenReasoning) options.onTokenReasoning(QString(token.c_str()), thinking);
+        };
         newOptions.onError = [options](std::string err) {
             if (options.onError) options.onError(QString(err.c_str()));
         };
@@ -50,6 +53,9 @@ public:
         newOptions.onThinkStateChange = [options](bool thinking) {
             if (options.onThinkStateChange) options.onThinkStateChange(thinking);
         };
+        newOptions.onTokenReasoning = [options](std::string token, bool thinking) {
+            if (options.onTokenReasoning) options.onTokenReasoning(QString(token.c_str()), thinking);
+        };
         newOptions.onError = [options](std::string err) {
             if (options.onError) options.onError(QString(err.c_str()));
         };
@@ -65,6 +71,9 @@ public:
         newOptions.onDone = options.onDone;
         newOptions.onThinkStateChange = [options](bool thinking) {
             if (options.onThinkStateChange) options.onThinkStateChange(thinking);
+        };
+        newOptions.onTokenReasoning = [options](std::string token, bool thinking) {
+            if (options.onTokenReasoning) options.onTokenReasoning(QString(token.c_str()), thinking);
         };
         newOptions.onError = [options](std::string err) {
             if (options.onError) options.onError(QString(err.c_str()));
