@@ -109,6 +109,13 @@ private:
     void onVersionPrev(uint64_t parentId);
     void onVersionNext(uint64_t parentId);
     void onRegenerateRequested(uint64_t parentId);
+    void onEditRequested(uint64_t parentId);
+    void onContinueRequested(uint64_t parentId);
+    void cancelEditMode();
+
+    // Edit mode: the next send creates a new version of the message being edited
+    bool m_editing = false;
+    uint64_t m_editingParentId = 0;
 
     std::map<uint64_t, QListWidgetItem*> m_slotItems;
 };

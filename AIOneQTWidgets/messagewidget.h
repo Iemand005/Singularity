@@ -28,6 +28,7 @@ public:
     void setVersionInfo(size_t current, size_t total);
     void setParentId(uint64_t id) { m_parentId = id; }
     uint64_t parentId() const { return m_parentId; }
+    void setAssistantMessage(bool isAssistant);
 
     QSize sizeHint() const override;
     QSize minimumSizeHint() const override;
@@ -40,6 +41,8 @@ signals:
     void prevRequested();
     void nextRequested();
     void regenerateRequested();
+    void editRequested();
+    void continueRequested();
 
 private:
     void hideThinking();

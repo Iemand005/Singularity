@@ -37,6 +37,19 @@ public:
         super()->setSystemPrompt(prompt.toStdString());
     };
 
+    void continueAsync(uint64_t parentId, QAsyncTextGenOptions options) {
+        AsyncTextGenOptions newOptions {{(TextGenOptionsBase)options}};
+        newOptions.onToken = [options](std::string token) {
+            if (options.onToken) options.onToken(QString(token.c_str()));
+        };
+        newOptions.onInputEval = options.onInputEval;
+        newOptions.onDone = options.onDone;
+        newOptions.onThinkStateChange = [options](bool thinking) {
+            if (options.onThinkStateChange) options.onThinkStateChange(thinking);
+        };
+        super()->continueAsync(parentId, newOptions);
+    }
+
     void regenerateAsync(uint64_t parentId, QAsyncTextGenOptions options) {
         AsyncTextGenOptions newOptions {{(TextGenOptionsBase)options}};
         newOptions.onToken = [options](std::string token) {

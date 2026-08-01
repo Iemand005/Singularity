@@ -22,6 +22,8 @@ MessageWidget::MessageWidget(QWidget *parent)
     connect(ui->prevBtn, &QPushButton::clicked, this, &MessageWidget::prevRequested);
     connect(ui->nextBtn, &QPushButton::clicked, this, &MessageWidget::nextRequested);
     connect(ui->regenerateBtn, &QPushButton::clicked, this, &MessageWidget::regenerateRequested);
+    connect(ui->editBtn, &QPushButton::clicked, this, &MessageWidget::editRequested);
+    connect(ui->continueBtn, &QPushButton::clicked, this, &MessageWidget::continueRequested);
 
     ui->thinkToggle->setChecked(false);
     ui->thinkToggle->setText(QStringLiteral("\u25B6 Show thinking"));
@@ -67,6 +69,13 @@ QSize MessageWidget::sizeHint() const
 QSize MessageWidget::minimumSizeHint() const
 {
     return contentSize();
+}
+
+void MessageWidget::setAssistantMessage(bool isAssistant)
+{
+    if (ui->continueBtn) ui->continueBtn->setVisible(isAssistant);
+    if (ui->editBtn) ui->editBtn->setVisible(isAssistant);
+    if (ui->regenerateBtn) ui->regenerateBtn->setVisible(isAssistant);
 }
 
 void MessageWidget::hideThinking()
