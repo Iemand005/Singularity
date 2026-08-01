@@ -86,6 +86,8 @@ private:
 
     void setupCloudChatManager(const QString &modelId, const QString &apiKey);
     void connectOpenAI(const QString &apiKey);
+    QString currentApiBaseUrl() const;
+    QString apiKeyForUrl(const QString &url) const;
 
     // Chat storage
     void initChatStorage();

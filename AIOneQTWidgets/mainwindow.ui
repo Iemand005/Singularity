@@ -111,6 +111,16 @@
              </attribute>
              <layout class="QVBoxLayout" name="verticalLayout_13">
               <item>
+               <widget class="QLabel" name="label_9">
+                <property name="text">
+                 <string>API Base URL:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="openAIBaseUrlBox"/>
+              </item>
+              <item>
                <widget class="QLabel" name="label_8">
                 <property name="text">
                  <string>API Key:</string>

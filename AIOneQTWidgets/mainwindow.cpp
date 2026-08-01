@@ -262,16 +262,53 @@ MainWindow::MainWindow(QWidget *parent)
 
     // ---- OpenAI Provider ----
 
-    // Restore API key from settings
-    if (!m_settings.apiKey.empty()) {
-        ui->openAIKey->setText(QString::fromStdString(m_settings.apiKey));
+    // Base URL presets (selectable, editable for custom endpoints)
+    ui->openAIBaseUrlBox->setEditable(true);
+    ui->openAIBaseUrlBox->addItem("Groq", QString("https://api.groq.com/openai"));
+    ui->openAIBaseUrlBox->addItem("OpenAI", QString("https://api.openai.com/v1"));
+    ui->openAIBaseUrlBox->addItem("OpenRouter", QString("https://openrouter.ai/api/v1"));
+    ui->openAIBaseUrlBox->addItem("Together AI", QString("https://api.together.xyz/v1"));
+    ui->openAIBaseUrlBox->addItem("DeepInfra", QString("https://api.deepinfra.com/v1/openai"));
+    ui->openAIBaseUrlBox->addItem("Fireworks AI", QString("https://api.fireworks.ai/inference/v1"));
+    ui->openAIBaseUrlBox->addItem("Mistral AI", QString("https://api.mistral.ai/v1"));
 
-        // Auto-connect to the provider on launch if a key is already saved
-        QTimer::singleShot(0, this, [this]() {
-            if (!m_settings.apiKey.empty())
-                connectOpenAI(QString::fromStdString(m_settings.apiKey));
-        });
+    // Restore previously selected base URL (adding it as a custom entry if needed)
+    QString savedUrl = QString::fromStdString(m_settings.apiBaseUrl);
+    if (savedUrl.isEmpty())
+        savedUrl = QStringLiteral("https://api.groq.com/openai");
+    // Legacy settings may omit the scheme; normalize so it matches the presets
+    if (!savedUrl.contains("://"))
+        savedUrl = "https://" + savedUrl;
+    m_settings.apiBaseUrl = savedUrl.toStdString();
+
+    int savedIdx = ui->openAIBaseUrlBox->findData(savedUrl);
+    if (savedIdx >= 0) {
+        ui->openAIBaseUrlBox->setCurrentIndex(savedIdx);
+    } else {
+        ui->openAIBaseUrlBox->addItem(savedUrl, savedUrl);
+        ui->openAIBaseUrlBox->setCurrentIndex(ui->openAIBaseUrlBox->count() - 1);
     }
+
+    // Load the API key stored for the selected URL
+    ui->openAIKey->setText(apiKeyForUrl(savedUrl));
+
+    // Switching provider loads that provider's stored key
+    connect(ui->openAIBaseUrlBox, qOverload<const QString &>(&QComboBox::currentTextChanged), this, [this]() {
+        QString url = currentApiBaseUrl();
+        if (url.isEmpty()) return;
+        m_settings.apiBaseUrl = url.toStdString();
+        ui->openAIKey->setText(apiKeyForUrl(url));
+        saveSettings();
+    });
+
+    // Auto-connect to the provider on launch if a key is saved for the URL
+    QTimer::singleShot(0, this, [this]() {
+        if (!currentApiBaseUrl().isEmpty()) {
+            QString apiKey = apiKeyForUrl(currentApiBaseUrl());
+            if (!apiKey.isEmpty())
+                connectOpenAI(apiKey);
+        }
+    });
 
     connect(ui->openAIButton, &QPushButton::clicked, [this]() {
         QString apiKey = ui->openAIKey->text().trimmed();
@@ -303,15 +340,20 @@ void MainWindow::updateSeed() {
 void MainWindow::connectOpenAI(const QString &apiKey) {
     if (apiKey.isEmpty()) return;
 
-    // Save API key
+    QString baseUrl = currentApiBaseUrl();
+    if (baseUrl.isEmpty())
+        baseUrl = QString::fromStdString(m_settings.apiBaseUrl);
+
+    // Save API key, mapped to its base URL
     m_settings.apiKey = apiKey.toStdString();
+    m_settings.apiBaseUrl = baseUrl.toStdString();
+    m_settings.apiKeys[baseUrl.toStdString()] = apiKey.toStdString();
     saveSettings();
 
     ui->openAIButton->setEnabled(false);
     ui->openAIButton->setText("Fetching...");
 
-    static const std::string baseUrl = "api.groq.com/openai";
-    openAIProvider = std::make_unique<AIOne::OpenAIProvider>(baseUrl, apiKey.toStdString());
+    openAIProvider = std::make_unique<AIOne::OpenAIProvider>(baseUrl.toStdString(), apiKey.toStdString());
 
     std::thread([this]() {
         auto models = openAIProvider->getModels();
@@ -351,8 +393,11 @@ void MainWindow::connectOpenAI(const QString &apiKey) {
 
 void MainWindow::setupCloudChatManager(const QString &modelId, const QString &apiKey) {
     if (!openAIProvider) {
+        QString baseUrl = currentApiBaseUrl();
+        if (baseUrl.isEmpty())
+            baseUrl = QString::fromStdString(m_settings.apiBaseUrl);
         openAIProvider = std::make_unique<AIOne::OpenAIProvider>(
-            "api.groq.com/openai", apiKey.toStdString());
+            baseUrl.toStdString(), apiKey.toStdString());
     }
 
     auto newChat = std::make_unique<QChatManager>(openAIProvider.get());
@@ -428,8 +473,11 @@ void MainWindow::onChatSelected(int row) {
     auto meta = ChatStorage::loadMetadata(folder.toStdString());
 
     if (!chatManager) {
+        QString baseUrl = currentApiBaseUrl();
+        if (baseUrl.isEmpty())
+            baseUrl = QString::fromStdString(m_settings.apiBaseUrl);
         chatManager = std::make_unique<QChatManager>(
-            new AIOne::OpenAIProvider("api.groq.com/openai", ""));
+            new AIOne::OpenAIProvider(baseUrl.toStdString(), ""));
     }
 
     chatManager->loadChat(folder.toStdString());
@@ -519,6 +567,23 @@ void MainWindow::loadSettings() {
 
 void MainWindow::saveSettings() {
     ChatStorage::saveSettings(m_settings);
+}
+
+QString MainWindow::currentApiBaseUrl() const {
+    int idx = ui->openAIBaseUrlBox->currentIndex();
+    if (idx >= 0) {
+        QString url = ui->openAIBaseUrlBox->itemData(idx).toString().trimmed();
+        if (!url.isEmpty())
+            return url;
+    }
+    return ui->openAIBaseUrlBox->currentText().trimmed();
+}
+
+QString MainWindow::apiKeyForUrl(const QString &url) const {
+    auto it = m_settings.apiKeys.find(url.toStdString());
+    if (it != m_settings.apiKeys.end())
+        return QString::fromStdString(it->second);
+    return QString();
 }
 
 void MainWindow::loadLastChat() {
