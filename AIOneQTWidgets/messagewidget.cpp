@@ -94,22 +94,15 @@ void MessageWidget::animateThinking(bool expand)
 
     int target = expand ? thinkTargetHeight() : 0;
 
-    if (expand) {
-        // Size the item to the full expanded height right away so the scroll
-        // area has room to grow without relayouting the whole list each frame.
-        ui->thinkScroll->setMaximumHeight(target);
-        ui->thinkScroll->setMinimumHeight(target);
-        emit sizeChanged();
-    }
-
     m_thinkAnimMax = new QPropertyAnimation(ui->thinkScroll, "maximumHeight", this);
     m_thinkAnimMax->setDuration(250);
     m_thinkAnimMax->setEasingCurve(QEasingCurve::InOutCubic);
-    m_thinkAnimMax->setStartValue(expand ? 0 : ui->thinkScroll->maximumHeight());
+    m_thinkAnimMax->setStartValue(ui->thinkScroll->maximumHeight());
     m_thinkAnimMax->setEndValue(target);
 
     connect(m_thinkAnimMax, &QPropertyAnimation::valueChanged, this, [this](const QVariant &v) {
         ui->thinkScroll->setMinimumHeight(v.toInt());
+        emit sizeChanged();
     });
     connect(m_thinkAnimMax, &QPropertyAnimation::finished, this, [this, expand]() {
         stopThinkAnimation();

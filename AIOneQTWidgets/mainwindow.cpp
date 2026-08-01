@@ -856,9 +856,13 @@ void MainWindow::send() {
     ui->listWidget->setItemWidget(m_generatingItem, m_generatingWidget);
     m_generatingItem->setSizeHint(m_generatingWidget->minimumSizeHint());
 
-    connect(m_generatingWidget, &MessageWidget::sizeChanged, this, [this]() {
-        if (m_generatingItem && m_generatingWidget) {
-            m_generatingItem->setSizeHint(m_generatingWidget->minimumSizeHint());
+    // Capture the widget/item so the handler keeps working after onDone nulls
+    // the m_generating* members (expanding the think area after completion).
+    auto *genW = m_generatingWidget;
+    auto *genItem = m_generatingItem;
+    connect(genW, &MessageWidget::sizeChanged, this, [this, genW, genItem]() {
+        if (genItem && genW) {
+            genItem->setSizeHint(genW->minimumSizeHint());
             ui->listWidget->doItemsLayout();
         }
     });
