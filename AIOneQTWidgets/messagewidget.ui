@@ -134,6 +134,19 @@
       <number>0</number>
      </property>
      <item>
+      <widget class="QLabel" name="timestampLabel">
+       <property name="toolTip">
+        <string>Message time</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="prevBtn">
        <property name="visible">
         <bool>false</bool>
@@ -212,6 +225,16 @@
         </property>
         <property name="text">
          <string>Regenerate</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="forkBtn">
+        <property name="toolTip">
+         <string>Fork the chat up to this message into a new chat</string>
+        </property>
+        <property name="text">
+         <string>Fork</string>
         </property>
        </widget>
       </item>

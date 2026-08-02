@@ -13,6 +13,7 @@
 #include <QKeyEvent>
 #include <QScrollBar>
 #include <QScopeGuard>
+#include <QDateTime>
 
 // Normalize a provider base URL so it ends with exactly one "/v1" segment.
 // Adds "https://" when a scheme is missing, strips trailing "/v1" repeats
@@ -699,6 +700,7 @@ void MainWindow::rebuildConversationDisplay() {
         w->setParentId(slotParentId);
         w->setAssistantMessage(msg.role == "assistant");
 
+        const Message* displayMsg = &msg;
         if (msg.role == "assistant") {
             if (useFallback) {
                 w->setVersionInfo(0, 1);
@@ -711,11 +713,14 @@ void MainWindow::rebuildConversationDisplay() {
                 if (idx >= siblings.size()) idx = 0;
                 // Keep the runtime version selection in sync with the active path
                 chat->setCurrentVersionIndex(slotParentId, idx);
-                w->setContent(QString::fromStdString(siblings[idx].content));
+                displayMsg = &siblings[idx];
+                w->setContent(QString::fromStdString(displayMsg->content));
                 w->setVersionInfo(idx, siblings.size());
             }
         }
 
+        w->setMessageId(displayMsg->id);
+        w->setTimestamp(displayMsg->timestamps.creationTime);
         w->finish();
 
         connect(w, &MessageWidget::prevRequested, this, [this, slotParentId]() {
@@ -733,6 +738,7 @@ void MainWindow::rebuildConversationDisplay() {
         connect(w, &MessageWidget::continueRequested, this, [this, slotParentId]() {
             onContinueRequested(slotParentId);
         });
+        connect(w, &MessageWidget::forkRequested, this, &MainWindow::onForkRequested);
         connect(w, &MessageWidget::sizeChanged, this, [this, item, w]() {
             if (item && w) {
                 item->setSizeHint(w->minimumSizeHint());
@@ -766,6 +772,8 @@ void MainWindow::onVersionPrev(uint64_t parentId) {
     w->finish();
     w->setVersionInfo(newIdx, siblings.size());
     w->setParentId(parentId);
+    w->setMessageId(siblings[newIdx].id);
+    w->setTimestamp(siblings[newIdx].timestamps.creationTime);
 
     connect(w, &MessageWidget::prevRequested, this, [this, parentId]() {
         onVersionPrev(parentId);
@@ -782,6 +790,7 @@ void MainWindow::onVersionPrev(uint64_t parentId) {
     connect(w, &MessageWidget::continueRequested, this, [this, parentId]() {
         onContinueRequested(parentId);
     });
+    connect(w, &MessageWidget::forkRequested, this, &MainWindow::onForkRequested);
     connect(w, &MessageWidget::sizeChanged, this, [this, item, w]() {
         if (item && w) {
             item->setSizeHint(w->minimumSizeHint());
@@ -813,6 +822,8 @@ void MainWindow::onVersionNext(uint64_t parentId) {
     w->finish();
     w->setVersionInfo(newIdx, siblings.size());
     w->setParentId(parentId);
+    w->setMessageId(siblings[newIdx].id);
+    w->setTimestamp(siblings[newIdx].timestamps.creationTime);
 
     connect(w, &MessageWidget::prevRequested, this, [this, parentId]() {
         onVersionPrev(parentId);
@@ -829,6 +840,7 @@ void MainWindow::onVersionNext(uint64_t parentId) {
     connect(w, &MessageWidget::continueRequested, this, [this, parentId]() {
         onContinueRequested(parentId);
     });
+    connect(w, &MessageWidget::forkRequested, this, &MainWindow::onForkRequested);
     connect(w, &MessageWidget::sizeChanged, this, [this, item, w]() {
         if (item && w) {
             item->setSizeHint(w->minimumSizeHint());
@@ -1096,6 +1108,73 @@ void MainWindow::onContinueRequested(uint64_t parentId) {
     options.onInputEval = progressFor(ui->inputEvalProgressBar);
 
     chatManager->continueAsync(parentId, options);
+}
+
+void MainWindow::onForkRequested(uint64_t messageId) {
+    if (m_generating) return;
+    cancelEditMode();
+    auto* chat = chatManager ? chatManager->getCurrentChat() : nullptr;
+    if (!chat) return;
+
+    // Chain of messages from the root up to (and including) the fork message
+    auto chain = chat->getMessageChain(messageId);
+    if (chain.empty()) return;
+
+    // Save the current chat before switching to the fork
+    chatManager->saveCurrentChatMetadata();
+
+    std::string systemPrompt = ui->systemPromptInput->toPlainText().toStdString();
+    if (systemPrompt.empty() && !chain.empty() && chain[0].role == "system")
+        systemPrompt = chain[0].content;
+
+    std::string modelName = chat->model();
+    if (modelName.empty()) modelName = m_currentModelName.toStdString();
+    TextGenOptionsBase params = *chat->getOptions();
+
+    // Base the fork title on the source chat so the new folder is identifiable
+    std::string baseTitle = "Fork";
+    std::string curFolder = chat->folder();
+    if (!curFolder.empty()) {
+        auto pos = curFolder.rfind('/');
+        if (pos != std::string::npos) curFolder = curFolder.substr(pos + 1);
+        pos = curFolder.rfind('\\');
+        if (pos != std::string::npos) curFolder = curFolder.substr(pos + 1);
+        auto srcMeta = ChatStorage::loadMetadata(curFolder);
+        if (!srcMeta.title.empty() && srcMeta.title != "Untitled")
+            baseTitle = "Fork of " + srcMeta.title;
+    }
+
+    // Create the new chat folder (persists chat.json with the copied settings)
+    std::string newFolder = chatManager->createNewChat(baseTitle, modelName, systemPrompt, params);
+
+    // Copy the message history up to the fork point into the new folder
+    auto* newChat = chatManager->getCurrentChat();
+    newChat->setMessages(chain);
+    for (auto& m : chain)
+        newChat->saveMessage(m);
+
+    // Keep the fork title and bump the updated time so it sorts to the top
+    ChatMetadata fm = ChatStorage::loadMetadata(newFolder);
+    fm.title = baseTitle;
+    fm.updated = QDateTime::currentMSecsSinceEpoch();
+    ChatStorage::saveMetadata(newFolder, fm);
+
+    // Switch the UI to the forked chat without reloading from disk
+    m_slotItems.clear();
+    ui->listWidget->clear();
+    rebuildConversationDisplay();
+
+    refreshChatList();
+    for (int i = 0; i < m_chatList->count(); ++i) {
+        if (m_chatList->item(i)->data(Qt::UserRole).toString() == QString::fromStdString(newFolder)) {
+            m_chatList->blockSignals(true);
+            m_chatList->setCurrentRow(i);
+            m_chatList->blockSignals(false);
+            break;
+        }
+    }
+
+    ui->statusbar->showMessage("Forked chat: " + QString::fromStdString(baseTitle));
 }
 
 void MainWindow::send() {

@@ -1,7 +1,9 @@
 #include "messagewidget.h"
 #include "ui_messagewidget.h"
 
+#include <QDateTime>
 #include <QRegularExpression>
+#include <QTime>
 
 MessageWidget::MessageWidget(QWidget *parent)
     : QWidget(parent)
@@ -24,6 +26,9 @@ MessageWidget::MessageWidget(QWidget *parent)
     connect(ui->regenerateBtn, &QPushButton::clicked, this, &MessageWidget::regenerateRequested);
     connect(ui->editBtn, &QPushButton::clicked, this, &MessageWidget::editRequested);
     connect(ui->continueBtn, &QPushButton::clicked, this, &MessageWidget::continueRequested);
+    connect(ui->forkBtn, &QPushButton::clicked, this, [this]() {
+        emit forkRequested(m_messageId);
+    });
 
     ui->thinkToggle->setChecked(false);
     ui->thinkToggle->setText(QStringLiteral("\u25B6 Show thinking"));
@@ -76,6 +81,27 @@ void MessageWidget::setAssistantMessage(bool isAssistant)
     if (ui->continueBtn) ui->continueBtn->setVisible(isAssistant);
     if (ui->editBtn) ui->editBtn->setVisible(isAssistant);
     if (ui->regenerateBtn) ui->regenerateBtn->setVisible(isAssistant);
+}
+
+void MessageWidget::setTimestamp(qint64 millis)
+{
+    m_timestamp = millis;
+    if (!ui->timestampLabel || millis <= 0) return;
+
+    QDateTime dt = QDateTime::fromMSecsSinceEpoch(millis);
+    QDateTime now = QDateTime::currentDateTime();
+    QDate today = now.date();
+
+    QString text;
+    if (dt.date() == today)
+        text = dt.toString("HH:mm");
+    else if (dt.date().year() == today.year())
+        text = dt.toString("MMM d, HH:mm");
+    else
+        text = dt.toString("yyyy-MM-dd HH:mm");
+
+    ui->timestampLabel->setText(text);
+    ui->timestampLabel->setToolTip(dt.toString("yyyy-MM-dd HH:mm:ss"));
 }
 
 void MessageWidget::hideThinking()

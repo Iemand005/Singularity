@@ -28,6 +28,9 @@ public:
     void setVersionInfo(size_t current, size_t total);
     void setParentId(uint64_t id) { m_parentId = id; }
     uint64_t parentId() const { return m_parentId; }
+    void setMessageId(uint64_t id) { m_messageId = id; }
+    uint64_t messageId() const { return m_messageId; }
+    void setTimestamp(qint64 millis);
     void setAssistantMessage(bool isAssistant);
 
     QSize sizeHint() const override;
@@ -43,6 +46,7 @@ signals:
     void regenerateRequested();
     void editRequested();
     void continueRequested();
+    void forkRequested(uint64_t messageId);
 
 private:
     void hideThinking();
@@ -69,6 +73,8 @@ private:
     bool m_everHadContent = false;
     bool m_hasStreamedContent = false;
     uint64_t m_parentId = 0;
+    uint64_t m_messageId = 0;
+    qint64 m_timestamp = 0;
     QString m_tagBuffer;
 };
 

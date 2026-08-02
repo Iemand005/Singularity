@@ -111,6 +111,7 @@ private:
     void onRegenerateRequested(uint64_t parentId);
     void onEditRequested(uint64_t parentId);
     void onContinueRequested(uint64_t parentId);
+    void onForkRequested(uint64_t messageId);
     void cancelEditMode();
 
     // Edit mode: the next send creates a new version of the message being edited
