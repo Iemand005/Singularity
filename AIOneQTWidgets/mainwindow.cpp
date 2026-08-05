@@ -688,8 +688,10 @@ void MainWindow::rebuildConversationDisplay() {
     ui->listWidget->clear();
 
     const auto& displayMsgs = useFallback ? allMsgs : activePath;
+    const bool lastIsUser = !displayMsgs.empty() && displayMsgs.back().role == "user";
 
-    for (const auto& msg : displayMsgs) {
+    for (size_t msgIdx = 0; msgIdx < displayMsgs.size(); ++msgIdx) {
+        const auto& msg = displayMsgs[msgIdx];
         if (msg.role == "system") continue;
 
         auto *item = new QListWidgetItem(ui->listWidget);
@@ -699,6 +701,13 @@ void MainWindow::rebuildConversationDisplay() {
         w->setContent(QString::fromStdString(msg.content));
         w->setParentId(slotParentId);
         w->setAssistantMessage(msg.role == "assistant");
+
+        if (lastIsUser && msgIdx == displayMsgs.size() - 1) {
+            w->setGenerateVisible(true);
+            connect(w, &MessageWidget::generateRequested, this, [this, msg]() {
+                onGenerateLastResponse(msg.id);
+            });
+        }
 
         const Message* displayMsg = &msg;
         if (msg.role == "assistant") {
@@ -962,6 +971,141 @@ void MainWindow::onRegenerateRequested(uint64_t parentId) {
                 });
             }
             m_generatingWidget = nullptr;
+
+            ui->sendButton->setText("Send");
+            ui->messageInput->setEnabled(true);
+            ui->inputEvalProgressBar->setIndeterminate(false);
+            ui->inputEvalProgressBar->hide();
+
+            // Update version tracking: set to the last version
+            auto siblings = chat->getSiblings(parentId);
+            if (!siblings.empty())
+                chat->setCurrentVersionIndex(parentId, siblings.size() - 1);
+
+            if (chatManager) {
+                chatManager->saveCurrentChatMetadata();
+                refreshChatList();
+            }
+        });
+    };
+
+    options.onInputEval = progressFor(ui->inputEvalProgressBar);
+
+    chatManager->regenerateAsync(parentId, options);
+}
+
+void MainWindow::onGenerateLastResponse(uint64_t parentId) {
+    if (m_generating) return;
+    cancelEditMode();
+    auto* chat = chatManager ? chatManager->getCurrentChat() : nullptr;
+    if (!chat) return;
+
+    m_stopRequested = false;
+    m_generating = true;
+
+    ui->sendButton->setText("Stop");
+    ui->messageInput->setEnabled(false);
+    ui->inputEvalProgressBar->setRange(0, 0);
+    ui->inputEvalProgressBar->show();
+
+    ui->listWidget->addItem("");
+    m_generatingItem = ui->listWidget->item(ui->listWidget->count() - 1);
+    ui->tokensGeneratedDisplay->display(0);
+
+    m_generatingWidget = new MessageWidget(ui->listWidget);
+    m_generatingWidget->setParentId(parentId);
+    ui->listWidget->setItemWidget(m_generatingItem, m_generatingWidget);
+    m_generatingItem->setSizeHint(m_generatingWidget->minimumSizeHint());
+
+    auto *genW = m_generatingWidget;
+    auto *genItem = m_generatingItem;
+    connect(genW, &MessageWidget::sizeChanged, this, [this, genW, genItem]() {
+        if (genItem && genW) {
+            genItem->setSizeHint(genW->minimumSizeHint());
+            ui->listWidget->doItemsLayout();
+        }
+    });
+
+    QAsyncTextGenOptions options;
+    options.maxTokens = ui->maxTokensCheck->isChecked() ? ui->maxTokensInput->value() : 0;
+
+    options.onError = [this](const QString &err) {
+        QMetaObject::invokeMethod(this, [this, err]() {
+            QMessageBox::warning(this, "Request failed", err);
+        });
+    };
+
+    options.onTokenReasoning = [this](const QString &token, bool thinking) {
+        QMetaObject::invokeMethod(m_generatingWidget, [this, token, thinking]() {
+            if (!m_generatingWidget) return;
+            m_generatingWidget->appendTokenReasoning(token, thinking);
+        });
+    };
+
+    options.onThinkStateChange = [this](bool thinking) {
+        QMetaObject::invokeMethod(m_generatingWidget, [this, thinking]() {
+            if (m_generatingWidget)
+                m_generatingWidget->setThinking(thinking);
+        });
+    };
+
+    options.onToken = [this](const QString &token) {
+        if (m_stopRequested) return;
+        QMetaObject::invokeMethod(ui->listWidget, [this, token]() {
+            if (!m_generatingWidget || m_stopRequested) return;
+            auto *vbar = ui->listWidget->verticalScrollBar();
+            bool nearBottom = vbar->value() >= vbar->maximum() - 50;
+            m_generatingWidget->appendToken(token);
+            if (nearBottom)
+                ui->listWidget->scrollToBottom();
+            auto display = ui->tokensGeneratedDisplay;
+            display->display(display->intValue() + 1);
+        });
+    };
+
+    options.onDone = [this, parentId](const TextGenResult &output) {
+        QMetaObject::invokeMethod(this, [this, parentId, output]() {
+            auto* chat = chatManager->getCurrentChat();
+
+            auto *genW = m_generatingWidget;
+            auto *genItem = m_generatingItem;
+            m_generatingWidget = nullptr;
+            m_generatingItem = nullptr;
+
+            if (genW) {
+                auto content = QString::fromStdString(output.output.content);
+                genW->setContent(content);
+                auto siblings = chat->getSiblings(parentId);
+                size_t idx = siblings.empty() ? 0 : siblings.size() - 1;
+                genW->setVersionInfo(idx, std::max(siblings.size(), (size_t)1));
+                genW->finish();
+            }
+
+            m_generating = false;
+            m_stopRequested = false;
+
+            if (genItem) {
+                m_slotItems[parentId] = genItem;
+                if (genW) {
+                    connect(genW, &MessageWidget::prevRequested, this, [this, parentId]() {
+                        onVersionPrev(parentId);
+                    });
+                    connect(genW, &MessageWidget::nextRequested, this, [this, parentId]() {
+                        onVersionNext(parentId);
+                    });
+                    connect(genW, &MessageWidget::regenerateRequested, this, [this, parentId]() {
+                        onRegenerateRequested(parentId);
+                    });
+                    connect(genW, &MessageWidget::editRequested, this, [this, parentId]() {
+                        onEditRequested(parentId);
+                    });
+                    connect(genW, &MessageWidget::continueRequested, this, [this, parentId]() {
+                        onContinueRequested(parentId);
+                    });
+                    connect(genW, &MessageWidget::forkRequested, this, &MainWindow::onForkRequested);
+                    genItem->setSizeHint(genW->minimumSizeHint());
+                }
+            }
 
             ui->sendButton->setText("Send");
             ui->messageInput->setEnabled(true);

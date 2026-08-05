@@ -32,6 +32,7 @@ public:
     uint64_t messageId() const { return m_messageId; }
     void setTimestamp(qint64 millis);
     void setAssistantMessage(bool isAssistant);
+    void setGenerateVisible(bool visible);
 
     QSize sizeHint() const override;
     QSize minimumSizeHint() const override;
@@ -46,6 +47,7 @@ signals:
     void regenerateRequested();
     void editRequested();
     void continueRequested();
+    void generateRequested();
     void forkRequested(uint64_t messageId);
 
 private:

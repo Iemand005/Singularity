@@ -18,6 +18,28 @@ ApplicationWindow {
     property bool hasImage: false
     property int imageCounter: 0
 
+    function generateResponse() {
+        var lastUserMsg = ""
+        for (var i = messageList.count - 1; i >= 0; --i) {
+            var t = messageList.get(i).text
+            if (t.startsWith("You: ")) {
+                lastUserMsg = t.substring(5)
+                break
+            }
+        }
+        if (lastUserMsg === "") return
+
+        var lastText = messageList.get(messageList.count - 1).text
+        if (lastText.trim() === "Assistant:") {
+            currentResponse = "Assistant: "
+        } else {
+            currentResponse = "Assistant: "
+            messageList.append({"text": currentResponse})
+        }
+        messageListView.positionViewAtEnd()
+        inputHandler.prompt(lastUserMsg)
+    }
+
     Connections {
         target: inputHandler
         function onTokenReceived(token) {
@@ -168,18 +190,34 @@ ApplicationWindow {
 
                     delegate: Rectangle {
                         width: messageListView.width
-                        height: content.height + 20
+                        height: content.height + (generateButton.visible ? generateButton.height + 20 : 0) + 20
                         color: model.text.startsWith("You:") ? "#2a2a2a" : "#1a1a1a"
                         radius: 5
 
                         Text {
                             id: content
                             width: parent.width - 20
-                            anchors.centerIn: parent
+                            anchors.top: parent.top
+                            anchors.topMargin: 10
+                            anchors.left: parent.left
+                            anchors.leftMargin: 10
                             text: model.text
                             color: model.text.startsWith("You:") ? "#88ff88" : "white"
                             font.pixelSize: 14
                             wrapMode: Text.WordWrap
+                        }
+
+                        AIOButton {
+                            id: generateButton
+                            text: "Generate response"
+                            visible: index === messageListView.count - 1 && (model.text.startsWith("You:") || model.text.trim() === "Assistant:")
+                            anchors.top: content.bottom
+                            anchors.topMargin: 10
+                            anchors.left: parent.left
+                            anchors.leftMargin: 10
+                            anchors.bottom: parent.bottom
+                            anchors.bottomMargin: 10
+                            onClicked: window.generateResponse()
                         }
                     }
                 }

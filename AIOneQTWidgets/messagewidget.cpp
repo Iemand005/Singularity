@@ -26,6 +26,7 @@ MessageWidget::MessageWidget(QWidget *parent)
     connect(ui->regenerateBtn, &QPushButton::clicked, this, &MessageWidget::regenerateRequested);
     connect(ui->editBtn, &QPushButton::clicked, this, &MessageWidget::editRequested);
     connect(ui->continueBtn, &QPushButton::clicked, this, &MessageWidget::continueRequested);
+    connect(ui->generateBtn, &QPushButton::clicked, this, &MessageWidget::generateRequested);
     connect(ui->forkBtn, &QPushButton::clicked, this, [this]() {
         emit forkRequested(m_messageId);
     });
@@ -81,6 +82,11 @@ void MessageWidget::setAssistantMessage(bool isAssistant)
     if (ui->continueBtn) ui->continueBtn->setVisible(isAssistant);
     if (ui->editBtn) ui->editBtn->setVisible(isAssistant);
     if (ui->regenerateBtn) ui->regenerateBtn->setVisible(isAssistant);
+}
+
+void MessageWidget::setGenerateVisible(bool visible)
+{
+    if (ui->generateBtn) ui->generateBtn->setVisible(visible);
 }
 
 void MessageWidget::setTimestamp(qint64 millis)

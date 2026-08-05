@@ -238,6 +238,19 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QPushButton" name="generateBtn">
+        <property name="visible">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>Generate a response for this message</string>
+        </property>
+        <property name="text">
+         <string>Generate response</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
    </layout>
