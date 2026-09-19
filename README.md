@@ -5,3 +5,5 @@ Singularity is a lightweight, native AI inference application for running genera
 ## Why Singularity?
 
 Unlike most tools, this one does not rely on Electron, python or any web UI. It's fully native and focused on keeping the UI close to the runtime.
+
+It is intended to offer inference support to lower end devices as well, supporting Intel integrated graphics through Vulkan with shared memory support explicitly enabled for both LLM and Stable Diffusion inference. This way you can load larger SD models allowing the excess memory to overflow into shared VRAM.
